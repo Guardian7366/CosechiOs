@@ -1,0 +1,20 @@
+"intro_title" = "Welcome to CosechiOs";
+"intro_subtitle" = "Your guide to grow at home";
+
+"register" = "Register";
+"login" = "Login";
+"logout" = "Logout";
+
+"menu_my_crops" = "My Crops";
+"menu_explore" = "Explore Crops";
+"menu_tasks" = "Task Calendar";
+"menu_profile" = "User Profile";
+
+"profile_title" = "Profile";
+"profile_username" = "Username";
+"profile_email" = "Email";
+"profile_notifications" = "Notifications";
+"profile_language" = "Language";
+"profile_theme" = "Theme";
+"profile_delete_photo" = "Remove profile photo";
+"profile_export" = "Export data (backup)";

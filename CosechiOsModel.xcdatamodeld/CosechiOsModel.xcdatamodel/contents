@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="23H723" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Config" representedClassName="Config" syncable="YES" codeGenerationType="class">
+        <attribute name="configID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="language" attributeType="String"/>
+        <attribute name="notificationsEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="theme" attributeType="String"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="config" inverseEntity="User"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="configID" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="Crop" representedClassName="Crop" syncable="YES" codeGenerationType="class">
+        <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="climatePreferences" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="cropDescription" optional="YES" attributeType="String"/>
+        <attribute name="cropID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="difficulty" attributeType="String"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="recommendedSeasons" optional="YES" attributeType="Transformable" valueTransformerName="NNSecureUnarchiveFromData"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="steps" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Step" inverseName="crop" inverseEntity="Step"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskEntity" inverseName="crop" inverseEntity="TaskEntity"/>
+        <relationship name="userCollections" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserCollection" inverseName="crop" inverseEntity="UserCollection"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="cropID" type="Binary" order="ascending"/>
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="cropID"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="Step" representedClassName="Step" syncable="YES" codeGenerationType="class">
+        <attribute name="estimateDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="order" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="stepDescription" optional="YES" attributeType="String"/>
+        <attribute name="stepID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="title" attributeType="String"/>
+        <relationship name="crop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crop" inverseName="steps" inverseEntity="Crop"/>
+        <relationship name="progress" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StepProgress" inverseName="step" inverseEntity="StepProgress"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="stepID" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="StepProgress" representedClassName="StepProgress" syncable="YES" codeGenerationType="class">
+        <attribute name="completedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="progressID" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="step" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Step" inverseName="progress" inverseEntity="Step"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="stepProgresses" inverseEntity="User"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="progressID" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="TaskEntity" representedClassName="TaskEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="details" optional="YES" attributeType="String"/>
+        <attribute name="dueDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="reminder" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="status" attributeType="String"/>
+        <attribute name="taskID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="title" attributeType="String"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="crop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crop" inverseName="tasks" inverseEntity="Crop"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="dueDate" type="Binary" order="ascending"/>
+            <fetchIndexElement property="taskID" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="taskID"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="email" attributeType="String"/>
+        <attribute name="expertiseLevel" optional="YES" attributeType="String"/>
+        <attribute name="preferredCategories" optional="YES" attributeType="Transformable" valueTransformerName="NNSecureUnarchiveFromData"/>
+        <attribute name="profilePicture" optional="YES" attributeType="Binary"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="username" attributeType="String"/>
+        <relationship name="collections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserCollection" inverseName="user" inverseEntity="UserCollection"/>
+        <relationship name="config" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Config" inverseName="user" inverseEntity="Config"/>
+        <relationship name="stepProgresses" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StepProgress" inverseName="user" inverseEntity="StepProgress"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="email" type="Binary" order="ascending"/>
+            <fetchIndexElement property="username" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="email"/>
+            </uniquenessConstraint>
+            <uniquenessConstraint>
+                <constraint value="username"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="UserCollection" representedClassName="UserCollection" syncable="YES" codeGenerationType="class">
+        <attribute name="addedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="collectionID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <relationship name="crop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crop" inverseName="userCollections" inverseEntity="Crop"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="collections" inverseEntity="User"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="collectionID" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+</model>

@@ -1,0 +1,20 @@
+"intro_title" = "Bienvenido a CosechiOs";
+"intro_subtitle" = "Tu guía para cultivar en casa";
+
+"register" = "Registrarse";
+"login" = "Iniciar Sesión";
+"logout" = "Cerrar Sesión";
+
+"menu_my_crops" = "Mis Cultivos";
+"menu_explore" = "Explorar Cultivos";
+"menu_tasks" = "Calendario de Tareas";
+"menu_profile" = "Perfil de Usuario";
+
+"profile_title" = "Perfil";
+"profile_username" = "Nombre de usuario";
+"profile_email" = "Correo";
+"profile_notifications" = "Notificaciones";
+"profile_language" = "Idioma";
+"profile_theme" = "Tema";
+"profile_delete_photo" = "Eliminar foto de perfil";
+"profile_export" = "Exportar datos (backup)";

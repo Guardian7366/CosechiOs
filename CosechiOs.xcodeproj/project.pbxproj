@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C5D11C072E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5D11C052E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodeld */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C518C91F2E709150002DB254 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,11 +31,25 @@
 		C518C90D2E70914A002DB254 /* CosechiOs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CosechiOs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C518C91E2E709150002DB254 /* CosechiOsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CosechiOsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C518C9282E709150002DB254 /* CosechiOsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CosechiOsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5D11C062E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CosechiOsModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C518C93C2E709856002DB254 /* Exceptions for "CosechiOs" folder in "CosechiOs" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C518C90C2E70914A002DB254 /* CosechiOs */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C518C90F2E70914A002DB254 /* CosechiOs */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C518C93C2E709856002DB254 /* Exceptions for "CosechiOs" folder in "CosechiOs" target */,
+			);
 			path = CosechiOs;
 			sourceTree = "<group>";
 		};
@@ -75,6 +93,7 @@
 		C518C9042E70914A002DB254 = {
 			isa = PBXGroup;
 			children = (
+				C5D11C052E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodeld */,
 				C518C90F2E70914A002DB254 /* CosechiOs */,
 				C518C9212E709150002DB254 /* CosechiOsTests */,
 				C518C92B2E709150002DB254 /* CosechiOsUITests */,
@@ -187,11 +206,13 @@
 				};
 			};
 			buildConfigurationList = C518C9082E70914A002DB254 /* Build configuration list for PBXProject "CosechiOs" */;
-			developmentRegion = en;
+			developmentRegion = es;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"es-419",
+				es,
 			);
 			mainGroup = C518C9042E70914A002DB254;
 			minimizedProjectReferenceProxies = 1;
@@ -236,6 +257,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5D11C072E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,6 +418,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CosechiOs/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"Se usa para tomar fotos que ayuden a identificar plagas o estado del cultivo.\"";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Usamos tu ubicación para adaptar recomendaciones de cultivos y clima.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "\"Se usa para guardar/seleccionar fotos de tus cultivos.\"";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -435,6 +461,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CosechiOs/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "\"Se usa para tomar fotos que ayuden a identificar plagas o estado del cultivo.\"";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Usamos tu ubicación para adaptar recomendaciones de cultivos y clima.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "\"Se usa para guardar/seleccionar fotos de tus cultivos.\"";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -591,6 +621,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		C5D11C052E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				C5D11C062E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodel */,
+			);
+			currentVersion = C5D11C062E74DD4800D6A4A0 /* CosechiOsModel.xcdatamodel */;
+			path = CosechiOsModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = C518C9052E70914A002DB254 /* Project object */;
 }
