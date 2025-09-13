@@ -60,6 +60,8 @@
         <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="details" optional="YES" attributeType="String"/>
         <attribute name="dueDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="recurrenceRule" optional="YES" attributeType="String"/>
+        <attribute name="relativeDays" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="reminder" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="status" attributeType="String"/>
         <attribute name="taskID" attributeType="UUID" usesScalarValueType="NO"/>

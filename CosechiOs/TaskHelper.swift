@@ -28,4 +28,11 @@ struct TaskHelper {
             NotificationHelper.cancelNotification(id: id)
         }
     }
+    
+    /// Programa recordatorio de una tarea
+    static func scheduleNotification(for task: TaskEntity) {
+        NotificationHelper.scheduleNotification(for: task)
+    }
+
+
 }

@@ -18,3 +18,10 @@
 "profile_theme" = "Theme";
 "profile_delete_photo" = "Remove profile photo";
 "profile_export" = "Export data (backup)";
+
+"task_summary_title" = "Task Summary";
+"task_completed" = "Completed";
+"task_pending" = "Pending";
+"task_overdue" = "Overdue";
+"task_progress" = "Progress";
+"task_no_tasks" = "No tasks yet";

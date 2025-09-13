@@ -12,7 +12,7 @@ struct MainMenuView: View {
                 NavigationLink(destination: ExploreCropsView()) {
                     MenuCardView(icon: "book.fill", title: "menu_explore")
                 }
-                NavigationLink(destination: TasksCalendarView()) {
+                NavigationLink(destination: TaskCalendarView()) {
                     MenuCardView(icon: "calendar", title: "menu_tasks")
                 }
                 NavigationLink(destination: UserProfileView()) {
