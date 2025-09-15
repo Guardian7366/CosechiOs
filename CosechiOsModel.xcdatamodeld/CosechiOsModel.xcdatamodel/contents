@@ -78,7 +78,7 @@
         <attribute name="title" attributeType="String"/>
         <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="crop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crop" inverseName="tasks" inverseEntity="Crop"/>
-        <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="tasks" inverseEntity="User"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="tasks" inverseEntity="User"/>
         <fetchIndex name="byPropertyIndex">
             <fetchIndexElement property="dueDate" type="Binary" order="ascending"/>
             <fetchIndexElement property="taskID" type="Binary" order="ascending"/>
@@ -102,7 +102,7 @@
         <relationship name="config" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Config" inverseName="user" inverseEntity="Config"/>
         <relationship name="progressLogs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProgressLog" inverseName="user" inverseEntity="ProgressLog"/>
         <relationship name="stepProgresses" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StepProgress" inverseName="user" inverseEntity="StepProgress"/>
-        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TaskEntity" inverseName="user" inverseEntity="TaskEntity"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskEntity" inverseName="user" inverseEntity="TaskEntity"/>
         <fetchIndex name="byPropertyIndex">
             <fetchIndexElement property="email" type="Binary" order="ascending"/>
             <fetchIndexElement property="username" type="Binary" order="ascending"/>

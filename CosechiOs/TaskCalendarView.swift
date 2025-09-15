@@ -100,15 +100,31 @@ struct TaskCalendarView: View {
     }
 
     private func deleteTask(at offsets: IndexSet, in tasksForSection: [TaskEntity]) {
-        for index in offsets {
-            let task = tasksForSection[index]
-            TaskHelper.deleteTask(with: task.objectID, context: viewContext) {
-                // nothing
+        // Mapear offsets a las entidades concretas
+        let toDelete = offsets.compactMap { index -> TaskEntity? in
+            guard index < tasksForSection.count else { return nil }
+            return tasksForSection[index]
+        }
+
+        guard !toDelete.isEmpty else { return }
+
+        viewContext.perform {
+            for t in toDelete {
+                NotificationHelper.cancelNotification(for: t)
+                viewContext.delete(t)
+            }
+            do {
+                try viewContext.save()
+                DispatchQueue.main.async {
+                    loadTasks()
+                }
+            } catch {
+                print("❌ Error al eliminar tasks: \(error)")
+                viewContext.rollback()
             }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { loadTasks() }
     }
-
+    
     private func loadTasks() {
         let fr: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
         fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]

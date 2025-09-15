@@ -22,7 +22,7 @@ struct TaskHelper {
             }
         }
     }
-
+    
     /// Marca la tarea como completada (idempotente)
     static func completeTask(_ objectID: NSManagedObjectID, context: NSManagedObjectContext, completion: (() -> Void)? = nil) {
         context.perform {
@@ -41,7 +41,7 @@ struct TaskHelper {
             }
         }
     }
-
+    
     /// Borra la tarea de forma segura (cancela notificación primero)
     static func deleteTask(with objectID: NSManagedObjectID, context: NSManagedObjectContext, completion: (() -> Void)? = nil) {
         context.perform {
@@ -65,7 +65,7 @@ struct TaskHelper {
             }
         }
     }
-
+    
     /// Crea una tarea y la guarda (opcional helper)
     static func createTask(title: String, details: String?, dueDate: Date?, reminder: Bool, recurrence: String?, relativeDays: Int16, crop: Crop?, user: User?, context: NSManagedObjectContext) {
         context.perform {
@@ -93,16 +93,20 @@ struct TaskHelper {
     }
     
     static func fetchTasks(for crop: Crop, context: NSManagedObjectContext) -> [TaskEntity] {
-            let fr: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
-            fr.predicate = NSPredicate(format: "crop == %@", crop)
-            fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
-            return (try? context.fetch(fr)) ?? []
-        }
-
-        static func completeTask(_ task: TaskEntity, context: NSManagedObjectContext) {
+        let fr: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+        fr.predicate = NSPredicate(format: "crop == %@", crop)
+        fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
+        return (try? context.fetch(fr)) ?? []
+    }
+    
+    static func completeTask(_ task: TaskEntity, context: NSManagedObjectContext) {
+        context.perform {
             task.status = "completed"
             task.updatedAt = Date()
             NotificationHelper.cancelNotification(for: task)
             try? context.save()
         }
+    }
+    
 }
+
