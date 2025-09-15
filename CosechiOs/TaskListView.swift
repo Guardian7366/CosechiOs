@@ -1,18 +1,12 @@
 import SwiftUI
 import CoreData
 
-// Wrapper para poder usar NSManagedObjectID con .sheet(item:)
-struct ManagedObjectIDWrapper: Identifiable, Hashable {
-    let id: NSManagedObjectID
-}
-
 struct TaskListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
 
     @State private var tasks: [TaskEntity] = []
     @State private var filter: String = "pending" // "pending", "completed", "all"
-    @State private var showEditSheet = false
     @State private var selectedTaskID: ManagedObjectIDWrapper? = nil
 
     private var today: Date { Calendar.current.startOfDay(for: Date()) }
@@ -34,8 +28,8 @@ struct TaskListView: View {
                 }
                 if !todayTasks.isEmpty {
                     Section(header: Text("Hoy")) {
-                        ForEach(todayTasks) { task in
-                            taskCard(task)
+                        ForEach(todayTasks, id: \.objectID) { task in
+                            taskRow(task)
                         }
                     }
                 }
@@ -46,8 +40,8 @@ struct TaskListView: View {
                 }
                 if !upcoming.isEmpty {
                     Section(header: Text("Próximas")) {
-                        ForEach(upcoming) { task in
-                            taskCard(task)
+                        ForEach(upcoming, id: \.objectID) { task in
+                            taskRow(task)
                         }
                     }
                 }
@@ -56,8 +50,8 @@ struct TaskListView: View {
                 let completed = filteredTasks.filter { $0.status == "completed" }
                 if !completed.isEmpty {
                     Section(header: Text("Completadas")) {
-                        ForEach(completed) { task in
-                            taskCard(task)
+                        ForEach(completed, id: \.objectID) { task in
+                            taskRow(task)
                         }
                     }
                 }
@@ -83,69 +77,62 @@ struct TaskListView: View {
         }
     }
 
-    /// Tarjeta con detalles + fila de botones de acción
     @ViewBuilder
-    private func taskCard(_ task: TaskEntity) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Info principal
-            Text(task.title ?? "Sin título")
-                .font(.headline)
-                .strikethrough(task.status == "completed")
+    private func taskRow(_ task: TaskEntity) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(task.title ?? "Sin título")
+                    .font(.headline)
+                    .strikethrough(task.status == "completed")
 
-            if let due = task.dueDate {
-                Text("⏰ \(due.formatted(date: .abbreviated, time: .shortened))")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            if let crop = task.crop {
-                Text("🌱 Cultivo: \(crop.name ?? "-")")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-            }
-
-            Divider()
-
-            // Acciones en fila
-            HStack {
-                // ✅ Completar
-                Button {
-                    TaskHelper.completeTask(task, context: viewContext)
-                    loadTasks()
-                } label: {
-                    Label("Completar", systemImage: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                }
-                .disabled(task.status == "completed")
-
-                Spacer()
-
-                // ✏️ Editar
-                Button {
-                    selectedTaskID = ManagedObjectIDWrapper(id: task.objectID)
-                        showEditSheet = true
-                } label: {
-                    Label("Editar", systemImage: "pencil")
-                        .foregroundColor(.blue)
+                if let due = task.dueDate {
+                    Text("⏰ \(due.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
 
-                Spacer()
-
-                // 🗑 Eliminar
-                Button(role: .destructive) {
-                    NotificationHelper.cancelNotification(for: task)
-                    viewContext.delete(task)
-                    try? viewContext.save()
-                    loadTasks()
-                } label: {
-                    Label("Eliminar", systemImage: "trash")
+                if let crop = task.crop {
+                    Text("🌱 \(crop.name ?? "-")")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
             }
-            .font(.caption) // botones más compactos
+
+            Spacer()
+
+            // ✅ Completar (toggle) — NO abre sheet
+            Button {
+                TaskHelper.toggleCompletion(for: task.objectID, context: viewContext) {
+                    // reload UI once finished
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { loadTasks() }
+                }
+            } label: {
+                Image(systemName: task.status == "completed" ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(task.status == "completed" ? .green : .gray)
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, 6)
+
+            // ✏️ Editar (abre sheet)
+            Button {
+                selectedTaskID = ManagedObjectIDWrapper(id: task.objectID)
+            } label: {
+                Image(systemName: "pencil")
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, 6)
+
+            // 🗑 Eliminar (seguro)
+            Button(role: .destructive) {
+                TaskHelper.deleteTask(with: task.objectID, context: viewContext) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { loadTasks() }
+                }
+            } label: {
+                Image(systemName: "trash")
+            }
+            .buttonStyle(.plain)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(.vertical, 8)
     }
 
     private func loadTasks() {
@@ -154,10 +141,12 @@ struct TaskListView: View {
         fr.predicate = NSPredicate(format: "user.userID == %@", userID as CVarArg)
         fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
 
-        if let results = try? viewContext.fetch(fr) {
+        do {
+            let results = try viewContext.fetch(fr)
             self.tasks = results
-            print("📋 Cargadas \(results.count) tareas")
-        } else {
+            print("📋 TaskListView.loadTasks -> \(results.count) tasks for user \(userID)")
+        } catch {
+            print("❌ TaskListView.loadTasks fetch error: \(error)")
             self.tasks = []
         }
     }

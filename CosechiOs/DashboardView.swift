@@ -174,11 +174,16 @@ struct DashboardView: View {
     /// Próximas tareas: no completadas y con dueDate >= hoy (ordenadas por dueDate asc)
     private var upcomingTasks: [TaskEntity] {
         let now = Date()
-        return tasksRelevant
-            .filter { ($0.status ?? "pending") != "completed" && ($0.dueDate ?? Date()) >= now }
-            .sorted { ($0.dueDate ?? Date()) < ($1.dueDate ?? Date()) }
+        let filtered = tasksRelevant.filter { task in
+            let status = task.status ?? "pending"
+            let due = task.dueDate ?? Date.distantFuture
+            return status != "completed" && due >= now
+        }
+        return filtered.sorted { (a, b) in
+            (a.dueDate ?? Date.distantFuture) < (b.dueDate ?? Date.distantFuture)
+        }
     }
-
+    
     /// Estadísticas rápidas
     private var totalTasksCount: Int { tasksRelevant.count }
     private var completedTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "completed" }.count }

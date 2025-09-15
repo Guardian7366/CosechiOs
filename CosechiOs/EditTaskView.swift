@@ -2,8 +2,6 @@ import SwiftUI
 import CoreData
 import UserNotifications
 
-/// EditTaskView recibe un taskID para recuperar la entidad en el contexto activo.
-/// Evita faults o context-mismatch y maneja edición segura.
 struct EditTaskView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
@@ -16,13 +14,12 @@ struct EditTaskView: View {
     @State private var dueDate: Date = Date()
     @State private var reminder: Bool = true
 
-    // Avanzado
     @State private var recurrence: String = "none"
     @State private var useRelative: Bool = false
     @State private var relativeDays: Int = 0
 
-    // Referencia en vivo a la entidad
     @State private var liveTask: TaskEntity?
+    @State private var showMissingAlert = false
 
     var body: some View {
         NavigationStack {
@@ -73,32 +70,36 @@ struct EditTaskView: View {
                 }
             }
             .onAppear(perform: loadLiveTask)
-        }
-    }
-
-    // MARK: - Cargar datos desde Core Data
-
-    private func loadLiveTask() {
-        viewContext.perform {
-            do {
-                if let obj = try? viewContext.existingObject(with: taskID) as? TaskEntity {
-                    self.liveTask = obj
-                    self.title = obj.title ?? ""
-                    self.details = obj.details ?? ""
-                    self.dueDate = obj.dueDate ?? Date()
-                    self.reminder = obj.reminder
-                    self.recurrence = obj.recurrenceRule ?? "none"
-                    let rd = Int(obj.relativeDays)
-                    self.relativeDays = rd
-                    self.useRelative = rd > 0
-                } else {
-                    print("⚠️ EditTaskView: task not found or not TaskEntity")
-                }
+            .alert("Tarea no encontrada", isPresented: $showMissingAlert) {
+                Button("OK", role: .cancel) { dismiss() }
+            } message: {
+                Text("La tarea que intentas editar ya no existe.")
             }
         }
     }
 
-    // MARK: - Guardar cambios
+    private func loadLiveTask() {
+        do {
+            let obj = try viewContext.existingObject(with: taskID)
+            guard let t = obj as? TaskEntity else {
+                print("⚠️ EditTaskView: object with id is not TaskEntity")
+                showMissingAlert = true
+                return
+            }
+            self.liveTask = t
+            self.title = t.title ?? ""
+            self.details = t.details ?? ""
+            self.dueDate = t.dueDate ?? Date()
+            self.reminder = t.reminder
+            self.recurrence = t.recurrenceRule ?? "none"
+            let rd = Int(t.relativeDays)
+            self.relativeDays = rd
+            self.useRelative = rd > 0
+        } catch {
+            print("❌ EditTaskView load error: \(error)")
+            showMissingAlert = true
+        }
+    }
 
     private func saveChanges() {
         guard let t = liveTask else { return }
@@ -112,6 +113,7 @@ struct EditTaskView: View {
             t.recurrenceRule = recurrence
             t.relativeDays = Int16(useRelative ? relativeDays : 0)
 
+            // notificaciones seguras
             if reminder {
                 NotificationHelper.reschedule(for: t)
             } else {
@@ -120,9 +122,9 @@ struct EditTaskView: View {
 
             do {
                 try viewContext.save()
-                print("✅ Tarea actualizada correctamente")
+                print("✅ EditTaskView saved changes for task: \(t.title ?? "no title")")
             } catch {
-                print("❌ Error saving edited task: \(error.localizedDescription)")
+                print("❌ Error saving edited task: \(error)")
             }
         }
     }

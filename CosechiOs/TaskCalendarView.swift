@@ -6,7 +6,7 @@ struct TaskCalendarView: View {
     @EnvironmentObject var appState: AppState
 
     @State private var tasks: [TaskEntity] = []
-    @State private var showingEditTaskID: ManagedObjectIDWrapper?
+    @State private var showingEditTaskID: ManagedObjectIDWrapper? = nil
 
     var body: some View {
         NavigationStack {
@@ -33,12 +33,12 @@ struct TaskCalendarView: View {
             .navigationTitle("calendar_tasks")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: AddTaskView().environmentObject(appState)) {
+                    NavigationLink(destination: AddTaskView().environment(\.managedObjectContext, viewContext)) {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(item: $showingEditTaskID) { (wrapper: ManagedObjectIDWrapper) in
+            .sheet(item: $showingEditTaskID) { wrapper in
                 EditTaskView(taskID: wrapper.id)
                     .environment(\.managedObjectContext, viewContext)
                     .onDisappear(perform: loadTasks)
@@ -67,44 +67,24 @@ struct TaskCalendarView: View {
         return df.string(from: date)
     }
 
-    private func toggleTaskCompletion(_ task: TaskEntity) {
-        task.status = (task.status == "completed") ? "pending" : "completed"
-        task.updatedAt = Date()
-        try? viewContext.save()
-
-        if task.status == "completed" {
-            NotificationHelper.cancelNotification(for: task)
-        } else if task.status == "pending", task.reminder {
-            TaskHelper.scheduleNotification(for: task)
-        }
-        loadTasks()
-    }
-
-    private func deleteTask(at offsets: IndexSet, in tasksForSection: [TaskEntity]) {
-        for index in offsets {
-            let task = tasksForSection[index]
-            NotificationHelper.cancelNotification(for: task)
-            viewContext.delete(task)
-        }
-        try? viewContext.save()
-        loadTasks()
-    }
-
     private func taskRow(_ task: TaskEntity) -> some View {
         HStack {
-            Button(action: { toggleTaskCompletion(task) }) {
+            Button(action: {
+                TaskHelper.toggleCompletion(for: task.objectID, context: viewContext) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { loadTasks() }
+                }
+            }) {
                 Image(systemName: task.status == "completed" ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(task.status == "completed" ? .green : .gray)
             }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading) {
                 Text(task.title ?? "")
                     .strikethrough(task.status == "completed")
                     .font(.body)
                 if let details = task.details, !details.isEmpty {
-                    Text(details)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    Text(details).font(.caption).foregroundColor(.secondary)
                 }
             }
 
@@ -113,34 +93,46 @@ struct TaskCalendarView: View {
             Button {
                 showingEditTaskID = ManagedObjectIDWrapper(id: task.objectID)
             } label: {
-                Image(systemName: "pencil")
-                    .foregroundColor(.blue)
+                Image(systemName: "pencil").foregroundColor(.blue)
             }
+            .buttonStyle(.plain)
         }
     }
 
-    // MARK: - Carga de datos
+    private func deleteTask(at offsets: IndexSet, in tasksForSection: [TaskEntity]) {
+        for index in offsets {
+            let task = tasksForSection[index]
+            TaskHelper.deleteTask(with: task.objectID, context: viewContext) {
+                // nothing
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { loadTasks() }
+    }
 
     private func loadTasks() {
         let fr: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
         fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
-        let all = (try? viewContext.fetch(fr)) ?? []
+        do {
+            let all = try viewContext.fetch(fr)
+            guard let uid = appState.currentUserID else { tasks = []; return }
 
-        guard let uid = appState.currentUserID else {
+            // Filtrar: tareas que pertenecen al user OR tareas attachadas a crops en su colección
+            // 1) obtener cropIDs de la colección
+            let ucFR: NSFetchRequest<UserCollection> = UserCollection.fetchRequest()
+            ucFR.predicate = NSPredicate(format: "user.userID == %@", uid as CVarArg)
+            let userCollections = (try? viewContext.fetch(ucFR)) ?? []
+            let cropIDsInCollection = Set(userCollections.compactMap { $0.crop?.cropID })
+
+            // 2) filtrar
+            tasks = all.filter { task in
+                if let tUserID = task.user?.userID, tUserID == uid { return true }
+                if let cID = task.crop?.cropID, cropIDsInCollection.contains(cID) { return true }
+                return false
+            }
+            print("📋 TaskCalendarView.loadTasks -> \(tasks.count) tasks for user \(uid)")
+        } catch {
+            print("❌ TaskCalendarView.loadTasks fetch error: \(error)")
             tasks = []
-            return
-        }
-
-        // cultivos del usuario
-        let ucFR: NSFetchRequest<UserCollection> = UserCollection.fetchRequest()
-        ucFR.predicate = NSPredicate(format: "user.userID == %@", uid as CVarArg)
-        let userCollections = (try? viewContext.fetch(ucFR)) ?? []
-        let cropIDsInCollection = Set(userCollections.compactMap { $0.crop?.cropID })
-
-        tasks = all.filter { task in
-            if let tUserID = task.user?.userID, tUserID == uid { return true }
-            if let cID = task.crop?.cropID, cropIDsInCollection.contains(cID) { return true }
-            return false
         }
     }
 }

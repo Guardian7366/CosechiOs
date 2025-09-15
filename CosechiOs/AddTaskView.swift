@@ -4,7 +4,7 @@ import CoreData
 struct AddTaskView: View {
     var crop: Crop? = nil
     @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject var appState: AppState      // <-- agregar
+    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
 
     @State private var title: String = ""
@@ -78,27 +78,28 @@ struct AddTaskView: View {
         task.updatedAt = Date()
         if let c = crop { task.crop = c }
 
-        // Guardar la configuración extra en TaskEntity (requiere que hayas añadido los atributos)
+        // Guardar la configuración extra
         task.recurrenceRule = recurrence
         task.relativeDays = Int16(useRelative ? relativeDays : 0)
 
-        // --- ASIGNAR USUARIO ACTUAL si existe ---
+        // ASIGNAR USER: esto es crítico (evita "tareas sin dueño" que causan vistas compartidas / inconsistencias)
         if let uid = appState.currentUserID {
-            let fr: NSFetchRequest<User> = User.fetchRequest()
-            fr.predicate = NSPredicate(format: "userID == %@", uid as CVarArg)
-            fr.fetchLimit = 1
-            if let user = (try? viewContext.fetch(fr))?.first {
+            let ufr: NSFetchRequest<User> = User.fetchRequest()
+            ufr.predicate = NSPredicate(format: "userID == %@", uid as CVarArg)
+            ufr.fetchLimit = 1
+            if let user = try? viewContext.fetch(ufr).first {
                 task.user = user
             } else {
-                // opcional: log si no se encuentra el user
-                print("⚠️ AddTaskView: user not found for id \(uid)")
+                print("⚠️ AddTaskView: usuario no encontrado para userID=\(uid)")
             }
+        } else {
+            print("⚠️ AddTaskView: no hay usuario autenticado, task no tendrá owner")
         }
 
         do {
             try viewContext.save()
             if reminder {
-                TaskHelper.scheduleNotification(for: task)
+                NotificationHelper.scheduleNotification(for: task)
             }
             dismiss()
         } catch {
