@@ -300,7 +300,7 @@ struct DashboardView: View {
                             .environment(\.managedObjectContext, viewContext)
                             .environmentObject(appState))
         } else {
-            return AnyView(EditTaskView(task: task))
+            return AnyView(EditTaskView(taskID: task.objectID ))
         }
     }
 

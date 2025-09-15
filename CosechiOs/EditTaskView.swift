@@ -1,36 +1,28 @@
 import SwiftUI
-import UserNotifications
 import CoreData
+import UserNotifications
 
+/// EditTaskView recibe un taskID para recuperar la entidad en el contexto activo.
+/// Evita faults o context-mismatch y maneja edición segura.
 struct EditTaskView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
 
-    @State private var title: String
-    @State private var details: String
-    @State private var dueDate: Date
-    @State private var reminder: Bool
+    let taskID: NSManagedObjectID
 
-    // advanced
-    @State private var recurrence: String
-    @State private var useRelative: Bool
-    @State private var relativeDays: Int
+    // Campos editables
+    @State private var title: String = ""
+    @State private var details: String = ""
+    @State private var dueDate: Date = Date()
+    @State private var reminder: Bool = true
 
-    var task: TaskEntity
+    // Avanzado
+    @State private var recurrence: String = "none"
+    @State private var useRelative: Bool = false
+    @State private var relativeDays: Int = 0
 
-    init(task: TaskEntity) {
-        self.task = task
-        _title = State(initialValue: task.title ?? "")
-        _details = State(initialValue: task.details ?? "")
-        _dueDate = State(initialValue: task.dueDate ?? Date())
-        _reminder = State(initialValue: task.reminder)
-
-        // leer valores guardados (si existen)
-        _recurrence = State(initialValue: task.recurrenceRule ?? "none")
-        let rd = Int(task.relativeDays)
-        _relativeDays = State(initialValue: rd)
-        _useRelative = State(initialValue: rd > 0)
-    }
+    // Referencia en vivo a la entidad
+    @State private var liveTask: TaskEntity?
 
     var body: some View {
         NavigationStack {
@@ -61,6 +53,12 @@ struct EditTaskView: View {
                         }
                     }
                 }
+
+                if let crop = liveTask?.crop {
+                    Section(header: Text("Cultivo asociado")) {
+                        Text(crop.name ?? "—").foregroundColor(.secondary)
+                    }
+                }
             }
             .navigationTitle("edit_task")
             .toolbar {
@@ -74,28 +72,58 @@ struct EditTaskView: View {
                     }
                 }
             }
+            .onAppear(perform: loadLiveTask)
         }
     }
+
+    // MARK: - Cargar datos desde Core Data
+
+    private func loadLiveTask() {
+        viewContext.perform {
+            do {
+                if let obj = try? viewContext.existingObject(with: taskID) as? TaskEntity {
+                    self.liveTask = obj
+                    self.title = obj.title ?? ""
+                    self.details = obj.details ?? ""
+                    self.dueDate = obj.dueDate ?? Date()
+                    self.reminder = obj.reminder
+                    self.recurrence = obj.recurrenceRule ?? "none"
+                    let rd = Int(obj.relativeDays)
+                    self.relativeDays = rd
+                    self.useRelative = rd > 0
+                } else {
+                    print("⚠️ EditTaskView: task not found or not TaskEntity")
+                }
+            }
+        }
+    }
+
+    // MARK: - Guardar cambios
 
     private func saveChanges() {
-        task.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        task.details = details.trimmingCharacters(in: .whitespacesAndNewlines)
-        task.dueDate = dueDate
-        task.reminder = reminder
-        task.updatedAt = Date()
+        guard let t = liveTask else { return }
+        viewContext.performAndWait {
+            t.title = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            t.details = details.trimmingCharacters(in: .whitespacesAndNewlines)
+            t.dueDate = dueDate
+            t.reminder = reminder
+            t.updatedAt = Date()
 
-        // guardar opciones avanzadas
-        task.recurrenceRule = recurrence
-        task.relativeDays = Int16(useRelative ? relativeDays : 0)
+            t.recurrenceRule = recurrence
+            t.relativeDays = Int16(useRelative ? relativeDays : 0)
 
-        // reprogramar notificaciones
-        if reminder {
-            NotificationHelper.reschedule(for: task)
-        } else {
-            NotificationHelper.cancelNotification(for: task)
+            if reminder {
+                NotificationHelper.reschedule(for: t)
+            } else {
+                NotificationHelper.cancelNotification(for: t)
+            }
+
+            do {
+                try viewContext.save()
+                print("✅ Tarea actualizada correctamente")
+            } catch {
+                print("❌ Error saving edited task: \(error.localizedDescription)")
+            }
         }
-
-        try? viewContext.save()
     }
 }
-

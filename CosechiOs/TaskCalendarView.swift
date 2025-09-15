@@ -5,30 +5,24 @@ struct TaskCalendarView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
 
-    @State private var tasks: [TaskEntity] = []              // ahora manual
-    @State private var showingEditTask: TaskEntity?
+    @State private var tasks: [TaskEntity] = []
+    @State private var showingEditTaskID: ManagedObjectIDWrapper?
 
     var body: some View {
         NavigationStack {
             VStack {
-                // 🔹 Resumen de tareas
                 TaskSummaryView()
                     .environment(\.managedObjectContext, viewContext)
                     .padding(.horizontal)
 
                 List {
-                    // Obtener las fechas ordenadas (keys)
-                    let dates = groupedTasks.keys.sorted()
-
+                    let dates = groupedDates
                     ForEach(dates, id: \.self) { date in
                         Section(header: Text(formattedDate(date))) {
-                            // Items para esta fecha
                             let items = groupedTasks[date] ?? []
-
                             ForEach(items, id: \.objectID) { task in
                                 taskRow(task)
                             }
-                            // swipe-to-delete en la lista de items de la sección
                             .onDelete { offsets in
                                 deleteTask(at: offsets, in: items)
                             }
@@ -44,26 +38,28 @@ struct TaskCalendarView: View {
                     }
                 }
             }
-            .sheet(item: $showingEditTask) { task in
-                EditTaskView(task: task)
+            .sheet(item: $showingEditTaskID) { (wrapper: ManagedObjectIDWrapper) in
+                EditTaskView(taskID: wrapper.id)
                     .environment(\.managedObjectContext, viewContext)
+                    .onDisappear(perform: loadTasks)
             }
             .onAppear(perform: loadTasks)
-            .onChange(of: appState.currentUserID) { _ in loadTasks() } // recargar si cambia user
+            .onChange(of: appState.currentUserID) { _ in loadTasks() }
         }
     }
 
     // MARK: - Helpers
 
-    /// Agrupa las tareas por fecha (startOfDay)
+    private var groupedDates: [Date] {
+        groupedTasks.keys.sorted()
+    }
+
     private var groupedTasks: [Date: [TaskEntity]] {
-        let arr = tasks
-        return Dictionary(grouping: arr) { task in
+        Dictionary(grouping: tasks) { task in
             Calendar.current.startOfDay(for: task.dueDate ?? Date())
         }
     }
 
-    /// Formatea la fecha para el header de la sección
     private func formattedDate(_ date: Date) -> String {
         let df = DateFormatter()
         df.dateStyle = .full
@@ -71,21 +67,19 @@ struct TaskCalendarView: View {
         return df.string(from: date)
     }
 
-    /// Alterna el estado completado/pending
     private func toggleTaskCompletion(_ task: TaskEntity) {
         task.status = (task.status == "completed") ? "pending" : "completed"
         task.updatedAt = Date()
         try? viewContext.save()
-        // cancelar o reprogramar notificación si hace falta
+
         if task.status == "completed" {
             NotificationHelper.cancelNotification(for: task)
         } else if task.status == "pending", task.reminder {
             TaskHelper.scheduleNotification(for: task)
         }
-        loadTasks() // refrescar
+        loadTasks()
     }
 
-    /// Elimina tareas a partir de offsets dentro del array `tasksForSection`
     private func deleteTask(at offsets: IndexSet, in tasksForSection: [TaskEntity]) {
         for index in offsets {
             let task = tasksForSection[index]
@@ -96,12 +90,9 @@ struct TaskCalendarView: View {
         loadTasks()
     }
 
-    /// Vista de una fila de tarea
     private func taskRow(_ task: TaskEntity) -> some View {
         HStack {
-            Button(action: {
-                toggleTaskCompletion(task)
-            }) {
+            Button(action: { toggleTaskCompletion(task) }) {
                 Image(systemName: task.status == "completed" ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(task.status == "completed" ? .green : .gray)
             }
@@ -120,7 +111,7 @@ struct TaskCalendarView: View {
             Spacer()
 
             Button {
-                showingEditTask = task
+                showingEditTaskID = ManagedObjectIDWrapper(id: task.objectID)
             } label: {
                 Image(systemName: "pencil")
                     .foregroundColor(.blue)
@@ -130,26 +121,22 @@ struct TaskCalendarView: View {
 
     // MARK: - Carga de datos
 
-    /// Carga y filtra tareas respetando el usuario actual.
     private func loadTasks() {
-        // obtener todas las tareas (ordenadas)
         let fr: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
         fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
         let all = (try? viewContext.fetch(fr)) ?? []
 
         guard let uid = appState.currentUserID else {
-            // si no hay usuario, dejamos lista vacía (o podrías decidir mostrar sólo tareas sin user)
             tasks = []
             return
         }
 
-        // 1) cultivos en la colección del usuario (por cropID)
+        // cultivos del usuario
         let ucFR: NSFetchRequest<UserCollection> = UserCollection.fetchRequest()
         ucFR.predicate = NSPredicate(format: "user.userID == %@", uid as CVarArg)
         let userCollections = (try? viewContext.fetch(ucFR)) ?? []
         let cropIDsInCollection = Set(userCollections.compactMap { $0.crop?.cropID })
 
-        // 2) Filtrar: tareas del propio usuario O tareas que pertenecen a un crop dentro de la colección
         tasks = all.filter { task in
             if let tUserID = task.user?.userID, tUserID == uid { return true }
             if let cID = task.crop?.cropID, cropIDsInCollection.contains(cID) { return true }
