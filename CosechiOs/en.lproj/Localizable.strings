@@ -25,3 +25,48 @@
 "task_overdue" = "Overdue";
 "task_progress" = "Progress";
 "task_no_tasks" = "No tasks yet";
+
+"progress_note" = "Progress note";
+"progress_photo" = "Optional photo";
+"remove_photo" = "Remove photo";
+"add_photo" = "Add photo";
+"new_progress" = "New Progress";
+"cancel" = "Cancel";
+"save" = "Save";
+"progress_history" = "Progress History";
+"no_progress_yet" = "No progress logs yet.";
+"add_progress" = "Add progress";
+
+"dashboard_title" = "Dashboard";
+"dashboard_greeting" = "Hello!";
+"dashboard_greeting_name %@" = "Hello, %@!";
+"dashboard_subtitle" = "Here’s a quick overview of your progress";
+"dashboard_summary" = "Task Summary";
+"dashboard_tasks" = "tasks";
+"dashboard_completed" = "Completed";
+"dashboard_no_tasks" = "No tasks yet";
+"dashboard_overdue_count" = "%d overdue tasks";
+
+"dashboard_action_add_task" = "New Task";
+"dashboard_action_explore" = "Explore";
+"dashboard_action_my_crops" = "My Crops";
+"dashboard_action_profile" = "Profile";
+
+"dashboard_upcoming_tasks" = "Upcoming Tasks";
+"dashboard_no_upcoming" = "No upcoming tasks";
+
+"dashboard_my_crops" = "Crops in My Collection";
+"dashboard_no_crops" = "You don’t have saved crops";
+
+"dashboard_recent_progress" = "Recent Progress Logs";
+"dashboard_no_progress" = "No progress logs yet";
+"dashboard_progress_log_no_crop" = "No crop";
+"dashboard_progress_no_note" = "No note";
+
+"progress_note" = "Progress note";
+"progress_photo" = "Progress photo";
+"progress_category" = "Category";
+"new_progress" = "New progress";
+"add_photo" = "Add photo";
+"remove_photo" = "Remove photo";
+"edit_progress" = "Edit progress";

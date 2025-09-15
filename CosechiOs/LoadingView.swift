@@ -46,13 +46,12 @@ struct LoadingView: View {
 
                 Spacer()
 
-                // Enlace invisible que activa la navegación cuando `navigateToIntro` es true
-                NavigationLink(destination:
-                                IntroView()
-                                .environment(\.managedObjectContext, viewContext)
-                                .environmentObject(appState),
-                               isActive: $navigateToIntro) {
-                    EmptyView()
+                // Navegación programática moderna: usar navigationDestination en NavigationStack
+                // cuando navigateToIntro cambia a true, se presenta IntroView.
+                .navigationDestination(isPresented: $navigateToIntro) {
+                    IntroView()
+                        .environment(\.managedObjectContext, viewContext)
+                        .environmentObject(appState)
                 }
                 .hidden()
             }

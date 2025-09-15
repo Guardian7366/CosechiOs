@@ -6,15 +6,28 @@ struct MainMenuView: View {
     var body: some View {
         NavigationStack {
             List {
+                // 🚀 Nuevo acceso al Dashboard
+                NavigationLink(destination: DashboardView()) {
+                    MenuCardView(icon: "speedometer", title: "dashboard_title")
+                }
+                
                 NavigationLink(destination: MyCropsView()) {
                     MenuCardView(icon: "leaf.fill", title: "menu_my_crops")
                 }
+                
                 NavigationLink(destination: ExploreCropsView()) {
                     MenuCardView(icon: "book.fill", title: "menu_explore")
                 }
+                
                 NavigationLink(destination: TaskCalendarView()) {
                     MenuCardView(icon: "calendar", title: "menu_tasks")
                 }
+                
+                // ✅ NUEVO: acceso a todas las tareas
+                NavigationLink(destination: TaskListView()) {
+                    MenuCardView(icon: "checklist", title: "Todas mis tareas")
+                }
+                
                 NavigationLink(destination: UserProfileView()) {
                     MenuCardView(icon: "person.circle", title: "menu_profile")
                 }
@@ -34,7 +47,6 @@ struct MainMenuView: View {
         }
     }
 }
-
 struct MenuCardView: View {
     let icon: String
     let title: LocalizedStringKey

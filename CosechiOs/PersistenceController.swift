@@ -68,7 +68,7 @@ final class PersistenceController {
 
         func dict(from obj: NSManagedObject) -> [String: Any] {
             var d: [String: Any] = [:]
-            for (name, attr) in obj.entity.attributesByName {
+            for (name, _) in obj.entity.attributesByName {
                 if let v = obj.value(forKey: name) {
                     if let date = v as? Date {
                         d[name] = ISO8601DateFormatter().string(from: date)

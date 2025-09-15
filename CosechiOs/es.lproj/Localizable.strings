@@ -25,3 +25,48 @@
 "task_overdue" = "Atrasadas";
 "task_progress" = "Progreso";
 "task_no_tasks" = "No tienes tareas aún";
+
+"progress_note" = "Nota de progreso";
+"progress_photo" = "Foto opcional";
+"remove_photo" = "Eliminar foto";
+"add_photo" = "Añadir foto";
+"new_progress" = "Nuevo Progreso";
+"cancel" = "Cancelar";
+"save" = "Guardar";
+"progress_history" = "Historial de Progreso";
+"no_progress_yet" = "Todavía no hay registros de progreso.";
+"add_progress" = "Añadir progreso";
+
+"dashboard_title" = "Panel Principal";
+"dashboard_greeting" = "¡Hola!";
+"dashboard_greeting_name %@" = "¡Hola, %@!";
+"dashboard_subtitle" = "Aquí tienes un resumen de tu progreso";
+"dashboard_summary" = "Resumen de tareas";
+"dashboard_tasks" = "tareas";
+"dashboard_completed" = "Completadas";
+"dashboard_no_tasks" = "No tienes tareas todavía";
+"dashboard_overdue_count" = "%d tareas vencidas";
+
+"dashboard_action_add_task" = "Nueva Tarea";
+"dashboard_action_explore" = "Explorar";
+"dashboard_action_my_crops" = "Mis Cultivos";
+"dashboard_action_profile" = "Perfil";
+
+"dashboard_upcoming_tasks" = "Próximas tareas";
+"dashboard_no_upcoming" = "No hay tareas próximas";
+
+"dashboard_my_crops" = "Cultivos en mi colección";
+"dashboard_no_crops" = "No tienes cultivos guardados";
+
+"dashboard_recent_progress" = "Últimos registros de progreso";
+"dashboard_no_progress" = "Todavía no hay registros de progreso";
+"dashboard_progress_log_no_crop" = "Sin cultivo";
+"dashboard_progress_no_note" = "Sin nota";
+
+"progress_note" = "Nota de progreso";
+"progress_photo" = "Foto de progreso";
+"progress_category" = "Categoría";
+"new_progress" = "Nuevo progreso";
+"add_photo" = "Añadir foto";
+"remove_photo" = "Eliminar foto";
+"edit_progress" = "Editar progreso";

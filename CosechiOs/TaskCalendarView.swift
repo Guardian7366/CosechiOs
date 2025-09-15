@@ -5,13 +5,7 @@ struct TaskCalendarView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
 
-    // Uso explícito de entity(...) para evitar problemas de inferencia del compilador
-    @FetchRequest(
-        entity: TaskEntity.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "dueDate", ascending: true)]
-    )
-    private var tasks: FetchedResults<TaskEntity>
-
+    @State private var tasks: [TaskEntity] = []              // ahora manual
     @State private var showingEditTask: TaskEntity?
 
     var body: some View {
@@ -45,7 +39,7 @@ struct TaskCalendarView: View {
             .navigationTitle("calendar_tasks")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: AddTaskView()) {
+                    NavigationLink(destination: AddTaskView().environmentObject(appState)) {
                         Image(systemName: "plus")
                     }
                 }
@@ -54,6 +48,8 @@ struct TaskCalendarView: View {
                 EditTaskView(task: task)
                     .environment(\.managedObjectContext, viewContext)
             }
+            .onAppear(perform: loadTasks)
+            .onChange(of: appState.currentUserID) { _ in loadTasks() } // recargar si cambia user
         }
     }
 
@@ -61,7 +57,7 @@ struct TaskCalendarView: View {
 
     /// Agrupa las tareas por fecha (startOfDay)
     private var groupedTasks: [Date: [TaskEntity]] {
-        let arr = Array(tasks) // forzar arreglo para evitar inferencia compleja
+        let arr = tasks
         return Dictionary(grouping: arr) { task in
             Calendar.current.startOfDay(for: task.dueDate ?? Date())
         }
@@ -81,23 +77,23 @@ struct TaskCalendarView: View {
         task.updatedAt = Date()
         try? viewContext.save()
         // cancelar o reprogramar notificación si hace falta
-        if task.status == "completed", let id = task.taskID?.uuidString {
-            NotificationHelper.cancelNotification(id: id)
+        if task.status == "completed" {
+            NotificationHelper.cancelNotification(for: task)
         } else if task.status == "pending", task.reminder {
             TaskHelper.scheduleNotification(for: task)
         }
+        loadTasks() // refrescar
     }
 
     /// Elimina tareas a partir de offsets dentro del array `tasksForSection`
     private func deleteTask(at offsets: IndexSet, in tasksForSection: [TaskEntity]) {
         for index in offsets {
             let task = tasksForSection[index]
-            if let id = task.taskID?.uuidString {
-                NotificationHelper.cancelNotification(id: id)
-            }
+            NotificationHelper.cancelNotification(for: task)
             viewContext.delete(task)
         }
         try? viewContext.save()
+        loadTasks()
     }
 
     /// Vista de una fila de tarea
@@ -131,11 +127,33 @@ struct TaskCalendarView: View {
             }
         }
     }
-}
 
-// MARK: - Preview
-#Preview {
-    TaskCalendarView()
-        .environment(\.managedObjectContext, PersistenceController.shared.container.viewContext)
-        .environmentObject(AppState())
+    // MARK: - Carga de datos
+
+    /// Carga y filtra tareas respetando el usuario actual.
+    private func loadTasks() {
+        // obtener todas las tareas (ordenadas)
+        let fr: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+        fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
+        let all = (try? viewContext.fetch(fr)) ?? []
+
+        guard let uid = appState.currentUserID else {
+            // si no hay usuario, dejamos lista vacía (o podrías decidir mostrar sólo tareas sin user)
+            tasks = []
+            return
+        }
+
+        // 1) cultivos en la colección del usuario (por cropID)
+        let ucFR: NSFetchRequest<UserCollection> = UserCollection.fetchRequest()
+        ucFR.predicate = NSPredicate(format: "user.userID == %@", uid as CVarArg)
+        let userCollections = (try? viewContext.fetch(ucFR)) ?? []
+        let cropIDsInCollection = Set(userCollections.compactMap { $0.crop?.cropID })
+
+        // 2) Filtrar: tareas del propio usuario O tareas que pertenecen a un crop dentro de la colección
+        tasks = all.filter { task in
+            if let tUserID = task.user?.userID, tUserID == uid { return true }
+            if let cID = task.crop?.cropID, cropIDsInCollection.contains(cID) { return true }
+            return false
+        }
+    }
 }

@@ -2,16 +2,20 @@ import SwiftUI
 import CoreData
 
 struct AddTaskView: View {
-    // Ahora crop es opcional para permitir usar AddTaskView() desde varios sitios
     var crop: Crop? = nil
-
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var appState: AppState      // <-- agregar
     @Environment(\.dismiss) private var dismiss
 
     @State private var title: String = ""
     @State private var details: String = ""
     @State private var dueDate: Date = Date()
     @State private var reminder: Bool = true
+
+    // Notificaciones avanzadas
+    @State private var recurrence: String = "none" // "none","daily","weekly","monthly"
+    @State private var useRelative: Bool = false
+    @State private var relativeDays: Int = 0 // 0..30
 
     var body: some View {
         NavigationStack {
@@ -23,7 +27,23 @@ struct AddTaskView: View {
                     Toggle("Recordatorio", isOn: $reminder)
                 }
 
-                // Mostrar info del cultivo si fue pasado
+                Section(header: Text("Notificación avanzada")) {
+                    Picker("Repetir", selection: $recurrence) {
+                        Text("Ninguna").tag("none")
+                        Text("Diaria").tag("daily")
+                        Text("Semanal").tag("weekly")
+                        Text("Mensual").tag("monthly")
+                    }
+                    .pickerStyle(.segmented)
+
+                    Toggle("Recordar días antes", isOn: $useRelative)
+                    if useRelative {
+                        Stepper(value: $relativeDays, in: 0...30) {
+                            Text("\(relativeDays) días antes")
+                        }
+                    }
+                }
+
                 if let crop = crop {
                     Section(header: Text("Cultivo asociado")) {
                         Text(crop.name ?? "—")
@@ -56,23 +76,32 @@ struct AddTaskView: View {
         task.status = "pending"
         task.createdAt = Date()
         task.updatedAt = Date()
+        if let c = crop { task.crop = c }
 
-        // Solo asignar crop si hay uno
-        if let c = crop {
-            task.crop = c
+        // Guardar la configuración extra en TaskEntity (requiere que hayas añadido los atributos)
+        task.recurrenceRule = recurrence
+        task.relativeDays = Int16(useRelative ? relativeDays : 0)
+
+        // --- ASIGNAR USUARIO ACTUAL si existe ---
+        if let uid = appState.currentUserID {
+            let fr: NSFetchRequest<User> = User.fetchRequest()
+            fr.predicate = NSPredicate(format: "userID == %@", uid as CVarArg)
+            fr.fetchLimit = 1
+            if let user = (try? viewContext.fetch(fr))?.first {
+                task.user = user
+            } else {
+                // opcional: log si no se encuentra el user
+                print("⚠️ AddTaskView: user not found for id \(uid)")
+            }
         }
 
         do {
             try viewContext.save()
-
-            // Usar la API centralizada para programar notificaciones
             if reminder {
                 TaskHelper.scheduleNotification(for: task)
             }
-
             dismiss()
         } catch {
-            // Mejor manejar errores de guardado (podrías mostrar una alerta)
             print("❌ Error guardando tarea: \(error.localizedDescription)")
         }
     }

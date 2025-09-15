@@ -4,8 +4,10 @@ import CoreData
 struct MyCropsView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.managedObjectContext) private var viewContext
-
+    
     @State private var userCollections: [UserCollection] = []
+
+    private var notificationCenter = NotificationCenter.default
 
     var body: some View {
         VStack {
@@ -36,24 +38,48 @@ struct MyCropsView: View {
         .navigationTitle("Mis Cultivos")
         .onAppear {
             loadUserCollections()
+            notificationCenter.addObserver(forName: .userCollectionsChanged, object: nil, queue: .main) { _ in
+                loadUserCollections()
+            }
+        }
+        .onDisappear {
+            notificationCenter.removeObserver(self, name: .userCollectionsChanged, object: nil)
         }
     }
 
     private func loadUserCollections() {
         guard let userID = appState.currentUserID else { return }
-        let fr: NSFetchRequest<UserCollection> = UserCollection.fetchRequest()
-        fr.predicate = NSPredicate(format: "user.userID == %@", userID as CVarArg)
-        fr.sortDescriptors = [NSSortDescriptor(keyPath: \UserCollection.addedAt, ascending: false)]
-        userCollections = (try? viewContext.fetch(fr)) ?? []
+        viewContext.perform {
+            let fr: NSFetchRequest<UserCollection> = UserCollection.fetchRequest()
+            fr.predicate = NSPredicate(format: "user.userID == %@", userID as CVarArg)
+            fr.sortDescriptors = [NSSortDescriptor(keyPath: \UserCollection.addedAt, ascending: false)]
+            let results = (try? viewContext.fetch(fr)) ?? []
+            DispatchQueue.main.async {
+                self.userCollections = results
+                // DEBUG
+                for uc in results {
+                    print("📦 Loaded collection: crop=\(uc.crop?.name ?? "nil") uc=\(uc.collectionID?.uuidString ?? "nil")")
+                }
+            }
+        }
     }
 
     private func deleteItems(at offsets: IndexSet) {
-        for index in offsets {
-            let item = userCollections[index]
-            viewContext.delete(item)
+        viewContext.perform {
+            for index in offsets {
+                let collection = userCollections[index]
+                viewContext.delete(collection)
+            }
+            do {
+                try viewContext.save()
+            } catch {
+                print("❌ Error saving after delete: \(error)")
+            }
+            DispatchQueue.main.async {
+                loadUserCollections()
+                NotificationCenter.default.post(name: .userCollectionsChanged, object: nil)
+            }
         }
-        try? viewContext.save()
-        loadUserCollections()
     }
 }
 
