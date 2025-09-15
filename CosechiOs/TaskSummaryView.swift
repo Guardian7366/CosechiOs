@@ -2,60 +2,45 @@ import SwiftUI
 import CoreData
 
 struct TaskSummaryView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var appState: AppState
+
     @FetchRequest(
         entity: TaskEntity.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "dueDate", ascending: true)]
+        sortDescriptors: [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)],
+        animation: .default
     )
-    private var tasks: FetchedResults<TaskEntity>
-    
-    private var total: Int { tasks.count }
-    private var completed: Int { tasks.filter { $0.status == "completed" }.count }
-    private var pending: Int { tasks.filter { $0.status != "completed" && ($0.dueDate ?? Date()) >= Date() }.count }
-    private var overdue: Int { tasks.filter { $0.status != "completed" && ($0.dueDate ?? Date()) < Date() }.count }
-    
+    private var allTasks: FetchedResults<TaskEntity>
+
+    private var filteredTasks: [TaskEntity] {
+        guard let uid = appState.currentUserID else { return [] }
+        return allTasks.filter { $0.user?.userID == uid }
+    }
+
+    private var pendingTasks: Int {
+        filteredTasks.filter { $0.status == "pending" }.count
+    }
+
+    private var completedTasks: Int {
+        filteredTasks.filter { $0.status == "completed" }.count
+    }
+
     var body: some View {
-        VStack(spacing: 16) {
-            Text("task_summary_title")
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Resumen de tareas")
                 .font(.headline)
-            
+
             HStack {
-                summaryItem(color: .green, count: completed, label: "task_completed")
-                summaryItem(color: .orange, count: pending, label: "task_pending")
-                summaryItem(color: .red, count: overdue, label: "task_overdue")
+                Text("Pendientes: \(pendingTasks)")
+                    .foregroundColor(.orange)
+                Spacer()
+                Text("Completadas: \(completedTasks)")
+                    .foregroundColor(.green)
             }
-            
-            if total > 0 {
-                ProgressView(value: Double(completed), total: Double(total)) {
-                    Text("task_progress")
-                }
-                .progressViewStyle(.linear)
-                .padding(.top, 8)
-            } else {
-                Text("task_no_tasks")
-                    .foregroundColor(.secondary)
-            }
+            .font(.subheadline)
         }
         .padding()
         .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .shadow(radius: 2)
+        .cornerRadius(10)
     }
-    
-    private func summaryItem(color: Color, count: Int, label: LocalizedStringKey) -> some View {
-        VStack {
-            Text("\(count)")
-                .font(.title2)
-                .bold()
-                .foregroundColor(color)
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-#Preview {
-    TaskSummaryView()
-        .environment(\.managedObjectContext, PersistenceController.shared.container.viewContext)
 }

@@ -33,12 +33,12 @@ struct ProgressLogHelper {
     }
     
     /// Obtener logs de un cultivo
-    static func fetchLogs(for crop: Crop, context: NSManagedObjectContext) -> [ProgressLog] {
-        let fr: NSFetchRequest<ProgressLog> = ProgressLog.fetchRequest()
-        fr.predicate = NSPredicate(format: "crop == %@", crop)
-        fr.sortDescriptors = [NSSortDescriptor(keyPath: \ProgressLog.date, ascending: false)]
-        return (try? context.fetch(fr)) ?? []
-    }
+    static func fetchLogs(for crop: Crop, userID: UUID, context: NSManagedObjectContext) -> [ProgressLog] {
+            let fr: NSFetchRequest<ProgressLog> = ProgressLog.fetchRequest()
+            fr.predicate = NSPredicate(format: "crop == %@ AND user.userID == %@", crop, userID as CVarArg)
+            fr.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+            return (try? context.fetch(fr)) ?? []
+        }
     
     /// Eliminar log (safe): primero nullifica relaciones para evitar cascadas accidentales
     static func deleteLog(_ log: ProgressLog, context: NSManagedObjectContext) {

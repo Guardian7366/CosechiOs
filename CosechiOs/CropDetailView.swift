@@ -9,13 +9,22 @@ struct CropDetailView: View {
     
     @State private var isInCollection = false
     @State private var showingTaskSheet = false
-    @State private var tasks: [TaskEntity] = []
     @State private var stepProgress: [UUID: Bool] = [:]
     
     // Historial de progreso
     @State private var progressLogs: [ProgressLog] = []
     @State private var showingAddProgress = false
     @State private var selectedLog: ProgressLog? = nil
+    
+    // ✅ Nuevo: tareas en tiempo real con FetchRequest
+    @FetchRequest private var fetchedTasks: FetchedResults<TaskEntity>
+    
+    init(crop: Crop) {
+        self.crop = crop
+        let request: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
+        _fetchedTasks = FetchRequest(fetchRequest: request)
+    }
     
     var body: some View {
         ScrollView {
@@ -42,8 +51,9 @@ struct CropDetailView: View {
         .sheet(isPresented: $showingTaskSheet) {
             AddTaskView(crop: crop)
                 .environment(\.managedObjectContext, viewContext)
-                .onDisappear { loadTasks() }
+                .environmentObject(appState)
         }
+
         // Sheet para añadir progreso
         .sheet(isPresented: $showingAddProgress) {
             AddProgressLogView(crop: crop)
@@ -111,12 +121,13 @@ extension CropDetailView {
     }
     
     @ViewBuilder private var tasksSection: some View {
-        if !tasks.isEmpty {
+        let tasksForUser = filteredTasks
+        if !tasksForUser.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 Text("📅 Tareas de este cultivo")
                     .font(.headline)
                 
-                ForEach(tasks) { task in
+                ForEach(tasksForUser) { task in
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(task.title ?? "Tarea")
@@ -135,7 +146,6 @@ extension CropDetailView {
                         if task.status == "pending" {
                             Button {
                                 TaskHelper.completeTask(task, context: viewContext)
-                                loadTasks()
                             } label: {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.green)
@@ -262,14 +272,17 @@ extension CropDetailView {
             }
             loadStepProgress(for: userID)
         }
-        loadTasks()
         loadProgressLogs()
     }
     
-    private func loadTasks() {
-        tasks = TaskHelper.fetchTasks(for: crop, context: viewContext)
+    // ✅ Nuevo: filtrado por usuario + cultivo
+    private var filteredTasks: [TaskEntity] {
+        guard let uid = appState.currentUserID else { return [] }
+        return fetchedTasks.filter { task in
+            task.crop == crop && task.user?.userID == uid
+        }
     }
-    
+
     private func loadStepProgress(for userID: UUID) {
         if let steps = crop.steps as? Set<Step> {
             var map: [UUID: Bool] = [:]
@@ -284,9 +297,13 @@ extension CropDetailView {
     }
     
     private func loadProgressLogs() {
-        progressLogs = ProgressLogHelper.fetchLogs(for: crop, context: viewContext)
+        guard let uid = appState.currentUserID else {
+            progressLogs = []
+            return
+        }
+        progressLogs = ProgressLogHelper.fetchLogs(for: crop, userID: uid, context: viewContext)
     }
-    
+
     private func toggleStep(_ step: Step) {
         guard let userID = appState.currentUserID else { return }
         StepProgressHelper.toggleStep(step, userID: userID, context: viewContext)
@@ -319,9 +336,7 @@ extension CropDetailView {
             print("❌ toggleCollection error: \(error.localizedDescription)")
         }
     }
-
 }
-
 
 extension Notification.Name {
     static let userCollectionsChanged = Notification.Name("userCollectionsChanged")

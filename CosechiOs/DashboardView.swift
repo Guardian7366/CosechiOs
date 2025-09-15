@@ -132,7 +132,8 @@ struct DashboardView: View {
             // Present AddTaskView
             .sheet(isPresented: $showAddTask) {
                 AddTaskView()
-                    .environment(\.managedObjectContext, viewContext)
+                        .environment(\.managedObjectContext, viewContext)
+                        .environmentObject(appState)
             }
         }
     }
@@ -157,20 +158,10 @@ struct DashboardView: View {
     }
 
     private var tasksRelevant: [TaskEntity] {
-        let arr = Array(allTasks)
         guard let uid = appState.currentUserID else { return [] }
-
-        return arr.filter { task in
-            // Si la tarea pertenece a un cultivo de la colección del usuario
-            if let cID = task.crop?.cropID, collectionCropIDs.contains(cID) { return true }
-            // Si no tiene crop, podríamos permitir solo tareas personales creadas por el usuario
-            if task.crop == nil {
-                // Opcional: validar aquí con un futuro task.user?.userID == uid
-                return true
-            }
-            return false
-        }
+        return Array(allTasks).filter { $0.user?.userID == uid }
     }
+
     /// Próximas tareas: no completadas y con dueDate >= hoy (ordenadas por dueDate asc)
     private var upcomingTasks: [TaskEntity] {
         let now = Date()
@@ -195,7 +186,9 @@ struct DashboardView: View {
     /// Progress logs del usuario (filtrados)
     private var recentProgress: [ProgressLog] {
         guard let uid = appState.currentUserID else { return [] }
-        return Array(allProgressLogs).filter { $0.user?.userID == uid && $0.crop == nil ? false : true }
+        return Array(allProgressLogs).filter { log in
+            log.user?.userID == uid
+        }
     }
 
     // MARK: - UI Subviews

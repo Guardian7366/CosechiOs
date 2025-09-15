@@ -65,7 +65,7 @@ struct AddTaskView: View {
             }
         }
     }
-
+    
     private func saveTask() {
         let task = TaskEntity(context: viewContext)
         task.taskID = UUID()
@@ -82,7 +82,7 @@ struct AddTaskView: View {
         task.recurrenceRule = recurrence
         task.relativeDays = Int16(useRelative ? relativeDays : 0)
 
-        // ASIGNAR USER: esto es crítico (evita "tareas sin dueño" que causan vistas compartidas / inconsistencias)
+        // ASIGNAR USER: evita tareas "sin dueño"
         if let uid = appState.currentUserID {
             let ufr: NSFetchRequest<User> = User.fetchRequest()
             ufr.predicate = NSPredicate(format: "userID == %@", uid as CVarArg)
@@ -99,12 +99,16 @@ struct AddTaskView: View {
         do {
             try viewContext.save()
             if reminder {
+                // usar NotificationHelper (éste sí implementado)
                 NotificationHelper.scheduleNotification(for: task)
             }
             dismiss()
         } catch {
             print("❌ Error guardando tarea: \(error.localizedDescription)")
+            viewContext.rollback()
         }
     }
+
+      
 }
 

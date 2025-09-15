@@ -30,7 +30,9 @@ struct TaskListView: View {
 
             List {
                 // HOY
-                let todayTasks = filteredTasks.filter { $0.dueDate != nil && Calendar.current.isDateInToday($0.dueDate!) }
+                let todayTasks = filteredTasks.filter {
+                    $0.dueDate != nil && Calendar.current.isDateInToday($0.dueDate!)
+                }
                 if !todayTasks.isEmpty {
                     Section(header: Text("Hoy")) {
                         ForEach(todayTasks, id: \.objectID) { task in
@@ -40,7 +42,9 @@ struct TaskListView: View {
                 }
 
                 // PRÓXIMAS
-                let upcoming = filteredTasks.filter { $0.dueDate != nil && $0.dueDate! > today }
+                let upcoming = filteredTasks.filter {
+                    $0.dueDate != nil && $0.dueDate! > today
+                }
                 if !upcoming.isEmpty {
                     Section(header: Text("Próximas")) {
                         ForEach(upcoming, id: \.objectID) { task in
@@ -81,23 +85,15 @@ struct TaskListView: View {
 
     // MARK: - Helpers
 
-    /// Filtrado por usuario actual y crop collections
+    /// Filtrado por usuario actual (ya NO por crops compartidos)
     private var filteredTasks: [TaskEntity] {
         guard let uid = appState.currentUserID else { return [] }
 
-        // filtrar por dueño o por crops en colección
-        let userCollections: [UserCollection] = {
-            let fr: NSFetchRequest<UserCollection> = UserCollection.fetchRequest()
-            fr.predicate = NSPredicate(format: "user.userID == %@", uid as CVarArg)
-            return (try? viewContext.fetch(fr)) ?? []
-        }()
-        let cropIDsInCollection = Set(userCollections.compactMap { $0.crop?.cropID })
-
         return allTasks.filter { task in
-            if let tUserID = task.user?.userID, tUserID == uid { return true }
-            if let cID = task.crop?.cropID, cropIDsInCollection.contains(cID) { return true }
-            return false
-        }.filter { task in
+            // Solo mostrar tareas creadas por este usuario
+            task.user?.userID == uid
+        }
+        .filter { task in
             switch filter {
             case "pending": return task.status == "pending"
             case "completed": return task.status == "completed"
