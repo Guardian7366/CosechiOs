@@ -266,3 +266,22 @@
 "task_default" = "Tarea";
 "step_default" = "Paso";
 "days_abbr" = "días";
+
+/* Recomendaciones dinámicas */
+"recommendations_title" = "Recomendados para ti";
+"recommendations_subtitle" = "Cultivos que podrían interesarte ahora";
+"recommendations_no_results" = "No hay recomendaciones por el momento.";
+"recommendations_add" = "Añadir a Mis Cultivos";
+"recommendations_added" = "Añadido a Mis Cultivos";
+"recommendations_in_collection" = "Ya está en tu colección";
+"recommendations_error_not_logged" = "Inicia sesión para añadir cultivos a tu colección.";
+"recommendations_reason_season" = "Temporada adecuada: %@";
+"recommendations_reason_difficulty" = "Dificultad: %@";
+"recommendations_reason_new" = "No está en tu colección";
+"recommendations_reason_difficulty_default" = "media";
+
+/* Estaciones (display) */
+"season_spring" = "Primavera";
+"season_summer" = "Verano";
+"season_autumn" = "Otoño";
+"season_winter" = "Invierno";

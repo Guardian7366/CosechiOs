@@ -27,6 +27,11 @@ struct DashboardView: View {
     @State private var showAddTask = false
     @State private var showExplore = false
 
+    // Recomendaciones
+    @State private var recommendations: [CropRecommendation] = []
+    @State private var isLoadingRecommendations = false
+    @State private var recMessage: String? = nil
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -40,6 +45,90 @@ struct DashboardView: View {
                     // Accesos rápidos
                     quickActions
                         .padding(.horizontal)
+
+                    // --- Recomendaciones compactas (nueva sección) ---
+                    sectionTitle("recommendations_title")
+                        .padding(.horizontal)
+                        .padding(.top, 6)
+
+                    VStack(spacing: 8) {
+                        if isLoadingRecommendations {
+                            ProgressView().padding(.horizontal)
+                        } else if recommendations.isEmpty {
+                            Text("recommendations_no_results")
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal)
+                        } else {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    ForEach(recommendations.prefix(4)) { rec in
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            if let data = rec.crop.imageData, let ui = UIImage(data: data) {
+                                                Image(uiImage: ui)
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 140, height: 80)
+                                                    .clipped()
+                                                    .cornerRadius(8)
+                                            } else {
+                                                ZStack {
+                                                    Color(.systemGray5)
+                                                    Image(systemName: "leaf.fill")
+                                                        .font(.largeTitle)
+                                                        .foregroundColor(.white)
+                                                }
+                                                .frame(width: 140, height: 80)
+                                                .cornerRadius(8)
+                                            }
+
+                                            Text(rec.crop.name ?? NSLocalizedString("crop_default", comment: "Crop"))
+                                                .font(.subheadline)
+                                                .bold()
+                                            Text(rec.crop.category ?? "")
+                                                .font(.caption2)
+                                                .foregroundColor(.secondary)
+
+                                            HStack {
+                                                Button {
+                                                    addCropToCollection(rec.crop)
+                                                } label: {
+                                                    Text(LocalizedStringKey("recommendations_add"))
+                                                        .font(.caption2)
+                                                }
+                                                .buttonStyle(.borderedProminent)
+
+                                                Spacer()
+
+                                                Text("\(Int(rec.score))")
+                                                    .font(.caption2)
+                                                    .padding(6)
+                                                    .background(Color(.systemGray6))
+                                                    .cornerRadius(8)
+                                            }
+                                        }
+                                        .frame(width: 160)
+                                        .padding(8)
+                                        .background(Color(.systemBackground))
+                                        .cornerRadius(10)
+                                        .shadow(color: Color.black.opacity(0.02), radius: 1, x: 0, y: 1)
+                                    }
+
+                                    NavigationLink(destination: RecommendedCropsView().environmentObject(appState)) {
+                                        VStack {
+                                            ZStack {
+                                                Circle().fill(Color(.systemGray6)).frame(width: 64, height: 64)
+                                                Image(systemName: "chevron.right")
+                                            }
+                                            Text(LocalizedStringKey("recommendations_title"))
+                                                .font(.caption2)
+                                        }
+                                        .frame(width: 120, height: 120)
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                    }
 
                     // Próximas tareas
                     sectionTitle("dashboard_upcoming_tasks")
@@ -134,6 +223,12 @@ struct DashboardView: View {
                 AddTaskView()
                         .environment(\.managedObjectContext, viewContext)
                         .environmentObject(appState)
+            }
+            .onAppear {
+                loadRecommendations()
+            }
+            .onChange(of: appState.currentUserID) { _ in
+                loadRecommendations()
             }
         }
     }
@@ -292,7 +387,6 @@ struct DashboardView: View {
     }
 
     private func destinationForTask(_ task: TaskEntity) -> some View {
-        // Si la tarea tiene cultivo, vamos a CropDetailView; si no, ir a EditTaskView
         if let crop = task.crop {
             return AnyView(CropDetailView(crop: crop)
                             .environment(\.managedObjectContext, viewContext)
@@ -321,7 +415,6 @@ struct DashboardView: View {
                 }
             }
             Spacer()
-            // If attached crop, show small badge
             if let crop = task.crop {
                 Text(crop.name ?? "")
                     .font(.caption2)
@@ -347,7 +440,6 @@ struct DashboardView: View {
                     .clipped()
                     .cornerRadius(8)
             } else {
-                // placeholder
                 ZStack {
                     Color(.systemGray5)
                     Image(systemName: "leaf.fill")
@@ -413,6 +505,41 @@ struct DashboardView: View {
         .padding(10)
         .background(Color(.systemGray6))
         .cornerRadius(10)
+    }
+
+    // MARK: - Recomendaciones: funciones
+
+    private func loadRecommendations() {
+        isLoadingRecommendations = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            let recs = RecommendationHelper.recommendCrops(context: viewContext, forUserID: appState.currentUserID, maxResults: 8)
+            DispatchQueue.main.async {
+                self.recommendations = recs
+                self.isLoadingRecommendations = false
+                // analytics: marcar mostradas
+                recs.forEach { if let id = $0.crop.cropID { RecommendationAnalytics.logShown(cropID: id) } }
+            }
+        }
+    }
+
+    private func addCropToCollection(_ crop: Crop) {
+        guard let uid = appState.currentUserID else {
+            recMessage = NSLocalizedString("recommendations_error_not_logged", comment: "")
+            return
+        }
+        do {
+            let added = try RecommendationHelper.addCropToUserCollection(crop: crop, userID: uid, context: viewContext)
+            if added {
+                recMessage = NSLocalizedString("recommendations_added", comment: "")
+                if let id = crop.cropID { RecommendationAnalytics.logAccepted(cropID: id) }
+            } else {
+                recMessage = NSLocalizedString("recommendations_in_collection", comment: "")
+            }
+            // recarga recomendaciones y notifica otras vistas
+            loadRecommendations()
+        } catch {
+            recMessage = error.localizedDescription
+        }
     }
 }
 

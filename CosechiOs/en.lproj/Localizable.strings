@@ -270,3 +270,22 @@
 "task_default" = "Task";
 "step_default" = "Step";
 "days_abbr" = "days";
+
+/* Dynamic recommendations */
+"recommendations_title" = "Recommended for you";
+"recommendations_subtitle" = "Crops that might suit you right now";
+"recommendations_no_results" = "No recommendations at the moment.";
+"recommendations_add" = "Add to My Crops";
+"recommendations_added" = "Added to My Crops";
+"recommendations_in_collection" = "Already in your collection";
+"recommendations_error_not_logged" = "Please log in to add crops to your collection.";
+"recommendations_reason_season" = "Suitable season: %@";
+"recommendations_reason_difficulty" = "Difficulty: %@";
+"recommendations_reason_new" = "New to you";
+"recommendations_reason_difficulty_default" = "medium";
+
+/* Seasons */
+"season_spring" = "Spring";
+"season_summer" = "Summer";
+"season_autumn" = "Autumn";
+"season_winter" = "Winter";
