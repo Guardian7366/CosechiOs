@@ -216,3 +216,57 @@
 "dashboard_action_explore" = "Explore";
 "dashboard_action_my_crops" = "My crops";
 "dashboard_action_profile" = "Profile";
+
+/* Crops */
+"crop_tomato_name" = "Tomato";
+"crop_tomato_desc" = "A red-fruited plant popular in urban gardens.";
+"crop_lettuce_name" = "Lettuce";
+"crop_lettuce_desc" = "Great for beginners — fast-growing and low-space.";
+"crop_basil_name" = "Basil";
+"crop_basil_desc" = "Aromatic herb ideal for pots and balconies.";
+"crop_strawberry_name" = "Strawberry";
+"crop_strawberry_desc" = "Sweet fruits; needs sun and regular care.";
+
+"step_germination" = "Germination";
+"step_transplant" = "Transplant";
+"step_growth" = "Vegetative growth";
+"step_harvest" = "Harvest";
+"step_sowing_direct" = "Direct sowing";
+"step_thinning" = "Thinning";
+"step_sowing" = "Sowing";
+"step_planting" = "Planting";
+"step_vegetative" = "Vegetative growth";
+"step_flowering" = "Flowering";
+
+"step_description_template" = "Step: %@";
+
+/* Seasons */
+"season_spring" = "Spring";
+"season_summer" = "Summer";
+"season_autumn" = "Autumn";
+"season_winter" = "Winter";
+
+/* Crop UI labels */
+"crop_default" = "Crop";
+"crop_seasons" = "🌦️ Recommended seasons:";
+"crop_seasons_none" = "No recommended seasons.";
+"crop_add_my" = "Add to My Crops";
+"crop_remove_my" = "Remove from My Crops";
+"crop_add_task" = "➕ Add Task";
+"crop_tasks_title" = "📅 Tasks for this crop";
+"crop_steps" = "📋 Crop steps";
+"crop_progress_title" = "📖 Progress history";
+"crop_progress_empty" = "No progress logs yet.";
+"crop_add_progress" = "Add progress";
+"crop_recommended_now" = "Recommended now";
+
+/* Difficulty */
+"crop_difficulty_very_easy" = "Very easy";
+"crop_difficulty_easy" = "Easy";
+"crop_difficulty_medium" = "Medium";
+"crop_difficulty_hard" = "Hard";
+
+/* Small defaults */
+"task_default" = "Task";
+"step_default" = "Step";
+"days_abbr" = "days";

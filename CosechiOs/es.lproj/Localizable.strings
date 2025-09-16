@@ -212,3 +212,57 @@
 "dashboard_action_explore" = "Explorar";
 "dashboard_action_my_crops" = "Mis cultivos";
 "dashboard_action_profile" = "Perfil";
+
+/* Crops */
+"crop_tomato_name" = "Tomate";
+"crop_tomato_desc" = "Planta de fruto rojo muy popular en huertos urbanos.";
+"crop_lettuce_name" = "Lechuga";
+"crop_lettuce_desc" = "Ideal para principiantes, crece rápido y ocupa poco espacio.";
+"crop_basil_name" = "Albahaca";
+"crop_basil_desc" = "Hierba aromática perfecta para macetas y balcones.";
+"crop_strawberry_name" = "Fresa";
+"crop_strawberry_desc" = "Produce frutos dulces; requiere sol y cuidados regulares.";
+
+"step_germination" = "Germinación";
+"step_transplant" = "Trasplante";
+"step_growth" = "Crecimiento vegetativo";
+"step_harvest" = "Cosecha";
+"step_sowing_direct" = "Siembra directa";
+"step_thinning" = "Raleo";
+"step_sowing" = "Siembra";
+"step_planting" = "Plantación";
+"step_vegetative" = "Crecimiento vegetativo";
+"step_flowering" = "Floración";
+
+"step_description_template" = "Descripción del paso: %@";
+
+/* Seasons */
+"season_spring" = "Primavera";
+"season_summer" = "Verano";
+"season_autumn" = "Otoño";
+"season_winter" = "Invierno";
+
+/* Crop UI labels */
+"crop_default" = "Cultivo";
+"crop_seasons" = "🌦️ Estaciones recomendadas:";
+"crop_seasons_none" = "No hay temporadas recomendadas.";
+"crop_add_my" = "Añadir a Mis Cultivos";
+"crop_remove_my" = "Quitar de Mis Cultivos";
+"crop_add_task" = "➕ Añadir Tarea";
+"crop_tasks_title" = "📅 Tareas de este cultivo";
+"crop_steps" = "📋 Pasos de cultivo";
+"crop_progress_title" = "📖 Historial de Progreso";
+"crop_progress_empty" = "Todavía no hay registros de progreso.";
+"crop_add_progress" = "Añadir progreso";
+"crop_recommended_now" = "Recomendado ahora";
+
+/* Difficulty */
+"crop_difficulty_very_easy" = "Muy fácil";
+"crop_difficulty_easy" = "Fácil";
+"crop_difficulty_medium" = "Media";
+"crop_difficulty_hard" = "Difícil";
+
+/* Small defaults */
+"task_default" = "Tarea";
+"step_default" = "Paso";
+"days_abbr" = "días";
