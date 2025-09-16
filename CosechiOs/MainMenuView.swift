@@ -6,7 +6,6 @@ struct MainMenuView: View {
     var body: some View {
         NavigationStack {
             List {
-                // 🚀 Nuevo acceso al Dashboard
                 NavigationLink(destination: DashboardView()) {
                     MenuCardView(icon: "speedometer", title: "dashboard_title")
                 }
@@ -23,16 +22,14 @@ struct MainMenuView: View {
                     MenuCardView(icon: "calendar", title: "menu_tasks")
                 }
                 
-                // ✅ NUEVO: acceso a todas las tareas
                 NavigationLink(destination: TaskListView()) {
-                    MenuCardView(icon: "checklist", title: "Todas mis tareas")
+                    MenuCardView(icon: "checklist", title: "menu_all_tasks")
                 }
                 
                 NavigationLink(destination: UserProfileView()) {
                     MenuCardView(icon: "person.circle", title: "menu_profile")
                 }
 
-                // Cerrar sesión
                 Button(role: .destructive) {
                     appState.isAuthenticated = false
                     appState.currentUserID = nil
@@ -43,10 +40,11 @@ struct MainMenuView: View {
                     }
                 }
             }
-            .navigationTitle("CosechiOs")
+            .navigationTitle("app_name")
         }
     }
 }
+
 struct MenuCardView: View {
     let icon: String
     let title: LocalizedStringKey
@@ -71,8 +69,4 @@ struct MenuCardView: View {
         }
         .padding(.vertical, 8)
     }
-}
-
-#Preview {
-    MainMenuView().environmentObject(AppState())
 }

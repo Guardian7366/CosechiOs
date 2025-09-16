@@ -17,12 +17,12 @@ struct ExploreCropsView: View {
             // Filtros
             HStack {
                 Menu {
-                    Button("Todas") { selectedCategory = nil }
-                    Button("Hortaliza") { selectedCategory = "Hortaliza" }
-                    Button("Hierba") { selectedCategory = "Hierba" }
-                    Button("Fruta") { selectedCategory = "Fruta" }
+                    Button("filter_all") { selectedCategory = nil }
+                    Button("filter_vegetable") { selectedCategory = "Hortaliza" }
+                    Button("filter_herb") { selectedCategory = "Hierba" }
+                    Button("filter_fruit") { selectedCategory = "Fruta" }
                 } label: {
-                    Label(selectedCategory ?? "Categoría", systemImage: "line.3.horizontal.decrease.circle")
+                    Label(selectedCategory ?? NSLocalizedString("filter_category", comment: ""), systemImage: "line.3.horizontal.decrease.circle")
                 }
                 Spacer()
             }
@@ -32,7 +32,7 @@ struct ExploreCropsView: View {
                 ForEach(filteredCrops, id: \.self) { crop in
                     NavigationLink(destination: CropDetailView(crop: crop)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(crop.name ?? "Sin nombre")
+                            Text(crop.name ?? NSLocalizedString("crop_no_name", comment: ""))
                                 .font(.headline)
                             Text(crop.category ?? "")
                                 .font(.subheadline)
@@ -43,11 +43,10 @@ struct ExploreCropsView: View {
             }
             .listStyle(.insetGrouped)
         }
-        .navigationTitle("Explorar Cultivos")
-        .searchable(text: $searchText, prompt: "Buscar cultivos")
+        .navigationTitle("menu_explore")
+        .searchable(text: $searchText, prompt: Text("search_crops"))
     }
 
-    // Filtro combinado (búsqueda + categoría)
     private var filteredCrops: [Crop] {
         crops.filter { crop in
             let matchCategory = selectedCategory == nil || crop.category == selectedCategory

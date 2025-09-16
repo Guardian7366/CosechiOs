@@ -27,14 +27,14 @@ struct TaskSummaryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Resumen de tareas")
+            Text("task_summary_title")
                 .font(.headline)
 
             HStack {
-                Text("Pendientes: \(pendingTasks)")
+                Text("\(NSLocalizedString("task_pending", comment: "")): \(pendingTasks)")
                     .foregroundColor(.orange)
                 Spacer()
-                Text("Completadas: \(completedTasks)")
+                Text("\(NSLocalizedString("task_completed", comment: "")): \(completedTasks)")
                     .foregroundColor(.green)
             }
             .font(.subheadline)

@@ -11,12 +11,10 @@ struct CropDetailView: View {
     @State private var showingTaskSheet = false
     @State private var stepProgress: [UUID: Bool] = [:]
     
-    // Historial de progreso
     @State private var progressLogs: [ProgressLog] = []
     @State private var showingAddProgress = false
     @State private var selectedLog: ProgressLog? = nil
     
-    // ✅ Nuevo: tareas en tiempo real con FetchRequest
     @FetchRequest private var fetchedTasks: FetchedResults<TaskEntity>
     
     init(crop: Crop) {
@@ -43,25 +41,22 @@ struct CropDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(crop.name ?? "Cultivo")
+        .navigationTitle(crop.name ?? NSLocalizedString("crop_default", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { onAppearActions() }
         
-        // Sheet para añadir tarea
         .sheet(isPresented: $showingTaskSheet) {
             AddTaskView(crop: crop)
                 .environment(\.managedObjectContext, viewContext)
                 .environmentObject(appState)
         }
 
-        // Sheet para añadir progreso
         .sheet(isPresented: $showingAddProgress) {
             AddProgressLogView(crop: crop)
                 .environment(\.managedObjectContext, viewContext)
                 .environmentObject(appState)
                 .onDisappear { loadProgressLogs() }
         }
-        // Sheet para editar progreso
         .sheet(item: $selectedLog) { log in
             EditProgressLogView(log: log)
                 .environment(\.managedObjectContext, viewContext)
@@ -71,10 +66,8 @@ struct CropDetailView: View {
 }
 
 extension CropDetailView {
-    // MARK: - Secciones de UI
-    
     @ViewBuilder private var headerSection: some View {
-        Text(crop.name ?? "Cultivo")
+        Text(crop.name ?? NSLocalizedString("crop_default", comment: ""))
             .font(.largeTitle)
             .bold()
         
@@ -87,7 +80,7 @@ extension CropDetailView {
     
     @ViewBuilder private var seasonsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("🌦️ Estaciones recomendadas:")
+            Text("crop_seasons")
                 .font(.headline)
             if let seasons = crop.recommendedSeasons as? [String] {
                 ForEach(seasons, id: \.self) { season in
@@ -100,7 +93,7 @@ extension CropDetailView {
     @ViewBuilder private var collectionButtons: some View {
         Button(action: toggleCollection) {
             Label(
-                isInCollection ? "Quitar de Mis Cultivos" : "Añadir a Mis Cultivos",
+                isInCollection ? "crop_remove_my" : "crop_add_my",
                 systemImage: isInCollection ? "minus.circle.fill" : "plus.circle.fill"
             )
             .frame(maxWidth: .infinity)
@@ -112,7 +105,7 @@ extension CropDetailView {
             Button {
                 showingTaskSheet = true
             } label: {
-                Label("➕ Añadir Tarea", systemImage: "calendar.badge.plus")
+                Label("crop_add_task", systemImage: "calendar.badge.plus")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -124,13 +117,13 @@ extension CropDetailView {
         let tasksForUser = filteredTasks
         if !tasksForUser.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
-                Text("📅 Tareas de este cultivo")
+                Text("crop_tasks_title")
                     .font(.headline)
                 
                 ForEach(tasksForUser) { task in
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(task.title ?? "Tarea")
+                            Text(task.title ?? NSLocalizedString("task_default", comment: ""))
                                 .font(.subheadline)
                                 .strikethrough(task.status == "completed")
                             
@@ -164,7 +157,7 @@ extension CropDetailView {
     @ViewBuilder private var stepsSection: some View {
         if let steps = crop.steps as? Set<Step>, !steps.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
-                Text("📋 Pasos de cultivo")
+                Text("crop_steps")
                     .font(.headline)
                 
                 let sortedSteps: [Step] = steps.sorted { $0.order < $1.order }
@@ -190,7 +183,7 @@ extension CropDetailView {
                             }
                             .buttonStyle(.plain)
                             
-                            Text(step.title ?? "Paso")
+                            Text(step.title ?? NSLocalizedString("step_default", comment: ""))
                                 .strikethrough(stepProgress[stepID] == true)
                         }
                     }
@@ -201,11 +194,11 @@ extension CropDetailView {
     
     @ViewBuilder private var progressSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("📖 Historial de Progreso")
+            Text("crop_progress_title")
                 .font(.headline)
             
             if progressLogs.isEmpty {
-                Text("Todavía no hay registros de progreso.")
+                Text("crop_progress_empty")
                     .foregroundColor(.secondary)
             } else {
                 ForEach(progressLogs as [ProgressLog], id: \.progressID) { log in
@@ -256,7 +249,7 @@ extension CropDetailView {
             Button {
                 showingAddProgress = true
             } label: {
-                Label("Añadir progreso", systemImage: "plus.circle")
+                Label("crop_add_progress", systemImage: "plus.circle")
             }
         }
     }

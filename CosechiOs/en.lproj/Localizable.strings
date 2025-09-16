@@ -70,3 +70,149 @@
 "add_photo" = "Add photo";
 "remove_photo" = "Remove photo";
 "edit_progress" = "Edit progress";
+
+"loading_preparing" = "Preparing application…";
+"loading_inserting" = "Inserting initial data…";
+"loading_finalizing" = "Finalizing…";
+"loading_ready" = "Ready";
+"progress_percent %d" = "%d percent progress"; // (para accesibilidad)
+
+"register_title" = "Create Account";
+"register_navtitle" = "Register";
+"register_username" = "Username";
+"register_email" = "Email";
+"register_password" = "Password";
+"register_confirm_password" = "Confirm Password";
+"register_button" = "Register";
+"error_password_mismatch" = "Passwords do not match.";
+
+"login_title" = "Sign In";
+"login_navtitle" = "Login";
+"login_email" = "Email";
+"login_password" = "Password";
+"login_button" = "Login";
+
+"menu_all_tasks" = "All My Tasks";
+"app_name" = "CosechiOs";
+
+"profile_gallery" = "Gallery";
+"profile_camera" = "Camera";
+"theme_auto" = "Automatic";
+"theme_light" = "Light";
+"theme_dark" = "Dark";
+"save" = "Save";
+"alert_title" = "Notice";
+"ok" = "OK";
+"profile_saved_success" = "Profile saved successfully.";
+"profile_saved_error" = "Error saving profile: %@";
+
+"task_filter" = "Filter";
+"task_all" = "All";
+"task_today" = "Today";
+"task_upcoming" = "Upcoming";
+"task_delete_title" = "Delete Task";
+"task_delete_message" = "Do you want to delete this task?";
+"delete" = "Delete";
+"task_no_title" = "Untitled";
+"task_crop_prefix" = "Crop:";
+"edit_task" = "Edit Task";
+"mycrops_empty" = "You don’t have crops in your collection.";
+"crop_default" = "Crop";
+"crop_no_name" = "No name";
+
+"filter_all" = "All";
+"filter_vegetable" = "Vegetable";
+"filter_herb" = "Herb";
+"filter_fruit" = "Fruit";
+"filter_category" = "Category";
+"search_crops" = "Search crops";
+
+"task_advanced_notification" = "Advanced Notification";
+"task_repeat" = "Repeat";
+"repeat_none" = "None";
+"repeat_daily" = "Daily";
+"repeat_weekly" = "Weekly";
+"repeat_monthly" = "Monthly";
+"task_remember_days_before" = "Remember days before";
+"task_days_before %d" = "%d days before";
+"task_associated_crop" = "Associated crop";
+"task_not_found" = "Task not found";
+"task_not_found_message" = "The task you are trying to edit no longer exists.";
+"ok" = "OK";
+
+// EditProgressLogView
+"progress_note" = "Progress note";
+"progress_category" = "Category";
+"progress_photo" = "Photo";
+"progress_general" = "General";
+"progress_irrigation" = "Irrigation";
+"progress_fertilization" = "Fertilization";
+"progress_pest" = "Pest";
+"progress_harvest" = "Harvest";
+"remove_photo" = "Remove photo";
+"add_photo" = "Add photo";
+"edit_progress" = "Edit progress";
+"cancel" = "Cancel";
+"save" = "Save";
+
+// CropDetailView
+"crop_default" = "Crop";
+"crop_seasons" = "🌦️ Recommended seasons:";
+"crop_remove_my" = "Remove from My Crops";
+"crop_add_my" = "Add to My Crops";
+"crop_add_task" = "➕ Add Task";
+"crop_tasks_title" = "📅 Tasks for this crop";
+"task_default" = "Task";
+"crop_steps" = "📋 Growing steps";
+"step_default" = "Step";
+"crop_progress_title" = "📖 Progress History";
+"crop_progress_empty" = "No progress logs yet.";
+"crop_add_progress" = "Add progress";
+
+// AddTaskView
+"task_info" = "Task details";
+"task_title" = "Title";
+"task_details" = "Description";
+"task_due_date" = "Date";
+"task_reminder" = "Reminder";
+
+"task_advanced_notification" = "Advanced notification";
+"task_repeat" = "Repeat";
+"repeat_none" = "None";
+"repeat_daily" = "Daily";
+"repeat_weekly" = "Weekly";
+"repeat_monthly" = "Monthly";
+
+"task_remember_days_before" = "Remember days before";
+"task_days_before" = "%d days before";
+
+"task_associated_crop" = "Associated crop";
+"task_new" = "New Task";
+
+// DashboardView
+"dashboard_title" = "Dashboard";
+"dashboard_greeting" = "Welcome back 👋";
+"dashboard_greeting_name" = "Hello, %@ 👋";
+"dashboard_subtitle" = "Here’s your activity summary";
+
+"dashboard_summary" = "Summary";
+"dashboard_tasks" = "tasks";
+"dashboard_completed" = "Completed";
+"dashboard_no_tasks" = "No tasks yet.";
+"dashboard_overdue_count" = "%d overdue tasks";
+
+"dashboard_upcoming_tasks" = "Upcoming tasks";
+"dashboard_no_upcoming" = "No upcoming tasks.";
+
+"dashboard_my_crops" = "My Crops";
+"dashboard_no_crops" = "You don’t have crops in your collection yet.";
+
+"dashboard_recent_progress" = "Recent progress logs";
+"dashboard_no_progress" = "No progress logs yet.";
+"dashboard_progress_no_note" = "No note";
+"dashboard_progress_log_no_crop" = "No crop";
+
+"dashboard_action_add_task" = "New task";
+"dashboard_action_explore" = "Explore";
+"dashboard_action_my_crops" = "My crops";
+"dashboard_action_profile" = "Profile";

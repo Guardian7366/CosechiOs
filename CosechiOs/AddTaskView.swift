@@ -12,52 +12,51 @@ struct AddTaskView: View {
     @State private var dueDate: Date = Date()
     @State private var reminder: Bool = true
 
-    // Notificaciones avanzadas
-    @State private var recurrence: String = "none" // "none","daily","weekly","monthly"
+    @State private var recurrence: String = "none"
     @State private var useRelative: Bool = false
-    @State private var relativeDays: Int = 0 // 0..30
+    @State private var relativeDays: Int = 0
 
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Detalles de la tarea")) {
-                    TextField("Título", text: $title)
-                    TextField("Descripción", text: $details)
-                    DatePicker("Fecha", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
-                    Toggle("Recordatorio", isOn: $reminder)
+                Section(header: Text("task_info")) {
+                    TextField("task_title", text: $title)
+                    TextField("task_details", text: $details)
+                    DatePicker("task_due_date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                    Toggle("task_reminder", isOn: $reminder)
                 }
 
-                Section(header: Text("Notificación avanzada")) {
-                    Picker("Repetir", selection: $recurrence) {
-                        Text("Ninguna").tag("none")
-                        Text("Diaria").tag("daily")
-                        Text("Semanal").tag("weekly")
-                        Text("Mensual").tag("monthly")
+                Section(header: Text("task_advanced_notification")) {
+                    Picker("task_repeat", selection: $recurrence) {
+                        Text("repeat_none").tag("none")
+                        Text("repeat_daily").tag("daily")
+                        Text("repeat_weekly").tag("weekly")
+                        Text("repeat_monthly").tag("monthly")
                     }
                     .pickerStyle(.segmented)
 
-                    Toggle("Recordar días antes", isOn: $useRelative)
+                    Toggle("task_remember_days_before", isOn: $useRelative)
                     if useRelative {
                         Stepper(value: $relativeDays, in: 0...30) {
-                            Text("\(relativeDays) días antes")
+                            Text("task_days_before \(relativeDays)")
                         }
                     }
                 }
 
                 if let crop = crop {
-                    Section(header: Text("Cultivo asociado")) {
+                    Section(header: Text("task_associated_crop")) {
                         Text(crop.name ?? "—")
                             .foregroundColor(.secondary)
                     }
                 }
             }
-            .navigationTitle("Nueva Tarea")
+            .navigationTitle("task_new")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { dismiss() }
+                    Button("cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Guardar") {
+                    Button("save") {
                         saveTask()
                     }
                     .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -78,28 +77,21 @@ struct AddTaskView: View {
         task.updatedAt = Date()
         if let c = crop { task.crop = c }
 
-        // Guardar la configuración extra
         task.recurrenceRule = recurrence
         task.relativeDays = Int16(useRelative ? relativeDays : 0)
 
-        // ASIGNAR USER: evita tareas "sin dueño"
         if let uid = appState.currentUserID {
             let ufr: NSFetchRequest<User> = User.fetchRequest()
             ufr.predicate = NSPredicate(format: "userID == %@", uid as CVarArg)
             ufr.fetchLimit = 1
             if let user = try? viewContext.fetch(ufr).first {
                 task.user = user
-            } else {
-                print("⚠️ AddTaskView: usuario no encontrado para userID=\(uid)")
             }
-        } else {
-            print("⚠️ AddTaskView: no hay usuario autenticado, task no tendrá owner")
         }
 
         do {
             try viewContext.save()
             if reminder {
-                // usar NotificationHelper (éste sí implementado)
                 NotificationHelper.scheduleNotification(for: task)
             }
             dismiss()
@@ -108,7 +100,4 @@ struct AddTaskView: View {
             viewContext.rollback()
         }
     }
-
-      
 }
-

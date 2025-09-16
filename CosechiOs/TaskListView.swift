@@ -20,10 +20,10 @@ struct TaskListView: View {
 
     var body: some View {
         VStack {
-            Picker("Filtro", selection: $filter) {
-                Text("Pendientes").tag("pending")
-                Text("Completadas").tag("completed")
-                Text("Todas").tag("all")
+            Picker("task_filter", selection: $filter) {
+                Text("task_pending").tag("pending")
+                Text("task_completed").tag("completed")
+                Text("task_all").tag("all")
             }
             .pickerStyle(.segmented)
             .padding()
@@ -34,7 +34,7 @@ struct TaskListView: View {
                     $0.dueDate != nil && Calendar.current.isDateInToday($0.dueDate!)
                 }
                 if !todayTasks.isEmpty {
-                    Section(header: Text("Hoy")) {
+                    Section(header: Text("task_today")) {
                         ForEach(todayTasks, id: \.objectID) { task in
                             taskRow(task)
                         }
@@ -46,7 +46,7 @@ struct TaskListView: View {
                     $0.dueDate != nil && $0.dueDate! > today
                 }
                 if !upcoming.isEmpty {
-                    Section(header: Text("Próximas")) {
+                    Section(header: Text("task_upcoming")) {
                         ForEach(upcoming, id: \.objectID) { task in
                             taskRow(task)
                         }
@@ -56,7 +56,7 @@ struct TaskListView: View {
                 // COMPLETADAS
                 let completed = filteredTasks.filter { $0.status == "completed" }
                 if !completed.isEmpty {
-                    Section(header: Text("Completadas")) {
+                    Section(header: Text("task_completed")) {
                         ForEach(completed, id: \.objectID) { task in
                             taskRow(task)
                         }
@@ -65,32 +65,29 @@ struct TaskListView: View {
             }
             .listStyle(.insetGrouped)
         }
-        .navigationTitle("Todas mis tareas")
-        // abrir editor pasando objectID
+        .navigationTitle("menu_all_tasks")
         .sheet(item: $selectedTaskID) { wrapper in
             EditTaskView(taskID: wrapper.id)
                 .environment(\.managedObjectContext, viewContext)
         }
-        // confirm delete alert
         .alert(item: $showDeleteAlertFor) { wrapper in
-            Alert(title: Text("Eliminar tarea"),
-                  message: Text("¿Eliminar esta tarea?"),
-                  primaryButton: .destructive(Text("Eliminar")) {
-                      deleteTask(by: wrapper.id)
-                  },
-                  secondaryButton: .cancel()
+            Alert(
+                title: Text("task_delete_title"),
+                message: Text("task_delete_message"),
+                primaryButton: .destructive(Text("delete")) {
+                    deleteTask(by: wrapper.id)
+                },
+                secondaryButton: .cancel()
             )
         }
     }
 
     // MARK: - Helpers
 
-    /// Filtrado por usuario actual (ya NO por crops compartidos)
     private var filteredTasks: [TaskEntity] {
         guard let uid = appState.currentUserID else { return [] }
 
         return allTasks.filter { task in
-            // Solo mostrar tareas creadas por este usuario
             task.user?.userID == uid
         }
         .filter { task in
@@ -106,7 +103,7 @@ struct TaskListView: View {
     private func taskRow(_ task: TaskEntity) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(task.title ?? "Sin título")
+                Text(task.title ?? NSLocalizedString("task_no_title", comment: ""))
                     .font(.headline)
                     .strikethrough(task.status == "completed")
 
@@ -117,14 +114,13 @@ struct TaskListView: View {
                 }
 
                 if let crop = task.crop {
-                    Text("🌱 Cultivo: \(crop.name ?? "-")")
+                    Text("\(NSLocalizedString("task_crop_prefix", comment: "")) \(crop.name ?? "-")")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
             }
             Spacer()
 
-            // ✅ Completar
             if task.status == "pending" {
                 Button {
                     completeTask(task)
@@ -138,7 +134,6 @@ struct TaskListView: View {
                     .foregroundColor(.gray)
             }
 
-            // ✏️ Editar
             Button {
                 selectedTaskID = ManagedObjectIDWrapper(id: task.objectID)
             } label: {
@@ -146,7 +141,6 @@ struct TaskListView: View {
             }
             .buttonStyle(.plain)
 
-            // 🗑 Eliminar
             Button(role: .destructive) {
                 showDeleteAlertFor = ManagedObjectIDWrapper(id: task.objectID)
             } label: {
@@ -157,7 +151,6 @@ struct TaskListView: View {
         .padding(.vertical, 4)
     }
 
-    // marcar como completada
     private func completeTask(_ task: TaskEntity) {
         task.status = "completed"
         task.updatedAt = Date()
@@ -170,7 +163,6 @@ struct TaskListView: View {
         }
     }
 
-    // eliminar una tarea segura
     private func deleteTask(by objectID: NSManagedObjectID) {
         viewContext.perform {
             do {

@@ -70,3 +70,145 @@
 "add_photo" = "Añadir foto";
 "remove_photo" = "Eliminar foto";
 "edit_progress" = "Editar progreso";
+
+"loading_preparing" = "Preparando la aplicación…";
+"loading_inserting" = "Insertando datos iniciales…";
+"loading_finalizing" = "Finalizando…";
+"loading_ready" = "Listo";
+"progress_percent %d" = "%d por ciento de progreso";
+
+"register_title" = "Crear cuenta";
+"register_navtitle" = "Registro";
+"register_username" = "Nombre de usuario";
+"register_email" = "Correo electrónico";
+"register_password" = "Contraseña";
+"register_confirm_password" = "Confirmar contraseña";
+"register_button" = "Registrarse";
+"error_password_mismatch" = "Las contraseñas no coinciden.";
+
+"login_title" = "Iniciar sesión";
+"login_navtitle" = "Login";
+"login_email" = "Correo electrónico";
+"login_password" = "Contraseña";
+"login_button" = "Entrar";
+
+"menu_all_tasks" = "Todas mis tareas";
+"app_name" = "CosechiOs";
+
+"profile_gallery" = "Galería";
+"profile_camera" = "Cámara";
+"theme_auto" = "Automático";
+"theme_light" = "Claro";
+"theme_dark" = "Oscuro";
+"save" = "Guardar";
+"alert_title" = "Aviso";
+"ok" = "OK";
+"profile_saved_success" = "Perfil guardado correctamente.";
+"profile_saved_error" = "Error al guardar perfil: %@";
+
+"task_filter" = "Filtro";
+"task_all" = "Todas";
+"task_today" = "Hoy";
+"task_upcoming" = "Próximas";
+"task_delete_title" = "Eliminar tarea";
+"task_delete_message" = "¿Eliminar esta tarea?";
+"delete" = "Eliminar";
+"task_no_title" = "Sin título";
+"task_crop_prefix" = "🌱 Cultivo:";
+
+"mycrops_empty" = "No tienes cultivos en tu colección.";
+"crop_default" = "Cultivo";
+"crop_no_name" = "Sin nombre";
+
+"filter_all" = "Todas";
+"filter_vegetable" = "Hortaliza";
+"filter_herb" = "Hierba";
+"filter_fruit" = "Fruta";
+"filter_category" = "Categoría";
+"search_crops" = "Buscar cultivos";
+
+"task_advanced_notification" = "Notificación avanzada";
+"task_repeat" = "Repetir";
+"repeat_none" = "Ninguna";
+"repeat_daily" = "Diaria";
+"repeat_weekly" = "Semanal";
+"repeat_monthly" = "Mensual";
+"task_remember_days_before" = "Recordar días antes";
+"task_days_before %d" = "%d días antes";
+"task_associated_crop" = "Cultivo asociado";
+"task_not_found" = "Tarea no encontrada";
+"task_not_found_message" = "La tarea que intentas editar ya no existe.";
+"ok" = "OK";
+
+"progress_note" = "Nota";
+"progress_category" = "Categoría";
+"progress_photo" = "Foto";
+"progress_general" = "General";
+"progress_irrigation" = "Riego";
+"progress_fertilization" = "Fertilización";
+"progress_pest" = "Plaga";
+"progress_harvest" = "Cosecha";
+"remove_photo" = "Eliminar foto";
+"add_photo" = "Añadir foto";
+"edit_progress" = "Editar progreso";
+"cancel" = "Cancelar";
+"save" = "Guardar";
+
+"crop_default" = "Cultivo";
+"crop_seasons" = "🌦️ Estaciones recomendadas:";
+"crop_remove_my" = "Quitar de Mis Cultivos";
+"crop_add_my" = "Añadir a Mis Cultivos";
+"crop_add_task" = "➕ Añadir Tarea";
+"crop_tasks_title" = "📅 Tareas de este cultivo";
+"task_default" = "Tarea";
+"crop_steps" = "📋 Pasos de cultivo";
+"step_default" = "Paso";
+"crop_progress_title" = "📖 Historial de Progreso";
+"crop_progress_empty" = "Todavía no hay registros de progreso.";
+"crop_add_progress" = "Añadir progreso";
+
+"task_info" = "Detalles de la tarea";
+"task_title" = "Título";
+"task_details" = "Descripción";
+"task_due_date" = "Fecha";
+"task_reminder" = "Recordatorio";
+
+"task_advanced_notification" = "Notificación avanzada";
+"task_repeat" = "Repetir";
+"repeat_none" = "Ninguna";
+"repeat_daily" = "Diaria";
+"repeat_weekly" = "Semanal";
+"repeat_monthly" = "Mensual";
+
+"task_remember_days_before" = "Recordar días antes";
+"task_days_before" = "%d días antes";
+"edit_task" = "Editar Tarea";
+"task_associated_crop" = "Cultivo asociado";
+"task_new" = "Nueva Tarea";
+
+"dashboard_title" = "Panel principal";
+"dashboard_greeting" = "Bienvenido de nuevo 👋";
+"dashboard_greeting_name" = "Hola, %@ 👋";
+"dashboard_subtitle" = "Aquí está el resumen de tu actividad";
+
+"dashboard_summary" = "Resumen";
+"dashboard_tasks" = "tareas";
+"dashboard_completed" = "Completadas";
+"dashboard_no_tasks" = "No tienes tareas aún.";
+"dashboard_overdue_count" = "%d tareas vencidas";
+
+"dashboard_upcoming_tasks" = "Próximas tareas";
+"dashboard_no_upcoming" = "No tienes tareas próximas.";
+
+"dashboard_my_crops" = "Mis Cultivos";
+"dashboard_no_crops" = "Todavía no tienes cultivos en tu colección.";
+
+"dashboard_recent_progress" = "Últimos registros de progreso";
+"dashboard_no_progress" = "Todavía no has añadido registros.";
+"dashboard_progress_no_note" = "Sin nota";
+"dashboard_progress_log_no_crop" = "Sin cultivo";
+
+"dashboard_action_add_task" = "Nueva tarea";
+"dashboard_action_explore" = "Explorar";
+"dashboard_action_my_crops" = "Mis cultivos";
+"dashboard_action_profile" = "Perfil";

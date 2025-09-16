@@ -12,7 +12,7 @@ struct MyCropsView: View {
     var body: some View {
         VStack {
             if userCollections.isEmpty {
-                Text("No tienes cultivos en tu colección.")
+                Text("mycrops_empty")
                     .foregroundColor(.secondary)
                     .padding()
             } else {
@@ -21,7 +21,7 @@ struct MyCropsView: View {
                         if let crop = uc.crop {
                             NavigationLink(destination: CropDetailView(crop: crop)) {
                                 VStack(alignment: .leading) {
-                                    Text(crop.name ?? "Cultivo")
+                                    Text(crop.name ?? NSLocalizedString("crop_default", comment: ""))
                                         .font(.headline)
                                     Text(crop.category ?? "")
                                         .font(.subheadline)
@@ -35,7 +35,7 @@ struct MyCropsView: View {
                 .listStyle(.insetGrouped)
             }
         }
-        .navigationTitle("Mis Cultivos")
+        .navigationTitle("menu_my_crops")
         .onAppear {
             loadUserCollections()
             notificationCenter.addObserver(forName: .userCollectionsChanged, object: nil, queue: .main) { _ in
@@ -56,7 +56,6 @@ struct MyCropsView: View {
             let results = (try? viewContext.fetch(fr)) ?? []
             DispatchQueue.main.async {
                 self.userCollections = results
-                // DEBUG
                 for uc in results {
                     print("📦 Loaded collection: crop=\(uc.crop?.name ?? "nil") uc=\(uc.collectionID?.uuidString ?? "nil")")
                 }
@@ -82,4 +81,3 @@ struct MyCropsView: View {
         }
     }
 }
-

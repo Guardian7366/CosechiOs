@@ -8,7 +8,6 @@ struct EditTaskView: View {
 
     let taskID: NSManagedObjectID
 
-    // Campos editables
     @State private var title: String = ""
     @State private var details: String = ""
     @State private var dueDate: Date = Date()
@@ -34,25 +33,25 @@ struct EditTaskView: View {
                     Toggle("task_reminder", isOn: $reminder)
                 }
 
-                Section(header: Text("Notificación avanzada")) {
-                    Picker("Repetir", selection: $recurrence) {
-                        Text("Ninguna").tag("none")
-                        Text("Diaria").tag("daily")
-                        Text("Semanal").tag("weekly")
-                        Text("Mensual").tag("monthly")
+                Section(header: Text("task_advanced_notification")) {
+                    Picker("task_repeat", selection: $recurrence) {
+                        Text("repeat_none").tag("none")
+                        Text("repeat_daily").tag("daily")
+                        Text("repeat_weekly").tag("weekly")
+                        Text("repeat_monthly").tag("monthly")
                     }
                     .pickerStyle(.segmented)
 
-                    Toggle("Recordar días antes", isOn: $useRelative)
+                    Toggle("task_remember_days_before", isOn: $useRelative)
                     if useRelative {
                         Stepper(value: $relativeDays, in: 0...30) {
-                            Text("\(relativeDays) días antes")
+                            Text("task_days_before \(relativeDays)")
                         }
                     }
                 }
 
                 if let crop = liveTask?.crop {
-                    Section(header: Text("Cultivo asociado")) {
+                    Section(header: Text("task_associated_crop")) {
                         Text(crop.name ?? "—").foregroundColor(.secondary)
                     }
                 }
@@ -70,10 +69,10 @@ struct EditTaskView: View {
                 }
             }
             .onAppear(perform: loadLiveTask)
-            .alert("Tarea no encontrada", isPresented: $showMissingAlert) {
-                Button("OK", role: .cancel) { dismiss() }
+            .alert("task_not_found", isPresented: $showMissingAlert) {
+                Button("ok", role: .cancel) { dismiss() }
             } message: {
-                Text("La tarea que intentas editar ya no existe.")
+                Text("task_not_found_message")
             }
         }
     }
@@ -113,7 +112,6 @@ struct EditTaskView: View {
             t.recurrenceRule = recurrence
             t.relativeDays = Int16(useRelative ? relativeDays : 0)
 
-            // notificaciones seguras
             if reminder {
                 NotificationHelper.reschedule(for: t)
             } else {

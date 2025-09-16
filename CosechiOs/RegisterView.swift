@@ -10,43 +10,83 @@ struct RegisterView: View {
     @State private var password = ""
     @State private var confirmPassword = ""
 
+    @State private var showPassword = false
+    @State private var showConfirmPassword = false
+
     @State private var errorMessage: String?
     @State private var isLoading = false
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Crear cuenta")
+            Text("register_title")
                 .font(.largeTitle).bold()
 
-            TextField("Nombre de usuario", text: $username)
+            // Nombre de usuario
+            TextField("register_username", text: $username)
                 .textFieldStyle(.roundedBorder)
 
-            TextField("Correo electrónico", text: $email)
+            // Email
+            TextField("register_email", text: $email)
                 .keyboardType(.emailAddress)
                 .autocapitalization(.none)
+                .disableAutocorrection(true)
                 .textFieldStyle(.roundedBorder)
 
-            SecureField("Contraseña", text: $password)
-                .textFieldStyle(.roundedBorder)
+            // Contraseña
+            HStack {
+                if showPassword {
+                    TextField("register_password", text: $password)
+                        .textContentType(.oneTimeCode) // 🚫 elimina cuadro amarillo
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .textFieldStyle(.roundedBorder)
+                } else {
+                    SecureField("register_password", text: $password)
+                        .textContentType(.oneTimeCode) // 🚫 elimina cuadro amarillo
+                        .textFieldStyle(.roundedBorder)
+                }
 
-            SecureField("Confirmar contraseña", text: $confirmPassword)
-                .textFieldStyle(.roundedBorder)
+                Button { showPassword.toggle() } label: {
+                    Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
+                        .foregroundColor(.gray)
+                }
+            }
 
+            // Confirmar contraseña
+            HStack {
+                if showConfirmPassword {
+                    TextField("register_confirm_password", text: $confirmPassword)
+                        .textContentType(.oneTimeCode) // 🚫 elimina cuadro amarillo
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .textFieldStyle(.roundedBorder)
+                } else {
+                    SecureField("register_confirm_password", text: $confirmPassword)
+                        .textContentType(.oneTimeCode) // 🚫 elimina cuadro amarillo
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                Button { showConfirmPassword.toggle() } label: {
+                    Image(systemName: showConfirmPassword ? "eye.slash.fill" : "eye.fill")
+                        .foregroundColor(.gray)
+                }
+            }
+
+            // Errores
             if let error = errorMessage {
                 Text(error)
                     .foregroundColor(.red)
                     .font(.caption)
             }
 
+            // Botón Registrar
             Button {
-                Task {
-                    await register()
-                }
+                Task { await register() }
             } label: {
                 if isLoading {
                     ProgressView()
                 } else {
-                    Text("Registrarse")
+                    Text("register_button")
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -56,12 +96,13 @@ struct RegisterView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Registro")
+        .navigationTitle("register_navtitle")
     }
 
+    // MARK: - Lógica de registro
     private func register() async {
         guard password == confirmPassword else {
-            errorMessage = "Las contraseñas no coinciden."
+            errorMessage = NSLocalizedString("error_password_mismatch", comment: "")
             return
         }
 
@@ -80,4 +121,3 @@ struct RegisterView: View {
         isLoading = false
     }
 }
-

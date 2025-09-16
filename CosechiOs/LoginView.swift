@@ -12,15 +12,15 @@ struct LoginView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Iniciar sesión")
+            Text("login_title")
                 .font(.largeTitle).bold()
 
-            TextField("Correo electrónico", text: $email)
+            TextField("login_email", text: $email)
                 .keyboardType(.emailAddress)
                 .autocapitalization(.none)
                 .textFieldStyle(.roundedBorder)
 
-            SecureField("Contraseña", text: $password)
+            SecureField("login_password", text: $password)
                 .textFieldStyle(.roundedBorder)
 
             if let error = errorMessage {
@@ -30,14 +30,12 @@ struct LoginView: View {
             }
 
             Button {
-                Task {
-                    await login()
-                }
+                Task { await login() }
             } label: {
                 if isLoading {
                     ProgressView()
                 } else {
-                    Text("Entrar")
+                    Text("login_button")
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -47,7 +45,7 @@ struct LoginView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Login")
+        .navigationTitle("login_navtitle")
     }
 
     private func login() async {

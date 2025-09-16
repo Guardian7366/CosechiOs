@@ -4,17 +4,24 @@ import CoreData
 struct TaskCalendarView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
-    
-    @State private var tasks: [TaskEntity] = []
+
+    // FetchRequest en vivo: cualquier cambio en Core Data actualizará esta colección.
+    @FetchRequest(
+        entity: TaskEntity.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)],
+        animation: .default
+    )
+    private var allTasks: FetchedResults<TaskEntity>
+
     @State private var showingEditTaskID: ManagedObjectIDWrapper? = nil
-    
+
     var body: some View {
         NavigationStack {
             VStack {
                 TaskSummaryView()
                     .environment(\.managedObjectContext, viewContext)
                     .padding(.horizontal)
-                
+
                 List {
                     ForEach(groupedDates, id: \.self) { date in
                         Section(header: Text(formattedDate(date))) {
@@ -29,7 +36,7 @@ struct TaskCalendarView: View {
                     }
                 }
             }
-            .navigationTitle("calendar_tasks")
+            .navigationTitle("menu_tasks")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(
@@ -41,58 +48,80 @@ struct TaskCalendarView: View {
                     }
                 }
             }
+            // editar tarea
             .sheet(item: $showingEditTaskID) { wrapper in
                 EditTaskView(taskID: wrapper.id)
                     .environment(\.managedObjectContext, viewContext)
-                    .onDisappear(perform: loadTasks)
+                    .onDisappear {
+                        // no suele ser necesario, FetchRequest se actualiza automáticamente,
+                        // pero forzamos pequeño refresco visual por si acaso
+                        DispatchQueue.main.async { /* noop */ }
+                    }
             }
-            .onAppear(perform: loadTasks)
-            .onChange(of: appState.currentUserID) { _ in loadTasks() }
+            .onAppear {
+                // Si quieres forzar carga inicial (no estrictamente necesario)
+                print("TaskCalendarView appear, total fetched tasks: \(allTasks.count)")
+            }
+            // cuando cambia de usuario, SwiftUI reevaluará las computed props y la lista
+            .onChange(of: appState.currentUserID) { _ in
+                // no-op: kept for clarity; fetch request + computed properties handle updates
+            }
         }
     }
-    
-    // MARK: - Helpers
-    
+
+    // MARK: - Computed helpers using live fetched results
+
+    /// tareas filtradas por usuario actual (las que el usuario creó)
+    private var tasksForUser: [TaskEntity] {
+        guard let uid = appState.currentUserID else { return [] }
+        return allTasks.filter { $0.user?.userID == uid }
+    }
+
     private var groupedDates: [Date] {
         groupedTasks.keys.sorted()
     }
-    
+
     private var groupedTasks: [Date: [TaskEntity]] {
-        Dictionary(grouping: tasks) { task in
+        Dictionary(grouping: tasksForUser) { task in
             Calendar.current.startOfDay(for: task.dueDate ?? Date())
         }
     }
-    
+
     private func formattedDate(_ date: Date) -> String {
         let df = DateFormatter()
         df.dateStyle = .full
         df.timeStyle = .none
         return df.string(from: date)
     }
-    
+
     private func taskRow(_ task: TaskEntity) -> some View {
         HStack {
+            // completar (toggle) — TaskHelper hace save en background; FetchRequest actualizará la UI
             Button(action: {
                 TaskHelper.toggleCompletion(for: task.objectID, context: viewContext) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { loadTasks() }
+                    // nada extra necesario: FetchRequest actualizará vista cuando Core Data cambie.
+                    // si quieres animación:
+                    DispatchQueue.main.async {
+                        withAnimation { /* noop to hint update */ }
+                    }
                 }
             }) {
                 Image(systemName: task.status == "completed" ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(task.status == "completed" ? .green : .gray)
             }
             .buttonStyle(.plain)
-            
+
             VStack(alignment: .leading) {
-                Text(task.title ?? "")
+                Text(task.title ?? NSLocalizedString("task_no_title", comment: ""))
                     .strikethrough(task.status == "completed")
                     .font(.body)
                 if let details = task.details, !details.isEmpty {
                     Text(details).font(.caption).foregroundColor(.secondary)
                 }
             }
-            
+
             Spacer()
-            
+
             Button {
                 showingEditTaskID = ManagedObjectIDWrapper(id: task.objectID)
             } label: {
@@ -101,15 +130,15 @@ struct TaskCalendarView: View {
             .buttonStyle(.plain)
         }
     }
-    
+
     private func deleteTask(at offsets: IndexSet, in tasksForSection: [TaskEntity]) {
         let toDelete = offsets.compactMap { index -> TaskEntity? in
             guard index < tasksForSection.count else { return nil }
             return tasksForSection[index]
         }
-        
+
         guard !toDelete.isEmpty else { return }
-        
+
         viewContext.perform {
             for t in toDelete {
                 NotificationHelper.cancelNotification(for: t)
@@ -117,30 +146,10 @@ struct TaskCalendarView: View {
             }
             do {
                 try viewContext.save()
-                DispatchQueue.main.async {
-                    loadTasks()
-                }
             } catch {
                 print("❌ Error al eliminar tasks: \(error)")
                 viewContext.rollback()
             }
         }
     }
-    
-    private func loadTasks() {
-        let fr: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
-        fr.sortDescriptors = [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)]
-        do {
-            let all = try viewContext.fetch(fr)
-            guard let uid = appState.currentUserID else { tasks = []; return }
-
-            // Sólo tareas creadas por este usuario
-            tasks = all.filter { $0.user?.userID == uid }
-            print("📋 TaskCalendarView.loadTasks -> \(tasks.count) tasks for user \(uid)")
-        } catch {
-            print("❌ TaskCalendarView.loadTasks fetch error: \(error)")
-            tasks = []
-        }
-    }
-
 }

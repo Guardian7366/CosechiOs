@@ -21,7 +21,6 @@ struct UserProfileView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // Perfil
                 Section(header: Text("profile_title")) {
                     HStack {
                         Spacer()
@@ -45,11 +44,11 @@ struct UserProfileView: View {
                             }
 
                             HStack(spacing: 20) {
-                                Button("Galería") {
+                                Button("profile_gallery") {
                                     imageSource = .photoLibrary
                                     showingImagePicker = true
                                 }
-                                Button("Cámara") {
+                                Button("profile_camera") {
                                     imageSource = .camera
                                     showingImagePicker = true
                                 }
@@ -71,7 +70,6 @@ struct UserProfileView: View {
                     }
                 }
 
-                // Configuración
                 Section(header: Text("profile_language")) {
                     Picker("profile_language", selection: Binding(
                         get: { config?.language ?? appState.appLanguage },
@@ -86,15 +84,13 @@ struct UserProfileView: View {
                                     self.config = cfg
                                 }
                             }
-                            // Guardar en UserDefaults y actualizar AppState en main thread
-                                    DispatchQueue.main.async {
-                                        UserDefaults.standard.set(newValue, forKey: "appLanguage")
-                                        appState.appLanguage = newValue
-                                    }
+                            DispatchQueue.main.async {
+                                UserDefaults.standard.set(newValue, forKey: "appLanguage")
+                                appState.appLanguage = newValue
+                            }
                         })) {
                         Text("English").tag("en")
                         Text("Español").tag("es")
-                        
                     }
                 }
 
@@ -114,13 +110,12 @@ struct UserProfileView: View {
                                 try? ConfigHelper.save(cfg, context: viewContext)
                             }
                         })) {
-                        Text("Automático").tag("Auto")
-                        Text("Claro").tag("Light")
-                        Text("Oscuro").tag("Dark")
+                        Text("theme_auto").tag("Auto")
+                        Text("theme_light").tag("Light")
+                        Text("theme_dark").tag("Dark")
                     }
                 }
 
-                // Extra
                 Section {
                     Button(role: .destructive) {
                         user?.profilePicture = nil
@@ -141,7 +136,7 @@ struct UserProfileView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: saveProfile) {
-                        if isSaving { ProgressView() } else { Text("Guardar") }
+                        if isSaving { ProgressView() } else { Text("save") }
                     }
                 }
             }
@@ -156,7 +151,9 @@ struct UserProfileView: View {
                 }
             }
             .alert(isPresented: $showAlert) {
-                Alert(title: Text("Aviso"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                Alert(title: Text("alert_title"),
+                      message: Text(alertMessage),
+                      dismissButton: .default(Text("ok")))
             }
         }
     }
@@ -185,10 +182,10 @@ struct UserProfileView: View {
         user.updatedAt = Date()
         do {
             try viewContext.save()
-            alertMessage = "Perfil guardado correctamente."
+            alertMessage = NSLocalizedString("profile_saved_success", comment: "")
             showAlert = true
         } catch {
-            alertMessage = "Error al guardar perfil: \(error.localizedDescription)"
+            alertMessage = String(format: NSLocalizedString("profile_saved_error", comment: ""), error.localizedDescription)
             showAlert = true
         }
         isSaving = false
@@ -209,5 +206,3 @@ struct UserProfileView: View {
         }
     }
 }
-
-

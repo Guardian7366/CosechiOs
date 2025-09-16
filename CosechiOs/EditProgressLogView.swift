@@ -11,14 +11,14 @@ struct EditProgressLogView: View {
     @State private var showImagePicker = false
     @State private var category: String
 
-    let categories = ["General", "Riego", "Fertilización", "Plaga", "Cosecha"]
+    let categories = ["progress_general", "progress_irrigation", "progress_fertilization", "progress_pest", "progress_harvest"]
 
     var log: ProgressLog
 
     init(log: ProgressLog) {
         self.log = log
         _note = State(initialValue: log.note ?? "")
-        _category = State(initialValue: log.category ?? "General")
+        _category = State(initialValue: log.category ?? "progress_general")
         if let data = log.imageData, let ui = UIImage(data: data) {
             _image = State(initialValue: ui)
         } else {
@@ -35,9 +35,9 @@ struct EditProgressLogView: View {
                 }
 
                 Section("progress_category") {
-                    Picker("Categoría", selection: $category) {
+                    Picker("progress_category", selection: $category) {
                         ForEach(categories, id: \.self) { cat in
-                            Text(cat).tag(cat)
+                            Text(LocalizedStringKey(cat)).tag(cat)
                         }
                     }
                     .pickerStyle(.menu)
@@ -85,4 +85,3 @@ struct EditProgressLogView: View {
         ProgressLogHelper.editLog(log, note: note.isEmpty ? nil : note, image: image, category: category, context: viewContext)
     }
 }
-
