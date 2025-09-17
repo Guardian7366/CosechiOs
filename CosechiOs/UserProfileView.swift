@@ -14,9 +14,13 @@ struct UserProfileView: View {
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
     @State private var pickedUIImage: UIImage?
 
+    @State private var showingEditor = false
+    @State private var editedUIImage: UIImage?
+
     @State private var isSaving = false
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var showDeleteConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -26,32 +30,42 @@ struct UserProfileView: View {
                     HStack {
                         Spacer()
                         VStack {
-                            if let imgData = user?.profilePicture,
-                               let ui = UIImage(data: imgData) {
-                                Image(uiImage: ui)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 110, height: 110)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                                    .shadow(radius: 3)
-                            } else {
-                                Image(systemName: "person.crop.square")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 110, height: 110)
-                                    .foregroundColor(.secondary)
-                                    .background(Color(.systemGray6))
-                                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                            ZStack(alignment: .bottomTrailing) {
+                                if let imgData = user?.profilePicture,
+                                   let ui = UIImage(data: imgData) {
+                                    Image(uiImage: ui)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 120, height: 120)
+                                        .clipShape(Circle())
+                                        .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
+                                        .shadow(radius: 4)
+                                } else {
+                                    Image(systemName: "person.circle.fill")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 120, height: 120)
+                                        .foregroundColor(.secondary)
+                                        .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
+                                }
+
+                                Button {
+                                    openImagePicker(source: .photoLibrary)
+                                } label: {
+                                    Image(systemName: "pencil.circle.fill")
+                                        .font(.system(size: 28))
+                                        .foregroundColor(.blue)
+                                        .background(Color.white.clipShape(Circle()))
+                                }
+                                .offset(x: -8, y: -8)
                             }
 
                             HStack(spacing: 20) {
                                 Button("profile_gallery") {
-                                    imageSource = .photoLibrary
-                                    showingImagePicker = true
+                                    openImagePicker(source: .photoLibrary)
                                 }
                                 Button("profile_camera") {
-                                    imageSource = .camera
-                                    showingImagePicker = true
+                                    openImagePicker(source: .camera)
                                 }
                             }
                             .font(.caption)
@@ -126,8 +140,7 @@ struct UserProfileView: View {
                         )) {
                             Text("profile_notify_tips")
                         }
-                        
-                        // NUEVO: enlace al historial
+
                         NavigationLink(destination: NotificationHistoryView()
                             .environment(\.managedObjectContext, viewContext)) {
                             Text("profile_notifications_history")
@@ -154,8 +167,7 @@ struct UserProfileView: View {
                 // MARK: - Extras
                 Section {
                     Button(role: .destructive) {
-                        user?.profilePicture = nil
-                        try? viewContext.save()
+                        showDeleteConfirm = true
                     } label: {
                         Text("profile_delete_photo")
                     }
@@ -179,10 +191,16 @@ struct UserProfileView: View {
             .onAppear { loadUserAndConfig() }
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(sourceType: imageSource) { img in
-                    let resized = img.resizeTo(maxDimension: 1024)
-                    if let data = resized.jpegData(compressionQuality: 0.8) {
-                        user?.profilePicture = data
-                        try? viewContext.save()
+                    pickedUIImage = img
+                    showingEditor = true
+                }
+            }
+            .sheet(isPresented: $showingEditor, onDismiss: saveEditedImage) {
+                if let picked = pickedUIImage {
+                    AvatarEditorView(image: picked) { result in
+                        editedUIImage = result
+                        saveEditedImage()
+                        showingEditor = false
                     }
                 }
             }
@@ -190,6 +208,15 @@ struct UserProfileView: View {
                 Alert(title: Text("alert_title"),
                       message: Text(alertMessage),
                       dismissButton: .default(Text("ok")))
+            }
+            .confirmationDialog("profile_delete_photo_confirm",
+                                isPresented: $showDeleteConfirm,
+                                titleVisibility: .visible) {
+                Button("delete", role: .destructive) {
+                    user?.profilePicture = nil
+                    try? viewContext.save()
+                }
+                Button("cancel", role: .cancel) {}
             }
         }
     }
@@ -227,6 +254,15 @@ struct UserProfileView: View {
         isSaving = false
     }
 
+    private func saveEditedImage() {
+        guard let edited = editedUIImage else { return }
+        let resized = edited.resizeTo(maxDimension: 1024)
+        if let data = resized.jpegData(compressionQuality: 0.8) {
+            user?.profilePicture = data
+            try? viewContext.save()
+        }
+    }
+
     private func handleNotificationToggle(enabled: Bool) {
         guard let uid = appState.currentUserID else { return }
         if let cfg = ConfigHelper.getOrCreateConfig(for: uid, context: viewContext) {
@@ -247,6 +283,46 @@ struct UserProfileView: View {
             cfg[keyPath: keyPath] = value
             try? ConfigHelper.save(cfg, context: viewContext)
             self.config = cfg
+        }
+    }
+
+    /// Valida disponibilidad antes de abrir el picker
+    private func openImagePicker(source: UIImagePickerController.SourceType) {
+        if UIImagePickerController.isSourceTypeAvailable(source) {
+            imageSource = source
+            showingImagePicker = true
+        } else {
+            alertMessage = NSLocalizedString("profile_source_unavailable", comment: "Source not available")
+            showAlert = true
+        }
+    }
+}
+
+// MARK: - Avatar Editor
+struct AvatarEditorView: View {
+    let image: UIImage
+    var onSave: (UIImage) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack {
+            Spacer()
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFit()
+                .clipShape(Circle())
+                .padding()
+            Spacer()
+            HStack {
+                Button("cancel") { dismiss() }
+                Spacer()
+                Button("save") {
+                    onSave(image)
+                    dismiss()
+                }
+            }
+            .padding()
         }
     }
 }

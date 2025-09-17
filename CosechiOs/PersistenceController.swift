@@ -1,5 +1,6 @@
 import Foundation
 import CoreData
+import UIKit
 
 final class PersistenceController {
     static let shared = PersistenceController()
@@ -9,45 +10,90 @@ final class PersistenceController {
     init(inMemory: Bool = false) {
         container = NSPersistentContainer(name: "CosechiOsModel")
 
-        // Ajustar store (inMemory para tests)
+        // Si pedimos inMemory (para tests) sustituimos la descripción por una en memoria
         if inMemory {
             let desc = NSPersistentStoreDescription()
             desc.type = NSInMemoryStoreType
             container.persistentStoreDescriptions = [desc]
         }
 
-        // Habilitar history tracking para facilitar merges y futuras migraciones
+        // Opciones de migración ligera + history tracking
         container.persistentStoreDescriptions.forEach { desc in
+            // Migración automática (lightweight)
+            desc.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
+            desc.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
+
+            // History tracking
             desc.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+
+            // WAL journal mode -> tiene que ser diccionario
+            desc.setOption(["journal_mode": "WAL"] as NSDictionary, forKey: NSSQLitePragmasOption)
         }
 
+        // Cargar stores
         container.loadPersistentStores { storeDescription, error in
-            if let error = error {
-                fatalError("Error cargando persistent store: \(error.localizedDescription)")
+            if let error = error as NSError? {
+                fatalError("❌ Error cargando persistent store: \(error), \(error.userInfo)")
+            } else {
+                print("✅ Loaded persistent store: \(storeDescription.url?.lastPathComponent ?? storeDescription.type)")
             }
         }
 
-        // Merge automático de cambios provenientes de contextos de fondo
+        // Merge automático y políticas para evitar conflictos
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        container.viewContext.shouldDeleteInaccessibleFaults = true
+
+        // Observador opcional
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(contextDidSavePrivateContext(_:)),
+                                               name: .NSManagedObjectContextDidSave,
+                                               object: nil)
     }
 
-    // Crear contexto de fondo para escrituras intensivas
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    // MARK: - Background context factory
     func newBackgroundContext() -> NSManagedObjectContext {
         let ctx = container.newBackgroundContext()
         ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        ctx.automaticallyMergesChangesFromParent = true
         return ctx
     }
 
-    // Save helper (seguros y con manejo de errores)
+    func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
+        container.performBackgroundTask { ctx in
+            ctx.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            block(ctx)
+            if ctx.hasChanges {
+                do {
+                    try ctx.save()
+                } catch {
+                    print("⚠️ Error saving background context: \(error.localizedDescription)")
+                    ctx.rollback()
+                }
+            }
+        }
+    }
+
+    // MARK: - Save helper
     func saveContext(_ context: NSManagedObjectContext) throws {
         if context.hasChanges {
             try context.save()
         }
     }
 
-    // MARK: - Backup / Export como JSON (seguro entre dispositivos sin nube)
-    /// Exporta un snapshot JSON con entidades principales: Users, Crops, Tasks, Steps, UserCollections, Config
+    // Listener opcional
+    @objc private func contextDidSavePrivateContext(_ note: Notification) {
+        guard let ctx = note.object as? NSManagedObjectContext else { return }
+        if ctx !== container.viewContext {
+            // Debug: podrías mergear si lo deseas
+        }
+    }
+
+    // MARK: - Export / Import
     func exportBackupJSON() throws -> Data {
         let context = container.viewContext
 
@@ -79,15 +125,19 @@ final class PersistenceController {
                     }
                 }
             }
-            // Relaciones opcionales (guardar ids referenciales)
             for (rname, rel) in obj.entity.relationshipsByName {
                 if rel.isToMany {
                     let set = obj.mutableSetValue(forKey: rname)
-                    let ids = set.allObjects.compactMap { ($0 as? NSManagedObject)?.value(forKey: "cropID") ?? ($0 as? NSManagedObject)?.value(forKey: "userID") }
+                    let ids = set.allObjects.compactMap {
+                        ($0 as? NSManagedObject)?.value(forKey: "cropID")
+                        ?? ($0 as? NSManagedObject)?.value(forKey: "userID")
+                    }
                     d[rname] = ids
                 } else {
                     if let tgt = obj.value(forKey: rname) as? NSManagedObject {
-                        d[rname] = tgt.value(forKey: "cropID") ?? tgt.value(forKey: "userID") ?? nil
+                        d[rname] = tgt.value(forKey: "cropID")
+                        ?? tgt.value(forKey: "userID")
+                        ?? NSNull()
                     }
                 }
             }
@@ -103,15 +153,11 @@ final class PersistenceController {
             "configs": cfgs.map(dict)
         ]
 
-        let data = try JSONSerialization.data(withJSONObject: payload, options: .prettyPrinted)
-        return data
+        return try JSONSerialization.data(withJSONObject: payload, options: .prettyPrinted)
     }
 
-    // IMPORT sencillo: la implementación depende del schema y de cómo quieras reconciliar. Aquí solo dejo un placeholder
     func importBackupJSON(_ data: Data, mergePolicy: MergePolicy = .createNew) throws {
-        // parsear JSON e insertar en context background (evitar duplicados basados en UUIDs)
-        // Implementación personalizada según tu estrategia de merge.
-        // Puedes pedirme que genere un importador robusto si quieres.
+        // TODO: implementar import robusto según reglas de negocio
     }
 
     enum MergePolicy {
@@ -119,5 +165,21 @@ final class PersistenceController {
         case preferLocal
         case preferIncoming
     }
-}
 
+    // MARK: - Debug helpers
+    func resetDemoData() {
+        performBackgroundTask { ctx in
+            let fr: NSFetchRequest<User> = User.fetchRequest()
+            fr.predicate = NSPredicate(format: "email == %@", "demo@local")
+            if let demoUsers = try? ctx.fetch(fr), !demoUsers.isEmpty {
+                demoUsers.forEach { ctx.delete($0) }
+                do {
+                    try ctx.save()
+                    print("🧹 Demo user(s) removed")
+                } catch {
+                    print("⚠️ Error removing demo user: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+}

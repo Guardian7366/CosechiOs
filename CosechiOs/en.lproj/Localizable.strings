@@ -402,3 +402,9 @@
 "statistics_metrics_completed" = "Completed";
 "statistics_metrics_pending" = "Pending";
 "statistics_metrics_overdue" = "Overdue";
+
+"profile_edit_photo" = "Edit photo";
+"profile_delete_photo_confirm" = "Delete your profile photo?";
+"delete" = "Delete";
+"cancel" = "Cancel";
+"profile_source_unavailable" = "This source is not available on your device.";

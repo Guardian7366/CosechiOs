@@ -398,3 +398,9 @@
 "statistics_metrics_completed" = "Completadas";
 "statistics_metrics_pending" = "Pendientes";
 "statistics_metrics_overdue" = "Atrasadas";
+
+"profile_edit_photo" = "Editar foto";
+"profile_delete_photo_confirm" = "¿Eliminar tu foto de perfil?";
+"delete" = "Eliminar";
+"cancel" = "Cancelar";
+"profile_source_unavailable" = "Este origen no está disponible en tu dispositivo.";
