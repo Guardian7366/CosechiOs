@@ -3,18 +3,19 @@ import UserNotifications
 import CoreData
 
 /// NotificationHelper avanzado:
-/// - Soporta recordatorios relativos (N días antes)
-/// - Soporta recurrencias simples: daily, weekly, monthly
+/// - Recordatorios de tareas con recurrencia
+/// - Recordatorios de cultivos (riego, fertilización, cosecha)
+/// - Reprogramación masiva
+/// - Mini API local para tips dinámicos
 struct NotificationHelper {
 
-    /// Cancela notificación pendiente por taskID
+    // MARK: - Tareas
+
     static func cancelNotification(for task: TaskEntity) {
         guard let id = task.taskID?.uuidString else { return }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [id])
     }
 
-    /// Programa notificación basada en la configuración de la task (dueDate, relativeDays, recurrenceRule).
-    /// Si la tarea no tiene dueDate no hace nada.
     static func scheduleNotification(for task: TaskEntity) {
         guard let id = task.taskID?.uuidString,
               let title = task.title,
@@ -22,75 +23,139 @@ struct NotificationHelper {
             return
         }
 
-        // Primero cancelar cualquier pending con el mismo id (reprogramación segura)
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [id])
 
-        // Calcular fecha objetivo aplicando relativeDays (si existe)
-        let relativeDays = Int(task.relativeDays) // 0 por defecto si nil -> cuidado, property es Int16 no optional aquí si lo añadiste
+        let relativeDays = Int(task.relativeDays)
         var targetDate = Calendar.current.startOfDay(for: dueDate)
         if relativeDays > 0 {
-            // restar días
             if let newDate = Calendar.current.date(byAdding: .day, value: -relativeDays, to: targetDate) {
                 targetDate = newDate
             }
         } else {
-            // si relativeDays == 0, usamos dueDate tal cual (con hora)
-            // Para mantener la hora original de dueDate:
             targetDate = dueDate
         }
 
-        // Contenido localizable: puedes usar Localizable.strings clave "task_reminder_body" o construir body desde task
         let content = UNMutableNotificationContent()
         content.title = "🌱 \(title)"
-        // usa detalles si hay
         if let details = task.details, !details.isEmpty {
             content.body = details
         } else {
-            content.body = NSLocalizedString("task_reminder_body", comment: "Recordatorio de tarea")
+            content.body = NSLocalizedString("task_reminder_body", comment: "Task reminder")
         }
         content.sound = .default
+        content.categoryIdentifier = "task_reminder" // importante para acciones rápidas
 
-        // Decidir trigger según recurrenceRule
         let rule = task.recurrenceRule ?? "none"
-
         let trigger: UNNotificationTrigger
 
         switch rule {
         case "daily":
-            // activar a la hora de targetDate cada día
             let comps = Calendar.current.dateComponents([.hour, .minute], from: targetDate)
             trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
 
         case "weekly":
-            // activar el mismo weekday y hora cada semana
             let comps = Calendar.current.dateComponents([.weekday, .hour, .minute], from: targetDate)
             trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
 
         case "monthly":
-            // activar el mismo day (día del mes) y hora cada mes
             let comps = Calendar.current.dateComponents([.day, .hour, .minute], from: targetDate)
             trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
 
         default:
-            // one-shot: usar fecha completa (a la hora indicada) sin repeats
             let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: targetDate)
             trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
         }
 
         let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
-
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
                 print("❌ Error scheduling notification \(id): \(error.localizedDescription)")
             } else {
-                print("✅ Notificación programada \(id) rule=\(rule) date=\(targetDate)")
+                print("✅ Task notification scheduled \(id) rule=\(rule) date=\(targetDate)")
             }
         }
     }
 
-    /// Utilidad: reprograma la notificación (cancela + schedule)
     static func reschedule(for task: TaskEntity) {
         cancelNotification(for: task)
         scheduleNotification(for: task)
+    }
+
+    // MARK: - Cultivos
+
+    static func scheduleCropNotification(crop: Crop, type: String, daysOffset: Int = 0) {
+        guard let cid = crop.cropID else { return }
+
+        var targetDate = Calendar.current.startOfDay(for: Date())
+        if let date = Calendar.current.date(byAdding: .day, value: daysOffset, to: targetDate) {
+            targetDate = date
+        }
+
+        let content = UNMutableNotificationContent()
+        switch type {
+        case "watering":
+            content.title = "💧 \(crop.name ?? "Cultivo")"
+            content.body = NSLocalizedString("crop_reminder_watering", comment: "Watering reminder")
+        case "fertilize":
+            content.title = "🌿 \(crop.name ?? "Cultivo")"
+            content.body = NSLocalizedString("crop_reminder_fertilize", comment: "Fertilization reminder")
+        case "harvest":
+            content.title = "🍓 \(crop.name ?? "Cultivo")"
+            content.body = NSLocalizedString("crop_reminder_harvest", comment: "Harvest reminder")
+        default:
+            content.title = "🌱 \(crop.name ?? "Cultivo")"
+            content.body = NSLocalizedString("crop_reminder_generic", comment: "Crop reminder")
+        }
+
+        content.sound = .default
+        content.categoryIdentifier = "crop_tip"
+
+        let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: targetDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+
+        let request = UNNotificationRequest(identifier: cid.uuidString + "_" + type, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Error scheduling crop notification: \(error.localizedDescription)")
+            } else {
+                print("✅ Crop notification scheduled for \(crop.name ?? "") type=\(type)")
+            }
+        }
+    }
+
+    // MARK: - Reprogramación masiva
+
+    static func rescheduleAll(forUser user: User, context: NSManagedObjectContext) {
+        let fetch: NSFetchRequest<TaskEntity> = TaskEntity.fetchRequest()
+        fetch.predicate = NSPredicate(format: "user == %@", user)
+        if let tasks = try? context.fetch(fetch) {
+            for task in tasks {
+                scheduleNotification(for: task)
+            }
+        }
+        print("🔄 Rescheduled all notifications for user \(user.username ?? "")")
+    }
+
+    // MARK: - Mini API Local
+
+    static func scheduleSeasonalTip(for crop: Crop) {
+        guard let name = crop.name else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "🌞 Tip de temporada"
+        content.body = String(format: NSLocalizedString("crop_season_tip", comment: ""), name)
+        content.sound = .default
+        content.categoryIdentifier = "tips_category"
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 15, repeats: false)
+        let request = UNNotificationRequest(identifier: "season_tip_" + (crop.cropID?.uuidString ?? ""), content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Error scheduling seasonal tip: \(error.localizedDescription)")
+            } else {
+                print("✅ Seasonal tip scheduled for \(name)")
+            }
+        }
     }
 }

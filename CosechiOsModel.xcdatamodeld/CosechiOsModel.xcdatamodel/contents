@@ -4,6 +4,9 @@
         <attribute name="configID" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="language" attributeType="String"/>
         <attribute name="notificationsEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notifyCrops" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notifyTasks" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notifyTips" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="theme" attributeType="String"/>
         <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="config" inverseEntity="User"/>
         <fetchIndex name="byPropertyIndex">
@@ -34,6 +37,13 @@
                 <constraint value="cropID"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
+    </entity>
+    <entity name="NotificationLog" representedClassName="NotificationLog" syncable="YES" codeGenerationType="class">
+        <attribute name="body" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
     </entity>
     <entity name="ProgressLog" representedClassName="ProgressLog" syncable="YES" codeGenerationType="class">
         <attribute name="category" optional="YES" attributeType="String"/>

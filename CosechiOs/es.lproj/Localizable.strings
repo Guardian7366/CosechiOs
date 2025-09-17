@@ -285,3 +285,63 @@
 "season_summer" = "Verano";
 "season_autumn" = "Otoño";
 "season_winter" = "Invierno";
+
+"dashboard_metrics_title" = "Tus métricas";
+"dashboard_metrics_completed" = "Completadas";
+"dashboard_metrics_pending" = "Pendientes";
+"dashboard_metrics_overdue" = "Vencidas";
+"dashboard_metrics_progresslogs" = "Registros de progreso";
+
+"crop_reminder_watering" = "¡No olvides regar tu cultivo hoy!";
+"crop_reminder_fertilize" = "Es momento de fertilizar tu cultivo.";
+"crop_reminder_harvest" = "¡Tu cultivo está listo para la cosecha!";
+"crop_reminder_generic" = "Recuerda cuidar tu cultivo.";
+"crop_season_tip" = "Es una buena temporada para %@, aprovéchalo.";
+
+"profile_notifications_settings" = "Configuración de notificaciones";
+"profile_notify_tasks" = "Recordatorios de tareas";
+"profile_notify_crops" = "Recordatorios de cultivos";
+"profile_notify_tips" = "Tips de temporada";
+
+"debug_notifications_title" = "Depuración de notificaciones";
+"debug_section_tasks" = "Probar tareas";
+"debug_section_crops" = "Probar cultivos";
+"debug_section_tips" = "Probar tips";
+"debug_section_clear" = "Gestión rápida";
+"debug_section_log" = "Registro de pruebas";
+"debug_test_task_body" = "Este es un recordatorio de prueba de tarea";
+"debug_test_crop_body" = "Este es un recordatorio de prueba de cultivo";
+"debug_test_tip_body" = "Este es un tip de temporada de prueba";
+
+"history_title" = "Historial de notificaciones";
+"history_no_notifications" = "No hay notificaciones registradas";
+"profile_notifications_history" = "Historial de notificaciones";
+
+"notif_action_complete" = "Completar";
+"notif_action_view_crop" = "Ver cultivo";
+"notif_action_view_tips" = "Ver tips";
+
+"notif_action_complete" = "Completar";
+"notif_action_snooze" = "Posponer 15 min";
+"notif_action_view_crop" = "Ver cultivo";
+"notif_action_view_tips" = "Ver consejos";
+
+"notif_log_action_title" = "Acción de notificación";
+"notif_log_action_body" = "El usuario realizó la acción %@ en la notificación";
+
+"dashboard_action_statistics" = "Estadísticas";
+"statistics_title" = "Panel de estadísticas";
+"statistics_tasks" = "Estado de tareas";
+"statistics_progress" = "Evolución del progreso";
+"statistics_notifications" = "Acciones de notificaciones";
+
+/* Statistics view */
+"statistics_title" = "Estadísticas";
+"statistics_tasks" = "Tareas";
+"statistics_progress" = "Progreso";
+"statistics_notifications" = "Notificaciones";
+"statistics_label_completed" = "Completadas";
+"statistics_label_pending" = "Pendientes";
+"statistics_label_overdue" = "Atrasadas";
+"statistics_no_progress" = "No hay registros de progreso aún.";
+"statistics_no_notifications_actions" = "No se han registrado acciones rápidas en notificaciones.";

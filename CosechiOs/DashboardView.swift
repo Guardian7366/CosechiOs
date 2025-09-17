@@ -26,20 +26,25 @@ struct DashboardView: View {
 
     @State private var showAddTask = false
     @State private var showExplore = false
-
+    @State private var showDebugMenu = false // NUEVO
+    
     // Recomendaciones
     @State private var recommendations: [CropRecommendation] = []
     @State private var isLoadingRecommendations = false
     @State private var recMessage: String? = nil
+    
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
                     headerView
-
+                    
                     // Resumen rápido
                     summaryCard
+                        .padding(.horizontal)
+                    
+                    metricsCard
                         .padding(.horizontal)
 
                     // Accesos rápidos
@@ -204,6 +209,15 @@ struct DashboardView: View {
             }
             .navigationTitle("dashboard_title")
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(LocalizedStringKey("dashboard_title"))
+                        .font(.headline)
+                        .onTapGesture(count: 3) { // triple tap en el título
+                            showDebugMenu = true
+                        }
+                }
+            }
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         Button {
@@ -231,6 +245,12 @@ struct DashboardView: View {
                 loadRecommendations()
             }
         }
+        .navigationDestination(isPresented: $showDebugMenu) {
+            DebugNotificationsView()
+                .environment(\.managedObjectContext, viewContext)
+                .environmentObject(appState)
+        }
+
     }
 
     // MARK: - Computed data filtered por usuario
@@ -271,13 +291,14 @@ struct DashboardView: View {
     }
     
     /// Estadísticas rápidas
-    private var totalTasksCount: Int { tasksRelevant.count }
-    private var completedTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "completed" }.count }
-    private var overdueCount: Int {
-        let now = Date()
-        return tasksRelevant.filter { ($0.status ?? "") != "completed" && ($0.dueDate ?? Date()) < now }.count
-    }
-
+        private var totalTasksCount: Int { tasksRelevant.count }
+        private var completedTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "completed" }.count }
+        private var pendingTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "pending" }.count }
+        private var overdueCount: Int {
+            let now = Date()
+            return tasksRelevant.filter { ($0.status ?? "") != "completed" && ($0.dueDate ?? Date()) < now }.count
+        }
+    
     /// Progress logs del usuario (filtrados)
     private var recentProgress: [ProgressLog] {
         guard let uid = appState.currentUserID else { return [] }
@@ -285,9 +306,10 @@ struct DashboardView: View {
             log.user?.userID == uid
         }
     }
-
+    
+    private var progressLogsCount: Int { recentProgress.count }
+    
     // MARK: - UI Subviews
-
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -356,25 +378,72 @@ struct DashboardView: View {
         .cornerRadius(12)
         .shadow(radius: 1)
     }
+    
+    // NUEVO: Metrics Panel
+        private var metricsCard: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("dashboard_metrics_title")
+                    .font(.headline)
 
-    private var quickActions: some View {
-        HStack(spacing: 12) {
-            NavigationLink(destination: AddTaskView().environment(\.managedObjectContext, viewContext)) {
-                QuickActionButton(icon: "plus.circle.fill", titleKey: "dashboard_action_add_task", color: .green)
+                HStack(spacing: 16) {
+                    metricColumn(color: .green, value: completedTasksCount, key: "dashboard_metrics_completed")
+                    metricColumn(color: .blue, value: pendingTasksCount, key: "dashboard_metrics_pending")
+                    metricColumn(color: .red, value: overdueCount, key: "dashboard_metrics_overdue")
+                }
+
+                Divider()
+
+                HStack {
+                    Image(systemName: "chart.bar.fill")
+                        .foregroundColor(.blue)
+                    Text("\(progressLogsCount) " + NSLocalizedString("dashboard_metrics_progresslogs", comment: ""))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
-            NavigationLink(destination: ExploreCropsView().environment(\.managedObjectContext, viewContext)) {
-                QuickActionButton(icon: "leaf.circle.fill", titleKey: "dashboard_action_explore", color: .blue)
-            }
-            NavigationLink(destination: MyCropsView().environment(\.managedObjectContext, viewContext)) {
-                QuickActionButton(icon: "tray.full.fill", titleKey: "dashboard_action_my_crops", color: .teal)
-            }
-            NavigationLink(destination: UserProfileView().environmentObject(appState)) {
-                QuickActionButton(icon: "person.crop.circle.fill", titleKey: "dashboard_action_profile", color: .gray)
-            }
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+            .shadow(radius: 1)
         }
-        .frame(maxWidth: .infinity)
-    }
-
+    private func metricColumn(color: Color, value: Int, key: String) -> some View {
+            VStack {
+                Text("\(value)")
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(color)
+                Text(LocalizedStringKey(key))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    
+    
+    private var quickActions: some View {
+            HStack(spacing: 12) {
+                NavigationLink(destination: AddTaskView().environment(\.managedObjectContext, viewContext)) {
+                    QuickActionButton(icon: "plus.circle.fill", titleKey: "dashboard_action_add_task", color: .green)
+                }
+                NavigationLink(destination: ExploreCropsView().environment(\.managedObjectContext, viewContext)) {
+                    QuickActionButton(icon: "leaf.circle.fill", titleKey: "dashboard_action_explore", color: .blue)
+                }
+                NavigationLink(destination: MyCropsView().environment(\.managedObjectContext, viewContext)) {
+                    QuickActionButton(icon: "tray.full.fill", titleKey: "dashboard_action_my_crops", color: .teal)
+                }
+                NavigationLink(destination: UserProfileView().environmentObject(appState)) {
+                    QuickActionButton(icon: "person.crop.circle.fill", titleKey: "dashboard_action_profile", color: .gray)
+                }
+                NavigationLink(destination: StatisticsView()
+                    .environment(\.managedObjectContext, viewContext)
+                    .environmentObject(appState)) {
+                    QuickActionButton(icon: "chart.bar.fill", titleKey: "dashboard_action_statistics", color: .purple)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    
+    
     // MARK: - Helper UI components (internos)
 
     @ViewBuilder
@@ -506,7 +575,7 @@ struct DashboardView: View {
         .background(Color(.systemGray6))
         .cornerRadius(10)
     }
-
+    
     // MARK: - Recomendaciones: funciones
 
     private func loadRecommendations() {

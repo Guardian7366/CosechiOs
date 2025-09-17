@@ -289,3 +289,63 @@
 "season_summer" = "Summer";
 "season_autumn" = "Autumn";
 "season_winter" = "Winter";
+
+"dashboard_metrics_title" = "Your metrics";
+"dashboard_metrics_completed" = "Completed";
+"dashboard_metrics_pending" = "Pending";
+"dashboard_metrics_overdue" = "Overdue";
+"dashboard_metrics_progresslogs" = "Progress logs";
+
+"crop_reminder_watering" = "Don’t forget to water your crop today!";
+"crop_reminder_fertilize" = "It’s time to fertilize your crop.";
+"crop_reminder_harvest" = "Your crop is ready for harvest!";
+"crop_reminder_generic" = "Remember to take care of your crop.";
+"crop_season_tip" = "It’s a great season for %@, make the most of it.";
+
+"profile_notifications_settings" = "Notification settings";
+"profile_notify_tasks" = "Task reminders";
+"profile_notify_crops" = "Crop reminders";
+"profile_notify_tips" = "Seasonal tips";
+
+"debug_notifications_title" = "Notification Debug";
+"debug_section_tasks" = "Test tasks";
+"debug_section_crops" = "Test crops";
+"debug_section_tips" = "Test tips";
+"debug_section_clear" = "Quick management";
+"debug_section_log" = "Test log";
+"debug_test_task_body" = "This is a test task reminder";
+"debug_test_crop_body" = "This is a test crop reminder";
+"debug_test_tip_body" = "This is a test seasonal tip";
+
+"history_title" = "Notification history";
+"history_no_notifications" = "No notifications recorded";
+"profile_notifications_history" = "Notification history";
+
+"notif_action_complete" = "Complete";
+"notif_action_view_crop" = "View crop";
+"notif_action_view_tips" = "View tips";
+
+"notif_action_complete" = "Complete";
+"notif_action_snooze" = "Snooze 15 min";
+"notif_action_view_crop" = "View crop";
+"notif_action_view_tips" = "View tips";
+
+"notif_log_action_title" = "Notification action";
+"notif_log_action_body" = "User performed action %@ on notification";
+
+"dashboard_action_statistics" = "Statistics";
+"statistics_title" = "Statistics Panel";
+"statistics_tasks" = "Task status";
+"statistics_progress" = "Progress evolution";
+"statistics_notifications" = "Notification actions";
+
+/* Statistics view */
+"statistics_title" = "Statistics";
+"statistics_tasks" = "Tasks";
+"statistics_progress" = "Progress";
+"statistics_notifications" = "Notifications";
+"statistics_label_completed" = "Completed";
+"statistics_label_pending" = "Pending";
+"statistics_label_overdue" = "Overdue";
+"statistics_no_progress" = "No progress logs yet.";
+"statistics_no_notifications_actions" = "No notification action events recorded.";

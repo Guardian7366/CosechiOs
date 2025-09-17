@@ -21,6 +21,7 @@ struct UserProfileView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // MARK: - Perfil
                 Section(header: Text("profile_title")) {
                     HStack {
                         Spacer()
@@ -70,6 +71,7 @@ struct UserProfileView: View {
                     }
                 }
 
+                // MARK: - Idioma
                 Section(header: Text("profile_language")) {
                     Picker("profile_language", selection: Binding(
                         get: { config?.language ?? appState.appLanguage },
@@ -94,7 +96,8 @@ struct UserProfileView: View {
                     }
                 }
 
-                Section {
+                // MARK: - Notificaciones
+                Section(header: Text("profile_notifications_settings")) {
                     Toggle(isOn: Binding(
                         get: { config?.notificationsEnabled ?? true },
                         set: { handleNotificationToggle(enabled: $0) }
@@ -102,6 +105,38 @@ struct UserProfileView: View {
                         Text("profile_notifications")
                     }
 
+                    if config?.notificationsEnabled ?? true {
+                        Toggle(isOn: Binding(
+                            get: { config?.notifyTasks ?? true },
+                            set: { updateConfig(\.notifyTasks, value: $0) }
+                        )) {
+                            Text("profile_notify_tasks")
+                        }
+
+                        Toggle(isOn: Binding(
+                            get: { config?.notifyCrops ?? true },
+                            set: { updateConfig(\.notifyCrops, value: $0) }
+                        )) {
+                            Text("profile_notify_crops")
+                        }
+
+                        Toggle(isOn: Binding(
+                            get: { config?.notifyTips ?? false },
+                            set: { updateConfig(\.notifyTips, value: $0) }
+                        )) {
+                            Text("profile_notify_tips")
+                        }
+                        
+                        // NUEVO: enlace al historial
+                        NavigationLink(destination: NotificationHistoryView()
+                            .environment(\.managedObjectContext, viewContext)) {
+                            Text("profile_notifications_history")
+                        }
+                    }
+                }
+
+                // MARK: - Apariencia
+                Section {
                     Picker("profile_theme", selection: Binding(
                         get: { config?.theme ?? "Auto" },
                         set: { newValue in
@@ -116,6 +151,7 @@ struct UserProfileView: View {
                     }
                 }
 
+                // MARK: - Extras
                 Section {
                     Button(role: .destructive) {
                         user?.profilePicture = nil
@@ -203,6 +239,14 @@ struct UserProfileView: View {
             UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
         } else {
             UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        }
+    }
+
+    private func updateConfig<T>(_ keyPath: ReferenceWritableKeyPath<Config, T>, value: T) {
+        if let cfg = config {
+            cfg[keyPath: keyPath] = value
+            try? ConfigHelper.save(cfg, context: viewContext)
+            self.config = cfg
         }
     }
 }

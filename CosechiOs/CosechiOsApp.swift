@@ -15,6 +15,8 @@ struct CosechiOsApp: App {
     @StateObject private var appState = AppState()
 
     init() {
+        NotificationManager.shared.configure()
+
         // Si no hay idioma guardado, establecer "es" por defecto
         if UserDefaults.standard.string(forKey: "appLanguage") == nil {
             UserDefaults.standard.set("es", forKey: "appLanguage")
