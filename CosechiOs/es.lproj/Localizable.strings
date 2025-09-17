@@ -345,3 +345,56 @@
 "statistics_label_overdue" = "Atrasadas";
 "statistics_no_progress" = "No hay registros de progreso aún.";
 "statistics_no_notifications_actions" = "No se han registrado acciones rápidas en notificaciones.";
+
+/* Debug notifications */
+"debug_notifications_title" = "Depuración de notificaciones";
+"debug_insert_demo" = "Insertar datos demo";
+"debug_insert_demo_success" = "Datos demo insertados y usuario demo seleccionado";
+"debug_insert_demo_exists" = "Ya existen datos demo en la base de datos";
+"debug_send_task_5s" = "Enviar recordatorio de tarea (5s)";
+"debug_send_crop_tip_5s" = "Enviar tip de cultivo (5s)";
+"debug_send_seasonal_tip_15s" = "Enviar tip de temporada (15s)";
+"debug_clear_pending" = "Borrar notificaciones pendientes";
+"debug_instructions" = "Triple-tap en el título del Dashboard para abrir este menú. Útil para pruebas rápidas.";
+"debug_alert_title" = "Debug";
+"debug_task_title" = "Recordatorio (demo)";
+"debug_task_body" = "Esto es una notificación de prueba de tarea.";
+"debug_crop_tip_body" = "Recordatorio de cuidado del cultivo (demo).";
+"debug_task_scheduled" = "Notificación de tarea programada (5s)";
+"debug_crop_scheduled" = "Notificación de cultivo programada (5s)";
+"debug_crop_scheduled_for_crop" = "Notificación programada para el cultivo: %@";
+"debug_seasonal_scheduled" = "Tip de temporada programado (15s)";
+"debug_send_error" = "Error al programar notificación: %@";
+"debug_cleared_pending_success" = "Notificaciones pendientes eliminadas";
+
+/* Statistics */
+"statistics_no_tasks" = "No hay tareas para mostrar";
+"statistics_no_progress_logs" = "No hay registros de progreso";
+"statistics_no_notifications" = "No hay acciones de notificación registradas";
+
+/* Statistics view */
+"statistics_title" = "Estadísticas";
+"statistics_subtitle" = "Resumen y métricas de tu huerto";
+"statistics_range_all" = "Todo";
+"statistics_range_7" = "7d";
+"statistics_range_30" = "30d";
+"statistics_range_90" = "90d";
+"statistics_summary_total_tasks" = "Tareas totales";
+"statistics_summary_completed_pct" = "Completadas (%)";
+"statistics_summary_my_crops" = "Cultivos guardados";
+"statistics_tasks" = "Estado de tareas";
+"statistics_progress" = "Evolución de registros";
+"statistics_notifications" = "Acciones en notificaciones";
+"statistics_top_crops" = "Cultivos más activos";
+"statistics_no_tasks" = "No hay tareas para mostrar.";
+"statistics_no_progress_logs" = "No hay registros de progreso en el periodo.";
+"statistics_no_notifications" = "No hay interacciones de notificación registradas.";
+"statistics_no_top_crops" = "No hay cultivos con actividad.";
+"statistics_export_csv" = "Exportar CSV";
+"statistics_export_success" = "CSV listo para compartir";
+"statistics_export_error" = "Error al generar CSV";
+
+/* metrics labels used in summary / small cards */
+"statistics_metrics_completed" = "Completadas";
+"statistics_metrics_pending" = "Pendientes";
+"statistics_metrics_overdue" = "Atrasadas";

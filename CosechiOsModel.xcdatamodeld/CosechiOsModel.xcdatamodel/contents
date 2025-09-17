@@ -40,13 +40,16 @@
     </entity>
     <entity name="NotificationLog" representedClassName="NotificationLog" syncable="YES" codeGenerationType="class">
         <attribute name="body" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <attribute name="type" optional="YES" attributeType="String"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="notificationLogs" inverseEntity="User"/>
     </entity>
     <entity name="ProgressLog" representedClassName="ProgressLog" syncable="YES" codeGenerationType="class">
         <attribute name="category" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="imageData" optional="YES" attributeType="Binary"/>
         <attribute name="note" optional="YES" attributeType="String"/>
@@ -110,6 +113,7 @@
         <attribute name="username" attributeType="String"/>
         <relationship name="collections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserCollection" inverseName="user" inverseEntity="UserCollection"/>
         <relationship name="config" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Config" inverseName="user" inverseEntity="Config"/>
+        <relationship name="notificationLogs" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NotificationLog" inverseName="user" inverseEntity="NotificationLog"/>
         <relationship name="progressLogs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProgressLog" inverseName="user" inverseEntity="ProgressLog"/>
         <relationship name="stepProgresses" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StepProgress" inverseName="user" inverseEntity="StepProgress"/>
         <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskEntity" inverseName="user" inverseEntity="TaskEntity"/>

@@ -349,3 +349,56 @@
 "statistics_label_overdue" = "Overdue";
 "statistics_no_progress" = "No progress logs yet.";
 "statistics_no_notifications_actions" = "No notification action events recorded.";
+
+/* Debug notifications */
+"debug_notifications_title" = "Debug Notifications";
+"debug_insert_demo" = "Insert demo data";
+"debug_insert_demo_success" = "Demo data inserted and demo user selected";
+"debug_insert_demo_exists" = "Demo data already present in database";
+"debug_send_task_5s" = "Send task reminder (5s)";
+"debug_send_crop_tip_5s" = "Send crop tip (5s)";
+"debug_send_seasonal_tip_15s" = "Send seasonal tip (15s)";
+"debug_clear_pending" = "Clear pending notifications";
+"debug_instructions" = "Triple-tap the Dashboard title to open this menu. Useful for quick tests.";
+"debug_alert_title" = "Debug";
+"debug_task_title" = "Reminder (demo)";
+"debug_task_body" = "This is a test task notification.";
+"debug_crop_tip_body" = "Crop care reminder (demo).";
+"debug_task_scheduled" = "Task notification scheduled (5s)";
+"debug_crop_scheduled" = "Crop notification scheduled (5s)";
+"debug_crop_scheduled_for_crop" = "Notification scheduled for crop: %@";
+"debug_seasonal_scheduled" = "Seasonal tip scheduled (15s)";
+"debug_send_error" = "Error scheduling notification: %@";
+"debug_cleared_pending_success" = "Pending notifications cleared";
+
+/* Statistics */
+"statistics_no_tasks" = "No tasks to show";
+"statistics_no_progress_logs" = "No progress logs";
+"statistics_no_notifications" = "No notification actions recorded";
+
+/* Statistics view */
+"statistics_title" = "Statistics";
+"statistics_subtitle" = "Summary & metrics for your garden";
+"statistics_range_all" = "All";
+"statistics_range_7" = "7d";
+"statistics_range_30" = "30d";
+"statistics_range_90" = "90d";
+"statistics_summary_total_tasks" = "Total tasks";
+"statistics_summary_completed_pct" = "Completed (%)";
+"statistics_summary_my_crops" = "Saved crops";
+"statistics_tasks" = "Task status";
+"statistics_progress" = "Progress over time";
+"statistics_notifications" = "Notification actions";
+"statistics_top_crops" = "Top crops by activity";
+"statistics_no_tasks" = "No tasks to show.";
+"statistics_no_progress_logs" = "No progress logs in range.";
+"statistics_no_notifications" = "No notification interactions recorded.";
+"statistics_no_top_crops" = "No crops with activity.";
+"statistics_export_csv" = "Export CSV";
+"statistics_export_success" = "CSV ready to share";
+"statistics_export_error" = "Error generating CSV";
+
+/* metrics labels used in summary / small cards */
+"statistics_metrics_completed" = "Completed";
+"statistics_metrics_pending" = "Pending";
+"statistics_metrics_overdue" = "Overdue";

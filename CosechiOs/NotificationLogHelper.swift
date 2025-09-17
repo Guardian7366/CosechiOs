@@ -1,35 +1,39 @@
 // NotificationLogHelper.swift
+import Foundation
 import CoreData
-import UserNotifications
 
+/// NotificationLog helper: ahora permite asociar el log a un usuario opcionalmente.
 struct NotificationLogHelper {
-    /// Registra cuando se programa o recibe una notificación
-    static func logNotification(title: String, body: String, type: String, context: NSManagedObjectContext) {
+    /// Registra una notificación en la BD. Si `userID` está presente, intentará vincular el log al User correspondiente.
+    static func logNotification(title: String, body: String, type: String, userID: UUID? = nil, context: NSManagedObjectContext) {
         let log = NotificationLog(context: context)
         log.id = UUID()
         log.title = title
         log.body = body
         log.type = type
         log.date = Date()
-        saveContext(context)
-    }
+        // Si añadiste createdAt a la entidad, asegurar su asignación
+        if log.responds(to: Selector(("setCreatedAt:"))) {
+            log.setValue(Date(), forKey: "createdAt")
+        } else {
+            log.createdAt = Date()
+        }
 
-    /// Registra cuando el usuario realiza una acción rápida
-    static func logAction(action: String, notificationID: String, context: NSManagedObjectContext) {
-        let log = NotificationLog(context: context)
-        log.id = UUID()
-        log.title = NSLocalizedString("notif_log_action_title", comment: "Notification action")
-        log.body = String(format: NSLocalizedString("notif_log_action_body", comment: "User performed action %@ on notification"), action)
-        log.type = "action:\(action)"
-        log.date = Date()
-        saveContext(context)
-    }
+        // Intentar asociar usuario si userID fue provisto
+        if let uid = userID {
+            let fr: NSFetchRequest<User> = User.fetchRequest()
+            fr.predicate = NSPredicate(format: "userID == %@", uid as CVarArg)
+            fr.fetchLimit = 1
+            if let user = try? context.fetch(fr).first {
+                log.user = user
+            }
+        }
 
-    private static func saveContext(_ context: NSManagedObjectContext) {
         do {
             try context.save()
         } catch {
             print("❌ Error saving NotificationLog: \(error.localizedDescription)")
+            context.rollback()
         }
     }
 }

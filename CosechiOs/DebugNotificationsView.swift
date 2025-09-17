@@ -1,113 +1,182 @@
 // DebugNotificationsView.swift
 import SwiftUI
-import UserNotifications
 import CoreData
+import UserNotifications
 
 struct DebugNotificationsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
-    
-    @State private var log: [String] = []
-    
+
+    @State private var showingAlert = false
+    @State private var alertMessage: String = ""
+
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("debug_section_tasks")) {
-                    Button("🔔 Test Task Reminder") {
-                        testTaskNotification()
+                Section(header: Text(LocalizedStringKey("debug_notifications_title"))) {
+                    Button {
+                        insertDemoData()
+                    } label: {
+                        Label(LocalizedStringKey("debug_insert_demo"), systemImage: "tray.and.arrow.down")
+                    }
+
+                    Button {
+                        sendTaskNotificationIn5s()
+                    } label: {
+                        Label(LocalizedStringKey("debug_send_task_5s"), systemImage: "bell")
+                    }
+
+                    Button {
+                        sendCropTipIn5s()
+                    } label: {
+                        Label(LocalizedStringKey("debug_send_crop_tip_5s"), systemImage: "leaf")
+                    }
+
+                    Button {
+                        sendSeasonalTipIn15s()
+                    } label: {
+                        Label(LocalizedStringKey("debug_send_seasonal_tip_15s"), systemImage: "sun.max")
+                    }
+
+                    Button(role: .destructive) {
+                        clearPendingNotifications()
+                    } label: {
+                        Label(LocalizedStringKey("debug_clear_pending"), systemImage: "xmark.circle")
                     }
                 }
-                
-                Section(header: Text("debug_section_crops")) {
-                    Button("🌱 Test Crop Reminder") {
-                        testCropNotification()
-                    }
-                }
-                
-                Section(header: Text("debug_section_tips")) {
-                    Button("💡 Test Seasonal Tip") {
-                        testTipNotification()
-                    }
-                }
-                
-                Section(header: Text("debug_section_clear")) {
-                    Button("❌ Clear All Pending") {
-                        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-                        appendLog("All pending notifications cleared.")
-                    }
-                }
-                
-                if !log.isEmpty {
-                    Section(header: Text("debug_section_log")) {
-                        ForEach(log, id: \.self) { entry in
-                            Text(entry).font(.caption2)
-                        }
-                    }
+
+                Section(header: Text("debug_logs")) {
+                    Text(LocalizedStringKey("debug_instructions"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             }
-            .navigationTitle("debug_notifications_title")
+            .navigationTitle(LocalizedStringKey("debug_notifications_title"))
+            .alert(isPresented: $showingAlert) {
+                Alert(title: Text("debug_alert_title"), message: Text(alertMessage), dismissButton: .default(Text("ok")))
+            }
         }
     }
-    
-    // MARK: - Test Helpers
-    
-    private func testTaskNotification() {
+
+    // MARK: - Actions
+
+    private func insertDemoData() {
+        let insertedID = DebugPreviewData.populateIfNeeded(context: viewContext)
+        if let id = insertedID {
+            appState.currentUserID = id
+            appState.isAuthenticated = true
+            alertMessage = NSLocalizedString("debug_insert_demo_success", comment: "")
+        } else {
+            // Buscar usuario demo si ya existía
+            let fr: NSFetchRequest<User> = User.fetchRequest()
+            fr.predicate = NSPredicate(format: "email == %@", "demo@local")
+            if let demoUser = try? viewContext.fetch(fr).first {
+                appState.currentUserID = demoUser.userID
+                appState.isAuthenticated = true
+            }
+            alertMessage = NSLocalizedString("debug_insert_demo_exists", comment: "")
+        }
+        showingAlert = true
+    }
+
+    private func sendTaskNotificationIn5s() {
+        let id = "debug_task_" + UUID().uuidString
         let content = UNMutableNotificationContent()
-        content.title = "🌱 Test Task"
-        content.body = NSLocalizedString("debug_test_task_body", comment: "Task reminder test")
+        content.title = "🌱 " + NSLocalizedString("debug_task_title", comment: "Debug task title")
+        content.body = NSLocalizedString("debug_task_body", comment: "Debug task body")
         content.sound = .default
-        
+        content.categoryIdentifier = "task_reminder"
+
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        let request = UNNotificationRequest(identifier: "debug_task", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { err in
-            if let err = err {
-                appendLog("❌ Task test error: \(err.localizedDescription)")
-            } else {
-                appendLog("✅ Task test scheduled in 5s")
+        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    alertMessage = String(format: NSLocalizedString("debug_send_error", comment: ""), error.localizedDescription)
+                } else {
+                    alertMessage = NSLocalizedString("debug_task_scheduled", comment: "")
+                    // Log (asociado al usuario actual si existe)
+                    NotificationLogHelper.logNotification(title: content.title, body: content.body, type: "action:DEBUG_SEND_TASK", userID: appState.currentUserID, context: viewContext)
+                }
+                showingAlert = true
             }
         }
     }
-    
-    private func testCropNotification() {
+
+    private func sendCropTipIn5s() {
+        // Try to find a crop in the store
+        let fr: NSFetchRequest<Crop> = Crop.fetchRequest()
+        fr.fetchLimit = 1
+        var cropName = NSLocalizedString("crop_default", comment: "Crop")
+        if let crop = try? viewContext.fetch(fr).first {
+            // Use NotificationHelper.scheduleSeasonalTip(for:) (which schedules the system notification)
+            NotificationHelper.scheduleSeasonalTip(for: crop)
+            // Log (associate to current user if any)
+            NotificationLogHelper.logNotification(title: "Seasonal tip: \(crop.name ?? cropName)", body: NSLocalizedString("debug_crop_tip_body", comment: ""), type: "tip:seasonal", userID: appState.currentUserID, context: viewContext)
+            alertMessage = String(format: NSLocalizedString("debug_crop_scheduled_for_crop", comment: ""), crop.name ?? cropName)
+            showingAlert = true
+            return
+        }
+
+        // Fallback: schedule a generic crop tip in 5s
+        let id = "debug_crop_" + UUID().uuidString
         let content = UNMutableNotificationContent()
-        content.title = "🌱 Test Crop"
-        content.body = NSLocalizedString("debug_test_crop_body", comment: "Crop reminder test")
+        content.title = "💧 \(cropName)"
+        content.body = NSLocalizedString("debug_crop_tip_body", comment: "Debug crop tip")
         content.sound = .default
-        
+        content.categoryIdentifier = "crop_tip"
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        let request = UNNotificationRequest(identifier: "debug_crop", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { err in
-            if let err = err {
-                appendLog("❌ Crop test error: \(err.localizedDescription)")
-            } else {
-                appendLog("✅ Crop test scheduled in 5s")
+        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    alertMessage = String(format: NSLocalizedString("debug_send_error", comment: ""), error.localizedDescription)
+                } else {
+                    alertMessage = NSLocalizedString("debug_crop_scheduled", comment: "")
+                    NotificationLogHelper.logNotification(title: content.title, body: content.body, type: "tip:crop_debug", userID: appState.currentUserID, context: viewContext)
+                }
+                showingAlert = true
             }
         }
     }
-    
-    private func testTipNotification() {
+
+    private func sendSeasonalTipIn15s() {
+        // Try to find a crop and use NotificationHelper which uses 15s by default
+        let fr: NSFetchRequest<Crop> = Crop.fetchRequest()
+        fr.fetchLimit = 1
+        if let crop = try? viewContext.fetch(fr).first {
+            NotificationHelper.scheduleSeasonalTip(for: crop)
+            NotificationLogHelper.logNotification(title: "Seasonal tip: \(crop.name ?? "")", body: NSLocalizedString("debug_crop_tip_body", comment: ""), type: "tip:seasonal", userID: appState.currentUserID, context: viewContext)
+            alertMessage = NSLocalizedString("debug_seasonal_scheduled", comment: "")
+            showingAlert = true
+            return
+        }
+
+        // No crops: fallback to generic
+        let id = "debug_seasonal_" + UUID().uuidString
         let content = UNMutableNotificationContent()
-        content.title = "💡 Test Tip"
-        content.body = NSLocalizedString("debug_test_tip_body", comment: "Tip reminder test")
+        content.title = NSLocalizedString("debug_seasonal_title", comment: "")
+        content.body = NSLocalizedString("debug_crop_tip_body", comment: "Debug crop tip")
         content.sound = .default
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-        let request = UNNotificationRequest(identifier: "debug_tip", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { err in
-            if let err = err {
-                appendLog("❌ Tip test error: \(err.localizedDescription)")
-            } else {
-                appendLog("✅ Tip test scheduled in 5s")
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 15, repeats: false)
+        let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request) { error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    alertMessage = String(format: NSLocalizedString("debug_send_error", comment: ""), error.localizedDescription)
+                } else {
+                    alertMessage = NSLocalizedString("debug_seasonal_scheduled", comment: "")
+                    NotificationLogHelper.logNotification(title: content.title, body: content.body, type: "tip:seasonal", userID: appState.currentUserID, context: viewContext)
+                }
+                showingAlert = true
             }
         }
     }
-    
-    private func appendLog(_ msg: String) {
-        DispatchQueue.main.async {
-            log.insert("[\(Date().formatted(date: .omitted, time: .standard))] \(msg)", at: 0)
-        }
+
+    private func clearPendingNotifications() {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        alertMessage = NSLocalizedString("debug_cleared_pending_success", comment: "")
+        showingAlert = true
     }
 }
