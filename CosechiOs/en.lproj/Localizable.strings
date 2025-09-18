@@ -464,3 +464,36 @@
 "badge_explorer_desc" = "You accepted recommendations.";
 "badge_level_milestone_title" = "Level Milestone";
 "badge_level_milestone_desc" = "You reached a level milestone.";
+
+// User progress
+"profile_progress" = "Progress";
+"profile_level" = "Level %d";
+"profile_no_progress" = "No progress recorded";
+"profile_no_achievements" = "No achievements yet";
+
+// Achievements base
+"level_2" = "Level 2 reached";
+"level_5" = "Level 5 reached";
+"level_10" = "Level 10 reached";
+
+"achievements_title" = "Achievements";
+"achievements_your_level" = "Your level";
+"achievements_progress" = "Progress";
+"achievements_progress_pct" = "%d%% completed";
+"achievements_level_next" = "Next: level %d";
+"achievements_badges" = "Badges";
+"achievements_no_badges" = "You don’t have any badges yet";
+"achievements_badges_count" = "%d badges";
+
+"badge_first_task_title" = "First task";
+"badge_first_task_desc" = "You created your first task";
+"badge_task_collector_title" = "Task collector";
+"badge_task_collector_desc" = "You have created 10 tasks";
+"badge_logger_novice_title" = "Logger novice";
+"badge_logger_novice_desc" = "You added 5 progress logs";
+"badge_logger_master_title" = "Logger master";
+"badge_logger_master_desc" = "You added 50 progress logs";
+"badge_explorer_title" = "Explorer";
+"badge_explorer_desc" = "You accepted a recommendation";
+"badge_level_milestone_title" = "Level milestone";
+"badge_level_milestone_desc" = "You reached an important level";

@@ -465,3 +465,35 @@
 "badge_level_milestone_title" = "Hito de nivel";
 "badge_level_milestone_desc" = "Alcanzaste un hito de nivel.";
 
+// Progreso usuario
+"profile_progress" = "Progreso";
+"profile_level" = "Nivel %d";
+"profile_no_progress" = "Sin progreso registrado";
+"profile_no_achievements" = "Aún no hay logros";
+
+// Achievements base
+"level_2" = "Nivel 2 alcanzado";
+"level_5" = "Nivel 5 alcanzado";
+"level_10" = "Nivel 10 alcanzado";
+
+"achievements_title" = "Logros";
+"achievements_your_level" = "Tu nivel";
+"achievements_progress" = "Progreso";
+"achievements_progress_pct" = "%d%% completado";
+"achievements_level_next" = "Siguiente: nivel %d";
+"achievements_badges" = "Insignias";
+"achievements_no_badges" = "Aún no tienes insignias";
+"achievements_badges_count" = "%d insignias";
+
+"badge_first_task_title" = "Primera tarea";
+"badge_first_task_desc" = "Creaste tu primera tarea";
+"badge_task_collector_title" = "Coleccionista de tareas";
+"badge_task_collector_desc" = "Has creado 10 tareas";
+"badge_logger_novice_title" = "Novato registrador";
+"badge_logger_novice_desc" = "Has añadido 5 registros de progreso";
+"badge_logger_master_title" = "Maestro registrador";
+"badge_logger_master_desc" = "Has añadido 50 registros de progreso";
+"badge_explorer_title" = "Explorador";
+"badge_explorer_desc" = "Aceptaste una recomendación";
+"badge_level_milestone_title" = "Hito de nivel";
+"badge_level_milestone_desc" = "Alcanzaste un nivel importante";

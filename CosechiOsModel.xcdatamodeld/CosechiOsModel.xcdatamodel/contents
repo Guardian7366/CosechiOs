@@ -111,10 +111,12 @@
         <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="userID" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="username" attributeType="String"/>
+        <relationship name="achievements" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserAchievement" inverseName="user" inverseEntity="UserAchievement"/>
         <relationship name="collections" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserCollection" inverseName="user" inverseEntity="UserCollection"/>
         <relationship name="config" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Config" inverseName="user" inverseEntity="Config"/>
         <relationship name="notificationLogs" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NotificationLog" inverseName="user" inverseEntity="NotificationLog"/>
         <relationship name="progressLogs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProgressLog" inverseName="user" inverseEntity="ProgressLog"/>
+        <relationship name="stats" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserStats" inverseName="user" inverseEntity="UserStats"/>
         <relationship name="stepProgresses" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StepProgress" inverseName="user" inverseEntity="StepProgress"/>
         <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskEntity" inverseName="user" inverseEntity="TaskEntity"/>
         <fetchIndex name="byPropertyIndex">
@@ -130,6 +132,12 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
+    <entity name="UserAchievement" representedClassName="UserAchievement" syncable="YES" codeGenerationType="class">
+        <attribute name="achievementID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="unlockedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="achievements" inverseEntity="User"/>
+    </entity>
     <entity name="UserCollection" representedClassName="UserCollection" syncable="YES" codeGenerationType="class">
         <attribute name="addedAt" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="collectionID" attributeType="UUID" usesScalarValueType="NO"/>
@@ -139,5 +147,11 @@
         <fetchIndex name="byPropertyIndex">
             <fetchIndexElement property="collectionID" type="Binary" order="ascending"/>
         </fetchIndex>
+    </entity>
+    <entity name="UserStats" representedClassName="UserStats" syncable="YES" codeGenerationType="class">
+        <attribute name="level" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="statsID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="xp" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="User" inverseName="stats" inverseEntity="User"/>
     </entity>
 </model>

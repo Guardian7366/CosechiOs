@@ -8,27 +8,18 @@ struct UserProfileView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
 
-    // Modelo y config
     @State private var user: User?
     @State private var config: Config?
 
-    // Imagen / pickers
     @State private var usernameText: String = ""
     @State private var showingImagePicker = false
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
     @State private var pickedUIImage: UIImage? = nil
-
-    // Editor (full screen)
     @State private var showingEditor = false
     @State private var editedUIImage: UIImage? = nil
-
-    // Forzar refresh del Image view cuando cambiamos foto
     @State private var imageRefreshID = UUID()
-
-    // diálogo de selección (lápiz)
     @State private var showImageSourceOptions = false
 
-    // UI state
     @State private var isSaving = false
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -39,74 +30,7 @@ struct UserProfileView: View {
             Form {
                 // PERFIL
                 Section(header: Text(LocalizedStringKey("profile_title"))) {
-                    HStack {
-                        Spacer()
-                        VStack {
-                            ZStack(alignment: .bottomTrailing) {
-                                if let imgData = user?.profilePicture, let ui = UIImage(data: imgData) {
-                                    Image(uiImage: ui)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 120, height: 120)
-                                        .clipShape(Circle())
-                                        .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
-                                        .shadow(radius: 4)
-                                        .id(imageRefreshID)
-                                } else {
-                                    Image(systemName: "person.circle.fill")
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 120, height: 120)
-                                        .foregroundColor(.secondary)
-                                        .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
-                                        .id(imageRefreshID)
-                                }
-
-                                // Botón lápiz -> opciones
-                                Button {
-                                    showImageSourceOptions = true
-                                } label: {
-                                    Image(systemName: "pencil.circle.fill")
-                                        .font(.system(size: 28))
-                                        .foregroundColor(.blue)
-                                        .background(Color.white.clipShape(Circle()))
-                                }
-                                .offset(x: -8, y: -8)
-                                .buttonStyle(.plain)
-                                .confirmationDialog(LocalizedStringKey("profile_choose_image"),
-                                                    isPresented: $showImageSourceOptions,
-                                                    titleVisibility: .visible) {
-                                    Button(LocalizedStringKey("profile_take_photo")) {
-                                        openImagePicker(source: .camera)
-                                    }
-                                    Button(LocalizedStringKey("profile_choose_from_gallery")) {
-                                        openImagePicker(source: .photoLibrary)
-                                    }
-                                    Button(LocalizedStringKey("cancel"), role: .cancel) {}
-                                }
-                            }
-
-                            HStack(spacing: 20) {
-                                Button {
-                                    openImagePicker(source: .photoLibrary)
-                                } label: {
-                                    Text(LocalizedStringKey("profile_gallery"))
-                                }
-                                .buttonStyle(.borderless)
-
-                                Button {
-                                    openImagePicker(source: .camera)
-                                } label: {
-                                    Text(LocalizedStringKey("profile_camera"))
-                                }
-                                .buttonStyle(.borderless)
-                            }
-                            .font(.caption)
-                            .padding(.top, 6)
-                        }
-                        Spacer()
-                    }
-
+                    profileHeader
                     TextField(LocalizedStringKey("profile_username"), text: $usernameText)
                         .autocapitalization(.words)
 
@@ -117,91 +41,33 @@ struct UserProfileView: View {
                             .foregroundColor(.secondary)
                     }
                 }
-                // dentro de Form, por ejemplo después de sección "Perfil"
+
+                // LOGROS
                 Section(header: Text(LocalizedStringKey("profile_achievements_section"))) {
-                    AchievementsSummaryView(userID: user?.userID)
-                    NavigationLink(destination: AchievementsView(userID: user?.userID)) {
-                        Text(LocalizedStringKey("profile_achievements_view_all"))
+                    if let uid = user?.userID {
+                        AchievementsSummaryView(userID: uid)
+                        NavigationLink(destination: AchievementsView(userID: uid)) {
+                            Text(LocalizedStringKey("profile_achievements_view_all"))
+                        }
+                    } else {
+                        Text("—")
+                            .foregroundColor(.secondary)
                     }
                 }
 
-
                 // IDIOMA
                 Section(header: Text(LocalizedStringKey("profile_language"))) {
-                    Picker(LocalizedStringKey("profile_language"), selection: Binding(
-                        get: { config?.language ?? appState.appLanguage },
-                        set: { newValue in
-                            if let cfg = config {
-                                cfg.language = newValue
-                                try? ConfigHelper.save(cfg, context: viewContext)
-                            } else if let uid = appState.currentUserID {
-                                if let cfg = ConfigHelper.getOrCreateConfig(for: uid, context: viewContext) {
-                                    cfg.language = newValue
-                                    try? ConfigHelper.save(cfg, context: viewContext)
-                                    self.config = cfg
-                                }
-                            }
-                            DispatchQueue.main.async {
-                                UserDefaults.standard.set(newValue, forKey: "appLanguage")
-                                appState.appLanguage = newValue
-                            }
-                        })) {
-                        Text("English").tag("en")
-                        Text("Español").tag("es")
-                    }
+                    languagePicker
                 }
 
                 // NOTIFICACIONES
                 Section(header: Text(LocalizedStringKey("profile_notifications_settings"))) {
-                    Toggle(isOn: Binding(
-                        get: { config?.notificationsEnabled ?? true },
-                        set: { handleNotificationToggle(enabled: $0) }
-                    )) {
-                        Text(LocalizedStringKey("profile_notifications"))
-                    }
-
-                    if config?.notificationsEnabled ?? true {
-                        Toggle(isOn: Binding(
-                            get: { config?.notifyTasks ?? true },
-                            set: { updateConfig(\.notifyTasks, value: $0) }
-                        )) {
-                            Text(LocalizedStringKey("profile_notify_tasks"))
-                        }
-
-                        Toggle(isOn: Binding(
-                            get: { config?.notifyCrops ?? true },
-                            set: { updateConfig(\.notifyCrops, value: $0) }
-                        )) {
-                            Text(LocalizedStringKey("profile_notify_crops"))
-                        }
-
-                        Toggle(isOn: Binding(
-                            get: { config?.notifyTips ?? false },
-                            set: { updateConfig(\.notifyTips, value: $0) }
-                        )) {
-                            Text(LocalizedStringKey("profile_notify_tips"))
-                        }
-
-                        NavigationLink(destination: NotificationHistoryView().environment(\.managedObjectContext, viewContext)) {
-                            Text(LocalizedStringKey("profile_notifications_history"))
-                        }
-                    }
+                    notificationsSection
                 }
 
                 // APARIENCIA
                 Section {
-                    Picker(LocalizedStringKey("profile_theme"), selection: Binding(
-                        get: { config?.theme ?? "Auto" },
-                        set: { newValue in
-                            if let cfg = config {
-                                cfg.theme = newValue
-                                try? ConfigHelper.save(cfg, context: viewContext)
-                            }
-                        })) {
-                        Text(LocalizedStringKey("theme_auto")).tag("Auto")
-                        Text(LocalizedStringKey("theme_light")).tag("Light")
-                        Text(LocalizedStringKey("theme_dark")).tag("Dark")
-                    }
+                    themePicker
                 }
 
                 // EXTRAS
@@ -230,7 +96,7 @@ struct UserProfileView: View {
             }
             .onAppear { loadUserAndConfig() }
 
-            // ImagePicker sheet
+            // ImagePicker
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(image: $pickedUIImage, sourceType: imageSource)
             }
@@ -248,12 +114,6 @@ struct UserProfileView: View {
                         pickedUIImage = nil
                         showingEditor = false
                     }
-                } else {
-                    VStack {
-                        Text(LocalizedStringKey("no_image"))
-                        Button(LocalizedStringKey("close")) { showingEditor = false }
-                    }
-                    .padding()
                 }
             }
             .alert(isPresented: $showAlert) {
@@ -271,6 +131,136 @@ struct UserProfileView: View {
                 }
                 Button(LocalizedStringKey("cancel"), role: .cancel) {}
             }
+        }
+    }
+
+    // MARK: - Subviews
+
+    private var profileHeader: some View {
+        HStack {
+            Spacer()
+            VStack {
+                ZStack(alignment: .bottomTrailing) {
+                    if let imgData = user?.profilePicture, let ui = UIImage(data: imgData) {
+                        Image(uiImage: ui)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 120, height: 120)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
+                            .shadow(radius: 4)
+                            .id(imageRefreshID)
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 120, height: 120)
+                            .foregroundColor(.secondary)
+                            .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
+                            .id(imageRefreshID)
+                    }
+
+                    Button {
+                        showImageSourceOptions = true
+                    } label: {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(.blue)
+                            .background(Color.white.clipShape(Circle()))
+                    }
+                    .offset(x: -8, y: -8)
+                    .buttonStyle(.plain)
+                    .confirmationDialog(LocalizedStringKey("profile_choose_image"),
+                                        isPresented: $showImageSourceOptions,
+                                        titleVisibility: .visible) {
+                        Button(LocalizedStringKey("profile_take_photo")) {
+                            openImagePicker(source: .camera)
+                        }
+                        Button(LocalizedStringKey("profile_choose_from_gallery")) {
+                            openImagePicker(source: .photoLibrary)
+                        }
+                        Button(LocalizedStringKey("cancel"), role: .cancel) {}
+                    }
+                }
+            }
+            Spacer()
+        }
+    }
+
+    private var languagePicker: some View {
+        Picker(LocalizedStringKey("profile_language"), selection: Binding(
+            get: { config?.language ?? appState.appLanguage },
+            set: { newValue in
+                if let cfg = config {
+                    cfg.language = newValue
+                    try? ConfigHelper.save(cfg, context: viewContext)
+                } else if let uid = appState.currentUserID {
+                    if let cfg = ConfigHelper.getOrCreateConfig(for: uid, context: viewContext) {
+                        cfg.language = newValue
+                        try? ConfigHelper.save(cfg, context: viewContext)
+                        self.config = cfg
+                    }
+                }
+                DispatchQueue.main.async {
+                    UserDefaults.standard.set(newValue, forKey: "appLanguage")
+                    appState.appLanguage = newValue
+                }
+            })) {
+            Text("English").tag("en")
+            Text("Español").tag("es")
+        }
+    }
+
+    private var notificationsSection: some View {
+        Group {
+            Toggle(isOn: Binding(
+                get: { config?.notificationsEnabled ?? true },
+                set: { handleNotificationToggle(enabled: $0) }
+            )) {
+                Text(LocalizedStringKey("profile_notifications"))
+            }
+
+            if config?.notificationsEnabled ?? true {
+                Toggle(isOn: Binding(
+                    get: { config?.notifyTasks ?? true },
+                    set: { updateConfig(\.notifyTasks, value: $0) }
+                )) {
+                    Text(LocalizedStringKey("profile_notify_tasks"))
+                }
+
+                Toggle(isOn: Binding(
+                    get: { config?.notifyCrops ?? true },
+                    set: { updateConfig(\.notifyCrops, value: $0) }
+                )) {
+                    Text(LocalizedStringKey("profile_notify_crops"))
+                }
+
+                Toggle(isOn: Binding(
+                    get: { config?.notifyTips ?? false },
+                    set: { updateConfig(\.notifyTips, value: $0) }
+                )) {
+                    Text(LocalizedStringKey("profile_notify_tips"))
+                }
+
+                NavigationLink(destination: NotificationHistoryView().environment(\.managedObjectContext, viewContext)) {
+                    Text(LocalizedStringKey("profile_notifications_history"))
+                }
+            }
+        }
+    }
+
+    private var themePicker: some View {
+        Picker(LocalizedStringKey("profile_theme"), selection: Binding(
+            get: { config?.theme ?? "Auto" },
+            set: { newValue in
+                if let cfg = config {
+                    cfg.theme = newValue
+                    try? ConfigHelper.save(cfg, context: viewContext)
+                }
+            })) {
+            Text(LocalizedStringKey("theme_auto")).tag("Auto")
+            Text(LocalizedStringKey("theme_light")).tag("Light")
+            Text(LocalizedStringKey("theme_dark")).tag("Dark")
         }
     }
 
@@ -368,7 +358,6 @@ struct UserProfileView: View {
 struct AvatarEditorView: View {
     let image: UIImage
     var onSave: (UIImage) -> Void
-
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

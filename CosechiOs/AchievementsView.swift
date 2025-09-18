@@ -1,7 +1,10 @@
 // AchievementsView.swift
 import SwiftUI
+import CoreData
 
 struct AchievementsView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+
     let userID: UUID?
 
     @State private var xp: Int = 0
@@ -10,72 +13,61 @@ struct AchievementsView: View {
     @State private var badges: [String] = []
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                header
-                progressCircle
-                Divider()
-                badgesSection
-                Spacer()
-            }
-            .padding()
+        VStack(spacing: 16) {
+            header
+            progressSection
+            badgesGrid
+            Spacer()
         }
+        .padding()
         .navigationTitle(LocalizedStringKey("achievements_title"))
         .onAppear(perform: load)
-        .onReceive(NotificationCenter.default.publisher(for: .didUpdateAchievements)) { _ in load() }
+        .onReceive(NotificationCenter.default.publisher(for: .didUpdateAchievements)) { note in
+            // If user updated matches, reload
+            if let info = note.userInfo, let uid = info["userID"] as? UUID, uid == userID {
+                load()
+            } else {
+                // fallback reload
+                load()
+            }
+        }
     }
 
     private var header: some View {
-        VStack(alignment: .center, spacing: 6) {
-            Text(LocalizedStringKey("achievements_subtitle"))
+        VStack(spacing: 6) {
+            Text(LocalizedStringKey("achievements_your_level"))
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text("\(level)")
+                .font(.system(size: 46, weight: .bold))
+            Text("\(xp) XP")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
     }
 
-    private var progressCircle: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .stroke(Color(.systemGray5), lineWidth: 14)
-                    .frame(width: 140, height: 140)
-                Circle()
-                    .trim(from: 0, to: CGFloat(min(max(progress, 0), 1)))
-                    .stroke(style: StrokeStyle(lineWidth: 14, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .frame(width: 140, height: 140)
-                    .foregroundColor(.green)
-                VStack {
-                    Text("\(level)")
-                        .font(.title)
-                        .bold()
-                    Text(LocalizedStringKey("achievements_level"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-
-            Text("\(xp) XP")
+    private var progressSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LocalizedStringKey("achievements_progress"))
                 .font(.headline)
-            Text(String(format: NSLocalizedString("achievements_to_next", comment: ""), Int((1.0 - progress) * Double(nextLevelXP()))))
-                .font(.caption)
-                .foregroundColor(.secondary)
+            ProgressView(value: progress)
+                .frame(height: 12)
+                .accentColor(.green)
+            HStack {
+                Text(String(format: NSLocalizedString("achievements_progress_pct", comment: ""), Int(progress * 100)))
+                    .font(.caption)
+                Spacer()
+                Text(String(format: NSLocalizedString("achievements_level_next", comment: ""), level + 1))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
     }
 
-    private func nextLevelXP() -> Int {
-        guard let uid = userID else { return AchievementManager.xpForLevel(level+1) }
-        let cur = AchievementManager.level(forXP: xp)
-        return AchievementManager.xpForLevel(cur+1)
-    }
-
-    private var badgesSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(LocalizedStringKey("achievements_badges"))
-                    .font(.headline)
-                Spacer()
-            }
+    private var badgesGrid: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LocalizedStringKey("achievements_badges"))
+                .font(.headline)
 
             if badges.isEmpty {
                 Text(LocalizedStringKey("achievements_no_badges"))
@@ -90,42 +82,35 @@ struct AchievementsView: View {
         }
     }
 
+    @ViewBuilder
     private func badgeCell(id: String) -> some View {
-        let def = AchievementManager.badgeDefinitions[id]
-        return VStack(spacing: 6) {
-            Image(systemName: def?.symbol ?? "seal.fill")
-                .font(.system(size: 28))
-                .frame(width: 56, height: 56)
-                .background(Color(.systemGray6))
-                .clipShape(Circle())
-            Text(LocalizedStringKey(def?.titleKey ?? "badge_unknown"))
+        let meta = AchievementManager.badgeDefinitions[id]
+        VStack(spacing: 6) {
+            if let symbol = meta?.symbol {
+                Image(systemName: symbol)
+                    .font(.system(size: 28))
+                    .frame(width: 56, height: 56)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(12)
+            } else {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color(.systemGray6))
+                    .frame(width: 56, height: 56)
+            }
+            Text(LocalizedStringKey(meta?.titleKey ?? id))
                 .font(.caption2)
                 .multilineTextAlignment(.center)
         }
-        .padding(8)
-        .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(radius: 1)
     }
 
     private func load() {
         guard let uid = userID else {
-            xp = 0; level = 1; badges = []
-            progress = 0; return
+            xp = 0; level = 1; progress = 0.0; badges = []
+            return
         }
-        xp = AchievementManager.getXP(for: uid)
-        level = AchievementManager.level(forXP: xp)
-        progress = AchievementManager.progressToNextLevel(for: uid)
-        badges = AchievementManager.getBadges(for: uid)
+        xp = AchievementManager.getXP(for: uid, context: viewContext)
+        level = AchievementManager.getLevel(for: uid, context: viewContext)
+        progress = AchievementManager.progressToNextLevel(for: uid, context: viewContext)
+        badges = AchievementManager.getBadges(for: uid, context: viewContext)
     }
 }
-
-#if DEBUG
-struct AchievementsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            AchievementsView(userID: UUID())
-        }
-    }
-}
-#endif
