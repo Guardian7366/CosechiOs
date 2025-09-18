@@ -94,6 +94,11 @@ struct AddTaskView: View {
             if reminder {
                 NotificationHelper.scheduleNotification(for: task)
             }
+            
+            // --- Otorgar XP por crear tarea
+            if let user = task.user {
+                AchievementManager.award(action: .createTask, to: user.userID ?? UUID(), context: viewContext)
+            }
             dismiss()
         } catch {
             print("❌ Error guardando tarea: \(error.localizedDescription)")

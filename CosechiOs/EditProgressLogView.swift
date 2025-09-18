@@ -74,9 +74,7 @@ struct EditProgressLogView: View {
                 }
             }
             .sheet(isPresented: $showImagePicker) {
-                ImagePicker { picked in
-                    self.image = picked
-                }
+                ImagePicker(image: $image, sourceType: .photoLibrary)
             }
         }
     }

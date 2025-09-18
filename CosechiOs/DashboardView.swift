@@ -601,6 +601,8 @@ struct DashboardView: View {
             if added {
                 recMessage = NSLocalizedString("recommendations_added", comment: "")
                 if let id = crop.cropID { RecommendationAnalytics.logAccepted(cropID: id) }
+                // --- Otorgar XP por aceptar recomendación
+                AchievementManager.award(action: .acceptRecommendation, to: uid, context: viewContext)
             } else {
                 recMessage = NSLocalizedString("recommendations_in_collection", comment: "")
             }

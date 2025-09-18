@@ -1,3 +1,4 @@
+// AddProgressLogView.swift
 import SwiftUI
 import CoreData
 import UIKit
@@ -19,43 +20,43 @@ struct AddProgressLogView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("progress_note") {
+                Section(header: Text(LocalizedStringKey("progress_note"))) {
                     TextEditor(text: $note)
                         .frame(minHeight: 100)
                 }
 
-                Section("progress_category") {
-                    Picker("Categoría", selection: $category) {
+                Section(header: Text(LocalizedStringKey("progress_category"))) {
+                    Picker(LocalizedStringKey("progress_category"), selection: $category) {
                         ForEach(categories, id: \.self) { cat in
                             Text(cat).tag(cat)
                         }
                     }
                 }
 
-                Section("progress_photo") {
+                Section(header: Text(LocalizedStringKey("progress_photo"))) {
                     if let img = image {
                         Image(uiImage: img)
                             .resizable()
                             .scaledToFit()
                             .frame(height: 200)
-                        Button("remove_photo") {
+                        Button(LocalizedStringKey("remove_photo")) {
                             image = nil
                         }
                         .foregroundColor(.red)
                     } else {
-                        Button("add_photo") {
+                        Button(LocalizedStringKey("add_photo")) {
                             showImagePicker = true
                         }
                     }
                 }
             }
-            .navigationTitle("new_progress")
+            .navigationTitle(LocalizedStringKey("new_progress"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("cancel") { dismiss() }
+                    Button(LocalizedStringKey("cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("save") {
+                    Button(LocalizedStringKey("save")) {
                         saveLog()
                         dismiss()
                     }
@@ -63,7 +64,8 @@ struct AddProgressLogView: View {
                 }
             }
             .sheet(isPresented: $showImagePicker) {
-                ImagePicker { img in image = img }
+                // Reutiliza tu ImagePicker con binding (ya presente en tu proyecto)
+                ImagePicker(image: $image, sourceType: .photoLibrary)
             }
         }
     }
@@ -75,7 +77,9 @@ struct AddProgressLogView: View {
         fr.predicate = NSPredicate(format: "userID == %@", userID as CVarArg)
         if let user = try? context.fetch(fr).first {
             ProgressLogHelper.addLog(for: crop, user: user, note: note.isEmpty ? nil : note, image: image, category: category, context: context)
+
+            // --- <-- Aquí se otorga XP por añadir un progress log
+            AchievementManager.award(action: .addProgressLog, to: user.userID ?? UUID(), context: context)
         }
     }
 }
-

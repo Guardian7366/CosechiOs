@@ -1,22 +1,34 @@
+// UserProfileView.swift
 import SwiftUI
 import CoreData
 import UserNotifications
+import UIKit
 
 struct UserProfileView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
 
+    // Modelo y config
     @State private var user: User?
     @State private var config: Config?
 
+    // Imagen / pickers
     @State private var usernameText: String = ""
     @State private var showingImagePicker = false
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
-    @State private var pickedUIImage: UIImage?
+    @State private var pickedUIImage: UIImage? = nil
 
+    // Editor (full screen)
     @State private var showingEditor = false
-    @State private var editedUIImage: UIImage?
+    @State private var editedUIImage: UIImage? = nil
 
+    // Forzar refresh del Image view cuando cambiamos foto
+    @State private var imageRefreshID = UUID()
+
+    // diálogo de selección (lápiz)
+    @State private var showImageSourceOptions = false
+
+    // UI state
     @State private var isSaving = false
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -25,14 +37,13 @@ struct UserProfileView: View {
     var body: some View {
         NavigationStack {
             Form {
-                // MARK: - Perfil
-                Section(header: Text("profile_title")) {
+                // PERFIL
+                Section(header: Text(LocalizedStringKey("profile_title"))) {
                     HStack {
                         Spacer()
                         VStack {
                             ZStack(alignment: .bottomTrailing) {
-                                if let imgData = user?.profilePicture,
-                                   let ui = UIImage(data: imgData) {
+                                if let imgData = user?.profilePicture, let ui = UIImage(data: imgData) {
                                     Image(uiImage: ui)
                                         .resizable()
                                         .scaledToFill()
@@ -40,6 +51,7 @@ struct UserProfileView: View {
                                         .clipShape(Circle())
                                         .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
                                         .shadow(radius: 4)
+                                        .id(imageRefreshID)
                                 } else {
                                     Image(systemName: "person.circle.fill")
                                         .resizable()
@@ -47,10 +59,12 @@ struct UserProfileView: View {
                                         .frame(width: 120, height: 120)
                                         .foregroundColor(.secondary)
                                         .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 2))
+                                        .id(imageRefreshID)
                                 }
 
+                                // Botón lápiz -> opciones
                                 Button {
-                                    openImagePicker(source: .photoLibrary)
+                                    showImageSourceOptions = true
                                 } label: {
                                     Image(systemName: "pencil.circle.fill")
                                         .font(.system(size: 28))
@@ -58,15 +72,34 @@ struct UserProfileView: View {
                                         .background(Color.white.clipShape(Circle()))
                                 }
                                 .offset(x: -8, y: -8)
+                                .buttonStyle(.plain)
+                                .confirmationDialog(LocalizedStringKey("profile_choose_image"),
+                                                    isPresented: $showImageSourceOptions,
+                                                    titleVisibility: .visible) {
+                                    Button(LocalizedStringKey("profile_take_photo")) {
+                                        openImagePicker(source: .camera)
+                                    }
+                                    Button(LocalizedStringKey("profile_choose_from_gallery")) {
+                                        openImagePicker(source: .photoLibrary)
+                                    }
+                                    Button(LocalizedStringKey("cancel"), role: .cancel) {}
+                                }
                             }
 
                             HStack(spacing: 20) {
-                                Button("profile_gallery") {
+                                Button {
                                     openImagePicker(source: .photoLibrary)
+                                } label: {
+                                    Text(LocalizedStringKey("profile_gallery"))
                                 }
-                                Button("profile_camera") {
+                                .buttonStyle(.borderless)
+
+                                Button {
                                     openImagePicker(source: .camera)
+                                } label: {
+                                    Text(LocalizedStringKey("profile_camera"))
                                 }
+                                .buttonStyle(.borderless)
                             }
                             .font(.caption)
                             .padding(.top, 6)
@@ -78,16 +111,24 @@ struct UserProfileView: View {
                         .autocapitalization(.words)
 
                     HStack {
-                        Text("profile_email")
+                        Text(LocalizedStringKey("profile_email"))
                         Spacer()
                         Text(user?.email ?? "-")
                             .foregroundColor(.secondary)
                     }
                 }
+                // dentro de Form, por ejemplo después de sección "Perfil"
+                Section(header: Text(LocalizedStringKey("profile_achievements_section"))) {
+                    AchievementsSummaryView(userID: user?.userID)
+                    NavigationLink(destination: AchievementsView(userID: user?.userID)) {
+                        Text(LocalizedStringKey("profile_achievements_view_all"))
+                    }
+                }
 
-                // MARK: - Idioma
-                Section(header: Text("profile_language")) {
-                    Picker("profile_language", selection: Binding(
+
+                // IDIOMA
+                Section(header: Text(LocalizedStringKey("profile_language"))) {
+                    Picker(LocalizedStringKey("profile_language"), selection: Binding(
                         get: { config?.language ?? appState.appLanguage },
                         set: { newValue in
                             if let cfg = config {
@@ -110,13 +151,13 @@ struct UserProfileView: View {
                     }
                 }
 
-                // MARK: - Notificaciones
-                Section(header: Text("profile_notifications_settings")) {
+                // NOTIFICACIONES
+                Section(header: Text(LocalizedStringKey("profile_notifications_settings"))) {
                     Toggle(isOn: Binding(
                         get: { config?.notificationsEnabled ?? true },
                         set: { handleNotificationToggle(enabled: $0) }
                     )) {
-                        Text("profile_notifications")
+                        Text(LocalizedStringKey("profile_notifications"))
                     }
 
                     if config?.notificationsEnabled ?? true {
@@ -124,33 +165,32 @@ struct UserProfileView: View {
                             get: { config?.notifyTasks ?? true },
                             set: { updateConfig(\.notifyTasks, value: $0) }
                         )) {
-                            Text("profile_notify_tasks")
+                            Text(LocalizedStringKey("profile_notify_tasks"))
                         }
 
                         Toggle(isOn: Binding(
                             get: { config?.notifyCrops ?? true },
                             set: { updateConfig(\.notifyCrops, value: $0) }
                         )) {
-                            Text("profile_notify_crops")
+                            Text(LocalizedStringKey("profile_notify_crops"))
                         }
 
                         Toggle(isOn: Binding(
                             get: { config?.notifyTips ?? false },
                             set: { updateConfig(\.notifyTips, value: $0) }
                         )) {
-                            Text("profile_notify_tips")
+                            Text(LocalizedStringKey("profile_notify_tips"))
                         }
 
-                        NavigationLink(destination: NotificationHistoryView()
-                            .environment(\.managedObjectContext, viewContext)) {
-                            Text("profile_notifications_history")
+                        NavigationLink(destination: NotificationHistoryView().environment(\.managedObjectContext, viewContext)) {
+                            Text(LocalizedStringKey("profile_notifications_history"))
                         }
                     }
                 }
 
-                // MARK: - Apariencia
+                // APARIENCIA
                 Section {
-                    Picker("profile_theme", selection: Binding(
+                    Picker(LocalizedStringKey("profile_theme"), selection: Binding(
                         get: { config?.theme ?? "Auto" },
                         set: { newValue in
                             if let cfg = config {
@@ -158,70 +198,84 @@ struct UserProfileView: View {
                                 try? ConfigHelper.save(cfg, context: viewContext)
                             }
                         })) {
-                        Text("theme_auto").tag("Auto")
-                        Text("theme_light").tag("Light")
-                        Text("theme_dark").tag("Dark")
+                        Text(LocalizedStringKey("theme_auto")).tag("Auto")
+                        Text(LocalizedStringKey("theme_light")).tag("Light")
+                        Text(LocalizedStringKey("theme_dark")).tag("Dark")
                     }
                 }
 
-                // MARK: - Extras
+                // EXTRAS
                 Section {
                     Button(role: .destructive) {
                         showDeleteConfirm = true
                     } label: {
-                        Text("profile_delete_photo")
+                        Text(LocalizedStringKey("profile_delete_photo"))
                     }
 
                     Button {
                         alertMessage = NSLocalizedString("profile_export", comment: "")
                         showAlert = true
                     } label: {
-                        Text("profile_export")
+                        Text(LocalizedStringKey("profile_export"))
                     }
                 }
             }
-            .navigationTitle("profile_title")
+            .navigationTitle(LocalizedStringKey("profile_title"))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: saveProfile) {
-                        if isSaving { ProgressView() } else { Text("save") }
+                        if isSaving { ProgressView() } else { Text(LocalizedStringKey("save")) }
                     }
                 }
             }
             .onAppear { loadUserAndConfig() }
+
+            // ImagePicker sheet
             .sheet(isPresented: $showingImagePicker) {
-                ImagePicker(sourceType: imageSource) { img in
-                    pickedUIImage = img
+                ImagePicker(image: $pickedUIImage, sourceType: imageSource)
+            }
+            .onChange(of: pickedUIImage) { new in
+                guard new != nil else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     showingEditor = true
                 }
             }
-            .sheet(isPresented: $showingEditor, onDismiss: saveEditedImage) {
+            .fullScreenCover(isPresented: $showingEditor) {
                 if let picked = pickedUIImage {
                     AvatarEditorView(image: picked) { result in
                         editedUIImage = result
                         saveEditedImage()
+                        pickedUIImage = nil
                         showingEditor = false
                     }
+                } else {
+                    VStack {
+                        Text(LocalizedStringKey("no_image"))
+                        Button(LocalizedStringKey("close")) { showingEditor = false }
+                    }
+                    .padding()
                 }
             }
             .alert(isPresented: $showAlert) {
-                Alert(title: Text("alert_title"),
+                Alert(title: Text(LocalizedStringKey("alert_title")),
                       message: Text(alertMessage),
-                      dismissButton: .default(Text("ok")))
+                      dismissButton: .default(Text(LocalizedStringKey("ok"))))
             }
-            .confirmationDialog("profile_delete_photo_confirm",
+            .confirmationDialog(LocalizedStringKey("profile_delete_photo_confirm"),
                                 isPresented: $showDeleteConfirm,
                                 titleVisibility: .visible) {
-                Button("delete", role: .destructive) {
+                Button(LocalizedStringKey("delete"), role: .destructive) {
                     user?.profilePicture = nil
                     try? viewContext.save()
+                    imageRefreshID = UUID()
                 }
-                Button("cancel", role: .cancel) {}
+                Button(LocalizedStringKey("cancel"), role: .cancel) {}
             }
         }
     }
 
     // MARK: - Helpers
+
     private func loadUserAndConfig() {
         guard let uid = appState.currentUserID else { return }
         let fr: NSFetchRequest<User> = User.fetchRequest()
@@ -230,6 +284,7 @@ struct UserProfileView: View {
         if let loadedUser = try? viewContext.fetch(fr).first {
             self.user = loadedUser
             self.usernameText = loadedUser.username ?? ""
+            imageRefreshID = UUID()
         }
         if let cfg = ConfigHelper.getOrCreateConfig(for: uid, context: viewContext) {
             self.config = cfg
@@ -259,7 +314,15 @@ struct UserProfileView: View {
         let resized = edited.resizeTo(maxDimension: 1024)
         if let data = resized.jpegData(compressionQuality: 0.8) {
             user?.profilePicture = data
-            try? viewContext.save()
+            do {
+                try viewContext.save()
+                imageRefreshID = UUID()
+                alertMessage = NSLocalizedString("profile_image_saved", comment: "")
+                showAlert = true
+            } catch {
+                alertMessage = String(format: NSLocalizedString("profile_image_save_error", comment: ""), error.localizedDescription)
+                showAlert = true
+            }
         }
     }
 
@@ -286,13 +349,16 @@ struct UserProfileView: View {
         }
     }
 
-    /// Valida disponibilidad antes de abrir el picker
     private func openImagePicker(source: UIImagePickerController.SourceType) {
         if UIImagePickerController.isSourceTypeAvailable(source) {
             imageSource = source
             showingImagePicker = true
         } else {
-            alertMessage = NSLocalizedString("profile_source_unavailable", comment: "Source not available")
+            if source == .camera {
+                alertMessage = NSLocalizedString("profile_camera_unavailable", comment: "")
+            } else {
+                alertMessage = NSLocalizedString("profile_source_unavailable", comment: "")
+            }
             showAlert = true
         }
     }
@@ -315,9 +381,9 @@ struct AvatarEditorView: View {
                 .padding()
             Spacer()
             HStack {
-                Button("cancel") { dismiss() }
+                Button(LocalizedStringKey("cancel")) { dismiss() }
                 Spacer()
-                Button("save") {
+                Button(LocalizedStringKey("save")) {
                     onSave(image)
                     dismiss()
                 }

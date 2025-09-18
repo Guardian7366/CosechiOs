@@ -404,3 +404,64 @@
 "delete" = "Eliminar";
 "cancel" = "Cancelar";
 "profile_source_unavailable" = "Este origen no está disponible en tu dispositivo.";
+
+"profile_source_unavailable" = "Este origen no está disponible en tu dispositivo.";
+"profile_camera_unavailable" = "La cámara no está disponible en este dispositivo.";
+"profile_image_saved" = "Foto de perfil guardada.";
+"profile_image_save_error" = "Error al guardar la foto: %@";
+"profile_choose_image" = "Seleccionar imagen";
+"profile_take_photo" = "Tomar foto";
+"profile_choose_from_gallery" = "Elegir de la galería";
+"cancel" = "Cancelar";
+"save" = "Guardar";
+"delete" = "Eliminar";
+
+"profile_title" = "Perfil";
+"profile_username" = "Nombre";
+"profile_email" = "Correo";
+"profile_gallery" = "Galería";
+"profile_camera" = "Cámara";
+"profile_choose_image" = "Elegir imagen";
+"profile_take_photo" = "Tomar foto";
+"profile_choose_from_gallery" = "Elegir desde galería";
+"profile_delete_photo" = "Eliminar foto de perfil";
+"profile_delete_photo_confirm" = "¿Eliminar foto de perfil?";
+"profile_export" = "Exportar perfil";
+"profile_image_saved" = "Imagen guardada";
+"profile_image_save_error" = "Error guardando imagen: %@";
+"profile_camera_unavailable" = "La cámara no está disponible en este dispositivo.";
+"profile_source_unavailable" = "Fuente seleccionada no disponible.";
+"no_image" = "Sin imagen";
+"close" = "Cerrar";
+"save" = "Guardar";
+"cancel" = "Cancelar";
+
+/* Achievements */
+"achievements_title" = "Nivel y Logros";
+"achievements_subtitle" = "Motívate: sube de nivel completando acciones";
+"achievements_level" = "Nivel";
+"achievements_to_next" = "Faltan %d XP para el siguiente nivel";
+"achievements_badges" = "Insignias";
+"achievements_no_badges" = "Aún no tienes insignias. ¡Comienza realizando acciones!";
+
+/* Profile */
+"profile_achievements_title" = "Logros";
+"profile_achievements_sub" = "Nivel actual: %d";
+"profile_achievements_no_badges" = "Sin insignias aún";
+"profile_achievements_section" = "Logros y progreso";
+"profile_achievements_view_all" = "Ver todos los logros";
+
+/* Badges */
+"badge_first_task_title" = "Primer paso";
+"badge_first_task_desc" = "Has creado tu primera tarea.";
+"badge_task_collector_title" = "Creador de tareas";
+"badge_task_collector_desc" = "Has creado 10 tareas.";
+"badge_logger_novice_title" = "Registrador";
+"badge_logger_novice_desc" = "Has hecho 5 registros de progreso.";
+"badge_logger_master_title" = "Maestro del registro";
+"badge_logger_master_desc" = "50 registros de progreso.";
+"badge_explorer_title" = "Explorador";
+"badge_explorer_desc" = "Has aceptado recomendaciones.";
+"badge_level_milestone_title" = "Hito de nivel";
+"badge_level_milestone_desc" = "Alcanzaste un hito de nivel.";
+
