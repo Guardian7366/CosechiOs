@@ -497,3 +497,111 @@
 "badge_explorer_desc" = "You accepted a recommendation";
 "badge_level_milestone_title" = "Level milestone";
 "badge_level_milestone_desc" = "You reached an important level";
+
+/* Notifications */
+"notif_level_up_title" = "Level up!";
+"notif_level_up_body" = "You reached level %d. Great job!";
+"notif_badge_unlocked_title" = "Badge unlocked";
+"notif_badge_unlocked_body" = "You unlocked: %@";
+
+/* Achievements UI */
+"achievements_title" = "Achievements";
+"achievements_your_level" = "Your level";
+"achievements_progress" = "Progress";
+"achievements_progress_pct" = "%d%% completed";
+"achievements_level_next" = "Next: level %d";
+"achievements_badges" = "Badges";
+"achievements_no_badges" = "You don’t have any badges yet";
+"achievements_badges_count" = "%d badges";
+
+/* Badges */
+"badge_first_task_title" = "First task";
+"badge_first_task_desc" = "You created your first task";
+"badge_task_collector_title" = "Task collector";
+"badge_task_collector_desc" = "You created 10 tasks";
+"badge_logger_novice_title" = "Logger novice";
+"badge_logger_novice_desc" = "You added 5 progress logs";
+"badge_logger_master_title" = "Logger master";
+"badge_logger_master_desc" = "You added 50 progress logs";
+"badge_explorer_title" = "Explorer";
+"badge_explorer_desc" = "You accepted a recommendation";
+"badge_level_milestone_title" = "Level milestone";
+"badge_level_milestone_desc" = "You reached an important level";
+
+"level_up_message" = "🎉 You leveled up!";
+"badge_unlocked" = "🏅 New achievement unlocked!";
+
+"crop_recommendations" = "Growing recommendations";
+"crop_info_unavailable" = "Information not available";
+"crop_soil" = "Soil type";
+"crop_watering" = "Watering";
+"crop_sunlight" = "Sunlight";
+"crop_temperature" = "Temperature";
+"crop_fertilization" = "Fertilization";
+
+"crop_recommendations" = "Crop recommendations";
+"crop_soil" = "Soil";
+"crop_watering" = "Watering";
+"crop_sunlight" = "Sunlight";
+"crop_temperature" = "Temperature";
+"crop_fertilization" = "Fertilization";
+"crop_info_unavailable" = "Information not available";
+
+"crop_cucumber_name" = "Cucumber";
+"crop_cucumber_desc" = "Climbing vegetable that produces elongated, fresh, and crunchy fruits.";
+
+"crop_pepper_name" = "Pepper";
+"crop_pepper_desc" = "Vegetable in various colors, used both raw and cooked.";
+
+"crop_carrot_name" = "Carrot";
+"crop_carrot_desc" = "Edible root rich in beta-carotene, sweet in flavor and crunchy in texture.";
+
+"crop_onion_name" = "Onion";
+"crop_onion_desc" = "Aromatic bulb widely used in gastronomy, base of many preparations.";
+
+"crop_watermelon_name" = "Watermelon";
+"crop_watermelon_desc" = "Large, juicy fruit with red flesh and black seeds, ideal in summer.";
+
+"crop_corn_name" = "Corn";
+"crop_corn_desc" = "Staple cereal cultivated worldwide, with yellow or white cobs.";
+
+"step_pollination" = "Pollination";
+"step_fruit_set" = "Fruit set";
+
+"crop_estimated_duration" = "Estimated duration: %d days";
+"crop_quick_tips" = "Quick tips";
+
+"tip_watering_template" = "Watering: %@";
+"tip_fertilization_template" = "Fertilization: %@";
+"tip_soil_template" = "Soil: %@";
+"tip_sunlight_template" = "Sun: %@";
+
+"crop_climate" = "Climate conditions";     // EN
+"crop_climate" = "Climate conditions";
+"crop_quick_tips" = "Quick tips";
+"crop_plagues" = "Common pests";
+"crop_estimated_duration" = "Estimated duration: %d days";
+"crop_tip_watch_plagues" = "Watch for pests:";
+"crop_recommendations" = "Growing recommendations";
+"crop_soil" = "Soil";
+"crop_watering" = "Watering";
+"crop_sunlight" = "Sunlight";
+"crop_temperature" = "Temperature";
+"crop_fertilization" = "Fertilization";
+"crop_info_unavailable" = "Information not available";
+
+"crop_season_tip" = "🌸 It’s %@ season! Consider planting them now.";
+"crop_recommended_now" = "Recommended this season";
+
+"crop_companions" = "Companion planting";
+"crop_germination_days" = "Germinates in %d days";
+
+"crop_companions" = "Companion planting";
+"crop_germination_days" = "Germinates in %d days";
+"crop_watering_frequency" = "Watering frequency";
+"crop_harvest_months" = "Ideal harvest months";
+
+"crop_companions" = "Companion planting";
+"crop_germination_days" = "🌱 Germinates in %d days";
+"crop_watering_frequency" = "Watering frequency: %@";
+"crop_harvest_months" = "📅 Harvest months: %@";

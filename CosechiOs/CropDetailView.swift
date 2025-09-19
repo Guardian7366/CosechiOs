@@ -1,4 +1,3 @@
-
 // CropDetailView.swift
 import SwiftUI
 import CoreData
@@ -8,6 +7,7 @@ import Foundation
 extension Notification.Name {
     static let userCollectionsChanged = Notification.Name("userCollectionsChanged")
 }
+
 struct CropDetailView: View {
     let crop: Crop
     @EnvironmentObject var appState: AppState
@@ -16,6 +16,7 @@ struct CropDetailView: View {
     @State private var isInCollection = false
     @State private var showingTaskSheet = false
     @State private var stepProgress: [UUID: Bool] = [:]
+    @State private var seasonalTipSent = false   // NUEVO estado
 
     // Historial de progreso
     @State private var progressLogs: [ProgressLog] = []
@@ -46,6 +47,8 @@ struct CropDetailView: View {
                 stepsSection
                 Divider()
                 progressSection
+                Divider()
+                infoSection // sección de recomendaciones + clima + plagas + duración total
             }
             .padding()
         }
@@ -77,7 +80,28 @@ struct CropDetailView: View {
 // MARK: - UI Sections & Helpers
 extension CropDetailView {
     @ViewBuilder private var headerSection: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .top, spacing: 12) {
+            // Imagen del cultivo (asset catalog) o placeholder
+            if let imageName = crop.imageName, !imageName.isEmpty, UIImage(named: imageName) != nil {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 120, height: 120)
+                    .clipped()
+                    .cornerRadius(10)
+                    .shadow(radius: 2)
+            } else {
+                ZStack {
+                    Color(.systemGray5)
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white)
+                }
+                .frame(width: 120, height: 120)
+                .cornerRadius(10)
+                .shadow(radius: 1)
+            }
+
             VStack(alignment: .leading, spacing: 6) {
                 Text(crop.name ?? NSLocalizedString("crop_default", comment: ""))
                     .font(.largeTitle)
@@ -205,8 +229,7 @@ extension CropDetailView {
                                     .foregroundColor(.green)
                             }
                         } else {
-                            Text("✔️")
-                                .foregroundColor(.green)
+                            Text("✔️").foregroundColor(.green)
                         }
                     }
                     .padding(.vertical, 4)
@@ -323,6 +346,92 @@ extension CropDetailView {
         }
     }
 
+    // 🔹 Info section extended (soil, watering, fertilization, climate, plagues, duration total)
+    @ViewBuilder private var infoSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LocalizedStringKey("crop_recommendations"))
+                .font(.headline)
+
+            // Duración estimada (sum of step durations)
+            if let stepsSet = crop.steps as? Set<Step>, !stepsSet.isEmpty {
+                let totalDays = stepsSet.reduce(0) { $0 + Int($1.estimateDuration) }
+                Text("⏳ " + String(format: NSLocalizedString("crop_estimated_duration", comment: ""), totalDays))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
+            if let info = crop.info {
+                Group {
+                    if let soil = info.soilType, !soil.isEmpty {
+                        Text("🌱 \(NSLocalizedString("crop_soil", comment: "")): \(soil)")
+                    }
+                    if let watering = info.watering, !watering.isEmpty {
+                        Text("💧 \(NSLocalizedString("crop_watering", comment: "")): \(watering)")
+                    }
+                    if let sun = info.sunlight, !sun.isEmpty {
+                        Text("☀️ \(NSLocalizedString("crop_sunlight", comment: "")): \(sun)")
+                    }
+                    if let temp = info.temperatureRange, !temp.isEmpty {
+                        Text("🌡 \(NSLocalizedString("crop_temperature", comment: "")): \(temp)")
+                    }
+                    if let fert = info.fertilizationTips, !fert.isEmpty {
+                        Text("🧪 \(NSLocalizedString("crop_fertilization", comment: "")): \(fert)")
+                    }
+                    if let climate = info.climate, !climate.isEmpty {
+                        Text("🌍 \(NSLocalizedString("crop_climate", comment: "")): \(climate)")
+                    }
+                    if let pl = info.plagues, !pl.isEmpty {
+                        Text("🐛 \(NSLocalizedString("crop_plagues", comment: "")): \(pl)")
+                    }
+                    
+                    if let companions = info.companions, !companions.isEmpty {
+                        Text("🤝 \(NSLocalizedString("crop_companions", comment: "")): \(companions)")
+                    }
+
+                    if info.germinationDays > 0 {
+                        Text("🌱 " + String(format: NSLocalizedString("crop_germination_days", comment: ""), info.germinationDays))
+                    }
+
+                    if let freq = info.wateringFrequency, !freq.isEmpty {
+                        Text("💧 \(NSLocalizedString("crop_watering_frequency", comment: "")): \(freq)")
+                    }
+
+                    if let months = info.harvestMonths as? [String], !months.isEmpty {
+                        Text("🌾 \(NSLocalizedString("crop_harvest_months", comment: "")): \(months.joined(separator: ", "))")
+                    }
+                }
+                
+                // Quick tips / resumen corto (construido simple para no añadir funciones extra)
+                let quick: [String] = {
+                    var tips: [String] = []
+                    if let watering = info.watering, !watering.isEmpty { tips.append(watering) }
+                    if let climate = info.climate, !climate.isEmpty { tips.append(climate) }
+                    if let pl = info.plagues, !pl.isEmpty {
+                        tips.append(NSLocalizedString("crop_tip_watch_plagues", comment: "") + " " + pl)
+                    }
+                    return tips
+                }()
+                if !quick.isEmpty {
+                    Divider().padding(.vertical, 6)
+                    Text(LocalizedStringKey("crop_quick_tips"))
+                        .font(.subheadline)
+                        .bold()
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(quick.indices, id: \.self) { idx in
+                            HStack(alignment: .top, spacing: 8) {
+                                Text("•").font(.body)
+                                Text(quick[idx]).font(.caption)
+                            }
+                        }
+                    }
+                }
+            } else {
+                Text(LocalizedStringKey("crop_info_unavailable"))
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
     // MARK: - Helpers & logic
 
     private func onAppearActions() {
@@ -333,6 +442,12 @@ extension CropDetailView {
             loadStepProgress(for: userID)
         }
         loadProgressLogs()
+        
+        // 🔔 Alerta de temporada
+        if isRecommendedNow(), !seasonalTipSent {
+            NotificationHelper.scheduleSeasonalTip(for: crop)
+            seasonalTipSent = true
+        }
     }
 
     // Filtrado por user + crop (FetchRequest trae todo; filtramos aquí)
@@ -385,24 +500,14 @@ extension CropDetailView {
                 let added = try UserCollectionHelper.addCrop(cropID: cid, for: userID, context: viewContext)
                 isInCollection = added
             }
-
-            // Refrescar estado desde Core Data
             isInCollection = UserCollectionHelper.isInCollection(cropID: cid, for: userID, context: viewContext)
-
-            // Forzar recarga de UI en otras pantallas
             NotificationCenter.default.post(name: .userCollectionsChanged, object: nil)
-
         } catch {
             print("❌ toggleCollection error: \(error.localizedDescription)")
         }
     }
 
-    // MARK: - Localization + UI helpers
-
-    /// Si crop.category es una key conocida, la traducimos; si no, devolvemos tal cual.
     private func localizedCategory(_ raw: String) -> String {
-        // Si deseas manejar categories como keys en el futuro, añade condiciones aquí.
-        // Por ahora devolvemos directamente (manteniendo compatibilidad con lo existente)
         return raw
     }
 
@@ -431,10 +536,7 @@ extension CropDetailView {
         }
     }
 
-    /// season might be a key (season_spring) or a localized string previously stored.
     private func seasonDisplayString(for stored: String) -> String {
-        // Si stored parece una key (empieza con "season_") -> localizarla,
-        // si no, devolver como texto (compatibilidad con crops antiguos).
         if stored.hasPrefix("season_") {
             return NSLocalizedString(stored, comment: "")
         } else {
@@ -451,7 +553,6 @@ extension CropDetailView {
         return "🗓"
     }
 
-    /// Devuelve la key de la temporada actual, ej. "season_spring"
     private func currentSeasonKey() -> String {
         let month = Calendar.current.component(.month, from: Date())
         switch month {
@@ -462,13 +563,37 @@ extension CropDetailView {
         }
     }
 
-    /// Determina si el cultivo está recomendado para la temporada actual.
     private func isRecommendedNow() -> Bool {
         guard let stored = crop.recommendedSeasons as? [String], !stored.isEmpty else { return false }
         let currentKey = currentSeasonKey()
         if stored.contains(currentKey) { return true }
-        // fallback: comparar con localized name
         let currentLocalized = NSLocalizedString(currentKey, comment: "")
         return stored.contains(currentLocalized)
+    }
+
+
+    // Genera consejos rápidos (no toca el modelo, usa campos existentes)
+    private func generateQuickTips(from info: CropInfo) -> [String] {
+        var tips: [String] = []
+
+        // Priorizar consejos útiles y cortos
+        if let water = info.watering, !water.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tips.append(String(format: NSLocalizedString("tip_watering_template", comment: "Watering tip template"), water))
+        }
+        if let fert = info.fertilizationTips, !fert.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tips.append(String(format: NSLocalizedString("tip_fertilization_template", comment: "Fertilization tip template"), fert))
+        }
+        if let soil = info.soilType, !soil.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tips.append(String(format: NSLocalizedString("tip_soil_template", comment: "Soil tip template"), soil))
+        }
+        if let sun = info.sunlight, !sun.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            tips.append(String(format: NSLocalizedString("tip_sunlight_template", comment: "Sunlight tip template"), sun))
+        }
+
+        // Limitar a 3 tips para mantener la sección compacta
+        if tips.count > 3 {
+            tips = Array(tips.prefix(3))
+        }
+        return tips
     }
 }

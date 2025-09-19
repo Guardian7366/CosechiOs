@@ -497,3 +497,115 @@
 "badge_explorer_desc" = "Aceptaste una recomendación";
 "badge_level_milestone_title" = "Hito de nivel";
 "badge_level_milestone_desc" = "Alcanzaste un nivel importante";
+
+/* Notifications */
+"notif_level_up_title" = "¡Subiste de nivel!";
+"notif_level_up_body" = "Has alcanzado el nivel %d. ¡Buen trabajo!";
+"notif_badge_unlocked_title" = "Insignia desbloqueada";
+"notif_badge_unlocked_body" = "Has desbloqueado: %@";
+
+/* Achievements UI */
+"achievements_title" = "Logros";
+"achievements_your_level" = "Tu nivel";
+"achievements_progress" = "Progreso";
+"achievements_progress_pct" = "%d%% completado";
+"achievements_level_next" = "Siguiente: nivel %d";
+"achievements_badges" = "Insignias";
+"achievements_no_badges" = "Aún no tienes insignias";
+"achievements_badges_count" = "%d insignias";
+
+/* Badges */
+"badge_first_task_title" = "Primera tarea";
+"badge_first_task_desc" = "Creaste tu primera tarea";
+"badge_task_collector_title" = "Coleccionista de tareas";
+"badge_task_collector_desc" = "Has creado 10 tareas";
+"badge_logger_novice_title" = "Novato registrador";
+"badge_logger_novice_desc" = "Has añadido 5 registros de progreso";
+"badge_logger_master_title" = "Maestro registrador";
+"badge_logger_master_desc" = "Has añadido 50 registros de progreso";
+"badge_explorer_title" = "Explorador";
+"badge_explorer_desc" = "Aceptaste una recomendación";
+"badge_level_milestone_title" = "Hito de nivel";
+"badge_level_milestone_desc" = "Alcanzaste un nivel importante";
+
+"level_up_message" = "🎉 ¡Has subido de nivel!";
+"badge_unlocked" = "🏅 ¡Nuevo logro desbloqueado!";
+
+"crop_recommendations" = "Recomendaciones de cultivo";
+"crop_info_unavailable" = "Información no disponible";
+"crop_soil" = "Tipo de suelo";
+"crop_watering" = "Riego";
+"crop_sunlight" = "Exposición solar";
+"crop_temperature" = "Temperatura";
+"crop_fertilization" = "Fertilización";
+
+"crop_recommendations" = "Recomendaciones de cultivo";
+"crop_soil" = "Suelo";
+"crop_watering" = "Riego";
+"crop_sunlight" = "Luz solar";
+"crop_temperature" = "Temperatura";
+"crop_fertilization" = "Fertilización";
+"crop_info_unavailable" = "Información no disponible";
+
+"crop_cucumber_name" = "Pepino";
+"crop_cucumber_desc" = "Hortaliza trepadora que produce frutos alargados, frescos y crujientes.";
+
+"crop_pepper_name" = "Pimiento";
+"crop_pepper_desc" = "Hortaliza de colores variados, utilizada tanto en crudo como cocinada.";
+
+"crop_carrot_name" = "Zanahoria";
+"crop_carrot_desc" = "Raíz comestible rica en betacarotenos, de sabor dulce y textura crujiente.";
+
+"crop_onion_name" = "Cebolla";
+"crop_onion_desc" = "Bulbo aromático ampliamente usado en gastronomía, base de muchas preparaciones.";
+
+"crop_watermelon_name" = "Sandía";
+"crop_watermelon_desc" = "Fruta grande y jugosa con pulpa roja y semillas negras, ideal en verano.";
+
+"crop_corn_name" = "Maíz";
+"crop_corn_desc" = "Cereal básico cultivado en todo el mundo, con mazorcas amarillas o blancas.";
+
+"step_pollination" = "Polinización";
+"step_fruit_set" = "Fructificación";
+
+"crop_estimated_duration" = "Duración estimada: %d días";
+"crop_quick_tips" = "Consejos rápidos";
+
+"tip_watering_template" = "Riego: %@";
+"tip_fertilization_template" = "Fertilización: %@";
+"tip_soil_template" = "Suelo: %@";
+"tip_sunlight_template" = "Sol: %@";
+"crop_climate" = "Condiciones climáticas"; // ES
+/* Secciones y etiquetas */
+"crop_climate" = "Condiciones climáticas";
+"crop_quick_tips" = "Consejos rápidos";
+"crop_plagues" = "Plagas comunes";
+"crop_estimated_duration" = "Duración estimada: %d días"; /* %d será el total de días */
+
+/* Tip interno */
+"crop_tip_watch_plagues" = "Vigilar plagas:";
+
+/* (si no existen ya) */
+"crop_recommendations" = "Recomendaciones de cultivo";
+"crop_soil" = "Suelo";
+"crop_watering" = "Riego";
+"crop_sunlight" = "Sol";
+"crop_temperature" = "Temperatura";
+"crop_fertilization" = "Fertilización";
+"crop_info_unavailable" = "Información no disponible";
+
+"crop_season_tip" = "🌸 ¡Es temporada de %@! Considera sembrarlos ahora.";
+"crop_recommended_now" = "Recomendado en esta temporada";
+
+"crop_companions" = "Compañeros de siembra";
+"crop_germination_days" = "Germina en %d días";
+
+"crop_companions" = "Compañeros de siembra";
+"crop_germination_days" = "Germina en %d días";
+"crop_watering_frequency" = "Frecuencia de riego";
+"crop_harvest_months" = "Meses de cosecha ideales";
+
+"crop_companions" = "Compañeros de siembra";
+"crop_germination_days" = "🌱 Germina en %d días";
+"crop_watering_frequency" = "Frecuencia de riego: %@";
+"crop_harvest_months" = "📅 Meses de cosecha: %@";

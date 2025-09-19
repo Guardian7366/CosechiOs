@@ -5,7 +5,6 @@ import UserNotifications
 final class AppState: ObservableObject {
     @Published var currentUserID: UUID?
     @Published var isAuthenticated: Bool = false
-    // inicializa desde UserDefaults (fallback "es")
     @Published var appLanguage: String = UserDefaults.standard.string(forKey: "appLanguage") ?? "es"
 }
 
@@ -17,22 +16,21 @@ struct CosechiOsApp: App {
     init() {
         NotificationManager.shared.configure()
 
-        // Si no hay idioma guardado, establecer "es" por defecto
         if UserDefaults.standard.string(forKey: "appLanguage") == nil {
             UserDefaults.standard.set("es", forKey: "appLanguage")
         }
-        // Pedir permisos de notificación (no bloqueante)
         requestNotificationPermissions()
     }
 
     var body: some Scene {
         WindowGroup {
-            // Forzamos que la jerarquía se reinicialice cuando cambie appLanguage
-            LoadingView()
-                .id(appState.appLanguage) // <- esto fuerza recrear las vistas cuando cambia el idioma
-                .environmentObject(appState)
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environment(\.locale, Locale(identifier: appState.appLanguage)) // <- esto le dice a SwiftUI qué locale usar
+            AchievementUIContainer {   // ⬅️ integración global
+                LoadingView()
+                    .id(appState.appLanguage)
+                    .environmentObject(appState)
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                    .environment(\.locale, Locale(identifier: appState.appLanguage))
+            }
         }
     }
 

@@ -21,9 +21,11 @@
         <attribute name="cropID" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="difficulty" attributeType="String"/>
         <attribute name="imageData" optional="YES" attributeType="Binary"/>
+        <attribute name="imageName" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="recommendedSeasons" optional="YES" attributeType="Transformable" valueTransformerName="NNSecureUnarchiveFromData"/>
         <attribute name="updatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="info" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CropInfo" inverseName="crop" inverseEntity="CropInfo"/>
         <relationship name="progressLogs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProgressLog" inverseName="crop" inverseEntity="ProgressLog"/>
         <relationship name="steps" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Step" inverseName="crop" inverseEntity="Step"/>
         <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskEntity" inverseName="crop" inverseEntity="TaskEntity"/>
@@ -37,6 +39,21 @@
                 <constraint value="cropID"/>
             </uniquenessConstraint>
         </uniquenessConstraints>
+    </entity>
+    <entity name="CropInfo" representedClassName="CropInfo" syncable="YES" codeGenerationType="class">
+        <attribute name="climate" optional="YES" attributeType="String"/>
+        <attribute name="companions" optional="YES" attributeType="String"/>
+        <attribute name="fertilizationTips" optional="YES" attributeType="String"/>
+        <attribute name="germinationDays" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="harvestMonths" optional="YES" attributeType="Transformable" valueTransformerName=""/>
+        <attribute name="infoID" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="plagues" optional="YES" attributeType="String"/>
+        <attribute name="soilType" optional="YES" attributeType="String"/>
+        <attribute name="sunlight" optional="YES" attributeType="String"/>
+        <attribute name="temperatureRange" optional="YES" attributeType="String"/>
+        <attribute name="watering" optional="YES" attributeType="String"/>
+        <attribute name="wateringFrequency" optional="YES" attributeType="String"/>
+        <relationship name="crop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crop" inverseName="info" inverseEntity="Crop"/>
     </entity>
     <entity name="NotificationLog" representedClassName="NotificationLog" syncable="YES" codeGenerationType="class">
         <attribute name="body" optional="YES" attributeType="String"/>

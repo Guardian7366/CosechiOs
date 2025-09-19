@@ -44,7 +44,7 @@ public final class AchievementManager {
         return max(1, lv)
     }
 
-    // Badge definitions (id -> metadata keys + symbol)
+    // MARK: - Badge definitions
     public static let badgeDefinitions: [String: (titleKey: String, descKey: String, symbol: String)] = [
         "first_task":      ("badge_first_task_title", "badge_first_task_desc", "checkmark.seal.fill"),
         "task_collector":  ("badge_task_collector_title", "badge_task_collector_desc", "tray.full.fill"),
@@ -55,8 +55,6 @@ public final class AchievementManager {
     ]
 
     // MARK: - Public helpers (Core Data backed)
-
-    /// Obtiene XP actual para un user (lee User -> stats.xp si existe)
     public static func getXP(for userID: UUID, context: NSManagedObjectContext) -> Int {
         guard let user = fetchUser(userID: userID, context: context) else { return 0 }
         if let statsObj = user.value(forKey: "stats") as? NSManagedObject,
@@ -66,20 +64,16 @@ public final class AchievementManager {
         return 0
     }
 
-    /// Obtiene level actual (desde stats.level o calculado)
     public static func getLevel(for userID: UUID, context: NSManagedObjectContext) -> Int {
-        // preferir stats.level si existe
         guard let user = fetchUser(userID: userID, context: context) else { return 1 }
         if let statsObj = user.value(forKey: "stats") as? NSManagedObject,
            let level = statsObj.value(forKey: "level") as? Int16 {
             return Int(level)
         }
-        // fallback: calcular desde xp
         let xp = getXP(for: userID, context: context)
         return level(forXP: xp)
     }
 
-    /// Progress ratio (0..1) hacia siguiente nivel
     public static func progressToNextLevel(for userID: UUID, context: NSManagedObjectContext) -> Double {
         let xp = getXP(for: userID, context: context)
         let currentLevel = level(forXP: xp)
@@ -89,10 +83,8 @@ public final class AchievementManager {
         return Double(xp - curLevelXP) / denom
     }
 
-    /// Lista de badge ids obtenidos por el user (leer UserAchievement ent. relacionada)
     public static func getBadges(for userID: UUID, context: NSManagedObjectContext) -> [String] {
         guard let user = fetchUser(userID: userID, context: context) else { return [] }
-        // fetch UserAchievement entities for this user (safer than relying on generated classes)
         let req = NSFetchRequest<NSManagedObject>(entityName: "UserAchievement")
         req.predicate = NSPredicate(format: "user == %@", user)
         req.sortDescriptors = [NSSortDescriptor(key: "unlockedAt", ascending: true)]
@@ -102,31 +94,25 @@ public final class AchievementManager {
         return []
     }
 
-    // MARK: - Award XP & evaluate badges (main flow)
-    /// Otorga XP por una acción y evalúa badges / nivel. Devuelve AchievementResult.
+    // MARK: - Award XP & evaluate badges
     @discardableResult
     public static func award(action: AchievementAction, to userID: UUID, context: NSManagedObjectContext) -> AchievementResult {
-        // Obtener user
         guard let user = fetchUser(userID: userID, context: context) else {
             return AchievementResult(xp: 0, level: 1, leveledUp: false, newBadges: [])
         }
 
-        // Obtener o crear stats (KVC-safe)
+        // Obtener/crear stats
         var statsObj: NSManagedObject?
         if let existing = user.value(forKey: "stats") as? NSManagedObject {
             statsObj = existing
-        } else {
-            if let ent = NSEntityDescription.entity(forEntityName: "UserStats", in: context) {
-                let created = NSManagedObject(entity: ent, insertInto: context)
-                created.setValue(UUID(), forKey: "statsID")
-                created.setValue(Int64(0), forKey: "xp")
-                created.setValue(Int16(1), forKey: "level")
-                // set inverse relation
-                created.setValue(user, forKey: "user")
-                // also set user->stats (KVC)
-                user.setValue(created, forKey: "stats")
-                statsObj = created
-            }
+        } else if let ent = NSEntityDescription.entity(forEntityName: "UserStats", in: context) {
+            let created = NSManagedObject(entity: ent, insertInto: context)
+            created.setValue(UUID(), forKey: "statsID")
+            created.setValue(Int64(0), forKey: "xp")
+            created.setValue(Int16(1), forKey: "level")
+            created.setValue(user, forKey: "user")
+            user.setValue(created, forKey: "stats")
+            statsObj = created
         }
 
         let oldXP = (statsObj?.value(forKey: "xp") as? Int64).flatMap { Int($0) } ?? 0
@@ -141,15 +127,12 @@ public final class AchievementManager {
 
         var newBadges: [String] = []
 
-        // Level milestone badge
         if leveledUp && newLevel % 3 == 0 {
             if addBadge("level_milestone", to: user, context: context) {
                 newBadges.append("level_milestone")
             }
         }
 
-        // Conteos y badges dependientes
-        // Tasks
         let taskCount = countTasks(for: user, context: context)
         if taskCount >= 1 {
             if addBadge("first_task", to: user, context: context) { newBadges.append("first_task") }
@@ -158,7 +141,6 @@ public final class AchievementManager {
             if addBadge("task_collector", to: user, context: context) { newBadges.append("task_collector") }
         }
 
-        // Progress logs
         let logsCount = countLogs(for: user, context: context)
         if logsCount >= 5 {
             if addBadge("logger_novice", to: user, context: context) { newBadges.append("logger_novice") }
@@ -167,29 +149,40 @@ public final class AchievementManager {
             if addBadge("logger_master", to: user, context: context) { newBadges.append("logger_master") }
         }
 
-        // Accept recommendation
         if action == .acceptRecommendation {
             if addBadge("explorer", to: user, context: context) { newBadges.append("explorer") }
         }
 
-        // Guardar cambios
         do {
             try context.save()
         } catch {
             context.rollback()
-            // ignore save error for now
         }
 
-        let result = AchievementResult(xp: newXP, level: newLevel, leveledUp: leveledUp, newBadges: newBadges)
-        NotificationCenter.default.post(name: .didUpdateAchievements, object: nil, userInfo: ["userID": userID])
+        let result = AchievementResult(
+            xp: newXP,
+            level: newLevel,
+            leveledUp: leveledUp,
+            newBadges: newBadges
+        )
+
+        NotificationCenter.default.post(
+            name: .didUpdateAchievements,
+            object: nil,
+            userInfo: [
+                "userID": userID,
+                "xp": result.xp,
+                "level": result.level,
+                "leveledUp": result.leveledUp,
+                "newBadges": result.newBadges
+            ]
+        )
+
         return result
     }
 
-    // MARK: - Internals (KVC/NSManagedObject safe)
-
-    /// Agrega badge (UserAchievement entity) si no existe
+    // MARK: - Internals
     private static func addBadge(_ badgeID: String, to user: NSManagedObject, context: NSManagedObjectContext) -> Bool {
-        // comprobar existencia
         let req = NSFetchRequest<NSManagedObject>(entityName: "UserAchievement")
         req.predicate = NSPredicate(format: "user == %@ AND type == %@", user, badgeID)
         req.fetchLimit = 1
@@ -202,11 +195,8 @@ public final class AchievementManager {
         newObj.setValue(Date(), forKey: "unlockedAt")
         newObj.setValue(user, forKey: "user")
 
-        // also update inverse set on user (if model has inverse)
         if let set = user.mutableSetValue(forKey: "achievements") as NSMutableSet? {
             set.add(newObj)
-        } else {
-            // fallback: set user relationship is usually enough
         }
         return true
     }
@@ -223,7 +213,6 @@ public final class AchievementManager {
         return (try? context.count(for: req)) ?? 0
     }
 
-    // Fetch user NSManagedObject by userID (returns NSManagedObject subclass 'User' if available)
     private static func fetchUser(userID: UUID, context: NSManagedObjectContext) -> NSManagedObject? {
         let freq: NSFetchRequest<User> = User.fetchRequest()
         freq.predicate = NSPredicate(format: "userID == %@", userID as CVarArg)
@@ -232,7 +221,8 @@ public final class AchievementManager {
     }
 }
 
-// Notification name for UI updates
+// MARK: - Notifications
 public extension Notification.Name {
     static let didUpdateAchievements = Notification.Name("didUpdateAchievements")
+    static let didUnlockAchievementUI = Notification.Name("didUnlockAchievementUI")
 }
