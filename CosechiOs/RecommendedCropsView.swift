@@ -33,7 +33,10 @@ struct RecommendedCropsView: View {
         .navigationTitle(LocalizedStringKey("recommendations_title"))
         .onAppear(perform: loadRecommendations)
         .alert(item: $showMessage) { msg in
-            Alert(title: Text(msg), dismissButton: .default(Text("OK")))
+            Alert(
+                title: Text(msg),
+                dismissButton: .default(Text(LocalizedStringKey("ok")))
+            )
         }
     }
 
@@ -73,7 +76,7 @@ struct RecommendedCropsView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text(rec.crop.name ?? NSLocalizedString("crop_default", comment: "Crop"))
+                    Text(rec.crop.name ?? NSLocalizedString("crop_default", comment: ""))
                         .font(.headline)
                     Spacer()
                     Text(String(format: "%.0f", rec.score))
@@ -113,7 +116,11 @@ struct RecommendedCropsView: View {
     private func loadRecommendations() {
         isLoading = true
         DispatchQueue.global(qos: .userInitiated).async {
-            let recs = RecommendationHelper.recommendCrops(context: viewContext, forUserID: appState.currentUserID, maxResults: 12)
+            let recs = RecommendationHelper.recommendCrops(
+                context: viewContext,
+                forUserID: appState.currentUserID,
+                maxResults: 12
+            )
             DispatchQueue.main.async {
                 self.recommendations = recs
                 self.isLoading = false
@@ -128,7 +135,11 @@ struct RecommendedCropsView: View {
         }
 
         do {
-            let added = try RecommendationHelper.addCropToUserCollection(crop: crop, userID: uid, context: viewContext)
+            let added = try RecommendationHelper.addCropToUserCollection(
+                crop: crop,
+                userID: uid,
+                context: viewContext
+            )
             if added {
                 self.showMessage = NSLocalizedString("recommendations_added", comment: "")
             } else {

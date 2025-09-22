@@ -1,4 +1,3 @@
-// StatisticsView.swift
 import SwiftUI
 import CoreData
 import Charts
@@ -8,7 +7,6 @@ struct StatisticsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
 
-    // FetchRequests
     @FetchRequest(entity: TaskEntity.entity(), sortDescriptors: [])
     private var allTasks: FetchedResults<TaskEntity>
 
@@ -21,7 +19,6 @@ struct StatisticsView: View {
     @FetchRequest(entity: UserCollection.entity(), sortDescriptors: [])
     private var allUserCollections: FetchedResults<UserCollection>
 
-    // UI State
     @State private var selectedRange: RangeOption = .last7
     @State private var showShareSheet = false
     @State private var shareItems: [Any] = []
@@ -43,7 +40,6 @@ struct StatisticsView: View {
         }
     }
 
-    // MARK: - Filtered data por usuario
     private var userTasks: [TaskEntity] {
         guard let uid = appState.currentUserID else { return [] }
         return allTasks.filter { $0.user?.userID == uid }
@@ -64,7 +60,6 @@ struct StatisticsView: View {
         return allUserCollections.filter { $0.user?.userID == uid }.count
     }
 
-    // MARK: - Rango / filtrado
     private func dateThreshold() -> Date? {
         if selectedRange == .all { return nil }
         return Calendar.current.date(byAdding: .day, value: -selectedRange.rawValue, to: Date())
@@ -86,13 +81,11 @@ struct StatisticsView: View {
         }
     }
 
-    // MARK: - UI
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 headerSection
 
-                // Range picker + Export
                 HStack {
                     Picker("", selection: $selectedRange) {
                         ForEach(RangeOption.allCases) { r in
@@ -112,11 +105,9 @@ struct StatisticsView: View {
                     .padding(.trailing)
                 }
 
-                // 1. Summary cards
                 summaryCards
                     .padding(.horizontal)
 
-                // 2. Task status (donut/pie)
                 section("statistics_tasks") {
                     if userTasks.isEmpty {
                         placeholderText("statistics_no_tasks")
@@ -137,7 +128,6 @@ struct StatisticsView: View {
                     }
                 }
 
-                // 3. Logs over time (line)
                 section("statistics_progress") {
                     if logsInRange.isEmpty {
                         placeholderText("statistics_no_progress_logs")
@@ -147,7 +137,6 @@ struct StatisticsView: View {
                     }
                 }
 
-                // 4. Top crops by engagement (bars)
                 section("statistics_top_crops") {
                     let top = topCrops.prefix(6)
                     if top.isEmpty {
@@ -168,7 +157,6 @@ struct StatisticsView: View {
                     }
                 }
 
-                // 5. Notification actions usage
                 section("statistics_notifications") {
                     if actionCounts.isEmpty {
                         placeholderText("statistics_no_notifications")
@@ -194,8 +182,6 @@ struct StatisticsView: View {
             ActivityView(activityItems: shareItems)
         }
     }
-
-    // MARK: - Subviews
 
     private var headerSection: some View {
         HStack {
@@ -254,8 +240,6 @@ struct StatisticsView: View {
         }
     }
 
-    // MARK: - Calculations
-
     private var completedCount: Int {
         userTasks.filter { $0.status == "completed" }.count
     }
@@ -273,7 +257,6 @@ struct StatisticsView: View {
         return "\(pct)%"
     }
 
-    // Notification action counts (igual que antes)
     private var actionCounts: [String: Int] {
         var dict: [String: Int] = [:]
         for log in userNotifs {
@@ -285,7 +268,6 @@ struct StatisticsView: View {
         return dict
     }
 
-    // Top crops por número de progress logs
     private var topCrops: [(name: String, count: Int, crop: Crop?)] {
         var map: [String: (Int, Crop?)] = [:]
         for log in userLogs {
@@ -296,7 +278,6 @@ struct StatisticsView: View {
         return arr.sorted { $0.1 > $1.1 }
     }
 
-    // MARK: - CSV Export / Share
     private func exportCSV() {
         var csv = "Metric,Value\n"
         csv += "Total Tasks,\(userTasks.count)\n"
@@ -311,7 +292,6 @@ struct StatisticsView: View {
             csv += "\(item.name),\(item.count)\n"
         }
 
-        // Logs detail (date, crop, note)
         csv += "\nProgressLogDate,Crop,Note\n"
         let formatter = ISO8601DateFormatter()
         for log in logsInRange {
@@ -322,14 +302,12 @@ struct StatisticsView: View {
         }
 
         if let data = csv.data(using: .utf8) {
-            // Compartir como archivo temporal
             let tmpURL = FileManager.default.temporaryDirectory.appendingPathComponent("cosechi_stats_\(Int(Date().timeIntervalSince1970)).csv")
             do {
                 try data.write(to: tmpURL)
                 shareItems = [tmpURL]
                 showShareSheet = true
             } catch {
-                // fallback: copiar al clipboard
                 UIPasteboard.general.string = csv
                 shareItems = [csv]
                 showShareSheet = true
@@ -341,7 +319,6 @@ struct StatisticsView: View {
         }
     }
 
-    // MARK: - Sección helper (faltaba)
     @ViewBuilder
     private func section(_ key: String, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 12) {

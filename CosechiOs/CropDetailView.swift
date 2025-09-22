@@ -16,14 +16,12 @@ struct CropDetailView: View {
     @State private var isInCollection = false
     @State private var showingTaskSheet = false
     @State private var stepProgress: [UUID: Bool] = [:]
-    @State private var seasonalTipSent = false   // NUEVO estado
+    @State private var seasonalTipSent = false
 
-    // Historial de progreso
     @State private var progressLogs: [ProgressLog] = []
     @State private var showingAddProgress = false
     @State private var selectedLog: ProgressLog? = nil
 
-    // FetchRequest para tareas (se filtra por user + crop en computed)
     @FetchRequest private var fetchedTasks: FetchedResults<TaskEntity>
 
     init(crop: Crop) {
@@ -48,27 +46,24 @@ struct CropDetailView: View {
                 Divider()
                 progressSection
                 Divider()
-                infoSection // sección de recomendaciones + clima + plagas + duración total
+                infoSection
             }
             .padding()
         }
-        .navigationTitle(crop.name ?? NSLocalizedString("crop_default", comment: ""))
+        .navigationTitle(Text(localizedName()))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { onAppearActions() }
-        // sheet para añadir tarea
         .sheet(isPresented: $showingTaskSheet) {
             AddTaskView(crop: crop)
                 .environment(\.managedObjectContext, viewContext)
                 .environmentObject(appState)
         }
-        // sheet para añadir progreso
         .sheet(isPresented: $showingAddProgress) {
             AddProgressLogView(crop: crop)
                 .environment(\.managedObjectContext, viewContext)
                 .environmentObject(appState)
                 .onDisappear { loadProgressLogs() }
         }
-        // sheet para editar progreso
         .sheet(item: $selectedLog) { log in
             EditProgressLogView(log: log)
                 .environment(\.managedObjectContext, viewContext)
@@ -77,11 +72,10 @@ struct CropDetailView: View {
     }
 }
 
-// MARK: - UI Sections & Helpers
+// MARK: - UI Sections
 extension CropDetailView {
     @ViewBuilder private var headerSection: some View {
         HStack(alignment: .top, spacing: 12) {
-            // Imagen del cultivo (asset catalog) o placeholder
             if let imageName = crop.imageName, !imageName.isEmpty, UIImage(named: imageName) != nil {
                 Image(imageName)
                     .resizable()
@@ -103,19 +97,18 @@ extension CropDetailView {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(crop.name ?? NSLocalizedString("crop_default", comment: ""))
+                Text(localizedName())
                     .font(.largeTitle)
                     .bold()
 
-                if let desc = crop.cropDescription {
-                    Text(desc)
+                if let descKey = crop.cropDescription, !descKey.isEmpty {
+                    Text(LocalizationHelper.shared.localized(descKey))
                         .font(.body)
                         .foregroundColor(.secondary)
                 }
 
-                // Category (mostramos tal cual pero localizable si es una key)
-                if let cat = crop.category {
-                    Text(localizedCategory(cat))
+                if let catKey = crop.category {
+                    Text(LocalizationHelper.shared.localized(catKey))
                         .font(.caption)
                         .padding(.vertical, 4)
                         .padding(.horizontal, 8)
@@ -126,9 +119,8 @@ extension CropDetailView {
 
             Spacer()
 
-            // Badge: dificultad
             VStack {
-                Text(localizedDifficulty(crop.difficulty ?? ""))
+                Text(localizedDifficultyKey(crop.difficulty ?? ""))
                     .font(.caption2)
                     .bold()
                     .padding(8)
@@ -136,9 +128,8 @@ extension CropDetailView {
                     .cornerRadius(10)
                     .foregroundColor(.white)
 
-                // Recomendado ahora?
                 if isRecommendedNow() {
-                    Text(LocalizedStringKey("crop_recommended_now"))
+                    Text(LocalizationHelper.shared.localized("crop_recommended_now"))
                         .font(.caption2)
                         .padding(6)
                         .background(Color.green.opacity(0.15))
@@ -150,17 +141,15 @@ extension CropDetailView {
 
     @ViewBuilder private var seasonsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(LocalizedStringKey("crop_seasons"))
+            Text(LocalizationHelper.shared.localized("crop_seasons"))
                 .font(.headline)
 
             if let stored = crop.recommendedSeasons as? [String], !stored.isEmpty {
-                // Muestra icono + nombre localizado por cada season key (o si la seed tenía strings, los usa)
                 HStack(spacing: 12) {
                     ForEach(stored, id: \.self) { s in
-                        let display = seasonDisplayString(for: s)
                         HStack {
                             Text(seasonEmoji(for: s))
-                            Text(display)
+                            Text(LocalizationHelper.shared.localized(s))
                                 .font(.subheadline)
                         }
                         .padding(6)
@@ -169,7 +158,7 @@ extension CropDetailView {
                     }
                 }
             } else {
-                Text(LocalizedStringKey("crop_seasons_none"))
+                Text(LocalizationHelper.shared.localized("crop_seasons_none"))
                     .foregroundColor(.secondary)
             }
         }
@@ -178,7 +167,7 @@ extension CropDetailView {
     @ViewBuilder private var collectionButtons: some View {
         Button(action: toggleCollection) {
             Label(
-                isInCollection ? LocalizedStringKey("crop_remove_my") : LocalizedStringKey("crop_add_my"),
+                isInCollection ? LocalizationHelper.shared.localized("crop_remove_my") : LocalizationHelper.shared.localized("crop_add_my"),
                 systemImage: isInCollection ? "minus.circle.fill" : "plus.circle.fill"
             )
             .frame(maxWidth: .infinity)
@@ -190,7 +179,7 @@ extension CropDetailView {
             Button {
                 showingTaskSheet = true
             } label: {
-                Label(LocalizedStringKey("crop_add_task"), systemImage: "calendar.badge.plus")
+                Label(LocalizationHelper.shared.localized("crop_add_task"), systemImage: "calendar.badge.plus")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -202,13 +191,13 @@ extension CropDetailView {
         let tasksForUser = filteredTasks
         if !tasksForUser.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
-                Text(LocalizedStringKey("crop_tasks_title"))
+                Text(LocalizationHelper.shared.localized("crop_tasks_title"))
                     .font(.headline)
 
                 ForEach(tasksForUser) { task in
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(task.title ?? NSLocalizedString("task_default", comment: ""))
+                            Text(task.title ?? LocalizationHelper.shared.localized("task_default"))
                                 .font(.subheadline)
                                 .strikethrough(task.status == "completed")
 
@@ -241,7 +230,7 @@ extension CropDetailView {
     @ViewBuilder private var stepsSection: some View {
         if let stepsSet = crop.steps as? Set<Step>, !stepsSet.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
-                Text(LocalizedStringKey("crop_steps"))
+                Text(LocalizationHelper.shared.localized("crop_steps"))
                     .font(.headline)
 
                 let sortedSteps: [Step] = stepsSet.sorted { $0.order < $1.order }
@@ -266,15 +255,29 @@ extension CropDetailView {
                             .buttonStyle(.plain)
 
                             VStack(alignment: .leading) {
-                                Text(step.title ?? NSLocalizedString("step_default", comment: ""))
-                                    .strikethrough(stepProgress[stepID] == true)
+                                if let stepKey = step.title {
+                                    Text(LocalizationHelper.shared.localized(stepKey))
+                                        .strikethrough(stepProgress[stepID] == true)
+                                }
+
                                 if step.estimateDuration > 0 {
-                                    Text("\(step.estimateDuration) " + NSLocalizedString("days_abbr", comment: "days"))
+                                    Text("\(step.estimateDuration) " + LocalizationHelper.shared.localized("days_abbr"))
                                         .font(.caption2)
                                         .foregroundColor(.secondary)
                                 }
+
                                 if let sd = step.stepDescription, !sd.isEmpty {
-                                    Text(sd).font(.caption2).foregroundColor(.secondary)
+                                    let resolved = LocalizationHelper.shared.localized(sd)
+                                    if resolved.contains("%@") {
+                                        let stepTitleLocalized = LocalizationHelper.shared.localized(step.title ?? "")
+                                        Text(String(format: resolved, stepTitleLocalized))
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    } else {
+                                        Text(resolved)
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                             }
                         }
@@ -286,11 +289,11 @@ extension CropDetailView {
 
     @ViewBuilder private var progressSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(LocalizedStringKey("crop_progress_title"))
+            Text(LocalizationHelper.shared.localized("crop_progress_title"))
                 .font(.headline)
 
             if progressLogs.isEmpty {
-                Text(LocalizedStringKey("crop_progress_empty"))
+                Text(LocalizationHelper.shared.localized("crop_progress_empty"))
                     .foregroundColor(.secondary)
             } else {
                 ForEach(progressLogs as [ProgressLog], id: \.progressID) { log in
@@ -300,8 +303,8 @@ extension CropDetailView {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
 
-                            if let category = log.category {
-                                Text(category)
+                            if let categoryKey = log.category {
+                                Text(LocalizationHelper.shared.localized(categoryKey))
                                     .font(.caption2)
                                     .padding(4)
                                     .background(Color.blue.opacity(0.2))
@@ -341,99 +344,51 @@ extension CropDetailView {
             Button {
                 showingAddProgress = true
             } label: {
-                Label(LocalizedStringKey("crop_add_progress"), systemImage: "plus.circle")
+                Label(LocalizationHelper.shared.localized("crop_add_progress"), systemImage: "plus.circle")
             }
         }
     }
 
-    // 🔹 Info section extended (soil, watering, fertilization, climate, plagues, duration total)
     @ViewBuilder private var infoSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(LocalizedStringKey("crop_recommendations"))
+            Text(LocalizationHelper.shared.localized("crop_recommendations"))
                 .font(.headline)
 
-            // Duración estimada (sum of step durations)
             if let stepsSet = crop.steps as? Set<Step>, !stepsSet.isEmpty {
                 let totalDays = stepsSet.reduce(0) { $0 + Int($1.estimateDuration) }
-                Text("⏳ " + String(format: NSLocalizedString("crop_estimated_duration", comment: ""), totalDays))
+                Text("⏳ " + String(format: LocalizationHelper.shared.localized("crop_estimated_duration"), totalDays))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
 
             if let info = crop.info {
                 Group {
-                    if let soil = info.soilType, !soil.isEmpty {
-                        Text("🌱 \(NSLocalizedString("crop_soil", comment: "")): \(soil)")
-                    }
-                    if let watering = info.watering, !watering.isEmpty {
-                        Text("💧 \(NSLocalizedString("crop_watering", comment: "")): \(watering)")
-                    }
-                    if let sun = info.sunlight, !sun.isEmpty {
-                        Text("☀️ \(NSLocalizedString("crop_sunlight", comment: "")): \(sun)")
-                    }
-                    if let temp = info.temperatureRange, !temp.isEmpty {
-                        Text("🌡 \(NSLocalizedString("crop_temperature", comment: "")): \(temp)")
-                    }
-                    if let fert = info.fertilizationTips, !fert.isEmpty {
-                        Text("🧪 \(NSLocalizedString("crop_fertilization", comment: "")): \(fert)")
-                    }
-                    if let climate = info.climate, !climate.isEmpty {
-                        Text("🌍 \(NSLocalizedString("crop_climate", comment: "")): \(climate)")
-                    }
-                    if let pl = info.plagues, !pl.isEmpty {
-                        Text("🐛 \(NSLocalizedString("crop_plagues", comment: "")): \(pl)")
-                    }
-                    
-                    if let companions = info.companions, !companions.isEmpty {
-                        Text("🤝 \(NSLocalizedString("crop_companions", comment: "")): \(companions)")
-                    }
-
-                    if info.germinationDays > 0 {
-                        Text("🌱 " + String(format: NSLocalizedString("crop_germination_days", comment: ""), info.germinationDays))
-                    }
-
-                    if let freq = info.wateringFrequency, !freq.isEmpty {
-                        Text("💧 \(NSLocalizedString("crop_watering_frequency", comment: "")): \(freq)")
-                    }
+                    if let soilKey = info.soilType { Text("🌱 \(LocalizationHelper.shared.localized("crop_soil")): \(LocalizationHelper.shared.localized(soilKey))") }
+                    if let wateringKey = info.watering { Text("💧 \(LocalizationHelper.shared.localized("crop_watering")): \(LocalizationHelper.shared.localized(wateringKey))") }
+                    if let sunKey = info.sunlight { Text("☀️ \(LocalizationHelper.shared.localized("crop_sunlight")): \(LocalizationHelper.shared.localized(sunKey))") }
+                    if let tempKey = info.temperatureRange { Text("🌡 \(LocalizationHelper.shared.localized("crop_temperature")): \(LocalizationHelper.shared.localized(tempKey))") }
+                    if let fertKey = info.fertilizationTips { Text("🧪 \(LocalizationHelper.shared.localized("crop_fertilization")): \(LocalizationHelper.shared.localized(fertKey))") }
+                    if let climateKey = info.climate { Text("🌍 \(LocalizationHelper.shared.localized("crop_climate")): \(LocalizationHelper.shared.localized(climateKey))") }
+                    if let plKey = info.plagues { Text("🐛 \(LocalizationHelper.shared.localized("crop_plagues")): \(LocalizationHelper.shared.localized(plKey))") }
+                    if let companionsKey = info.companions { Text("🤝 \(LocalizationHelper.shared.localized("crop_companions")): \(LocalizationHelper.shared.localized(companionsKey))") }
+                    if info.germinationDays > 0 { Text("🌱 " + String(format: LocalizationHelper.shared.localized("crop_germination_days"), info.germinationDays)) }
+                    if let freqKey = info.wateringFrequency { Text("💧 \(LocalizationHelper.shared.localized("crop_watering_frequency")): \(LocalizationHelper.shared.localized(freqKey))") }
 
                     if let months = info.harvestMonths as? [String], !months.isEmpty {
-                        Text("🌾 \(NSLocalizedString("crop_harvest_months", comment: "")): \(months.joined(separator: ", "))")
-                    }
-                }
-                
-                // Quick tips / resumen corto (construido simple para no añadir funciones extra)
-                let quick: [String] = {
-                    var tips: [String] = []
-                    if let watering = info.watering, !watering.isEmpty { tips.append(watering) }
-                    if let climate = info.climate, !climate.isEmpty { tips.append(climate) }
-                    if let pl = info.plagues, !pl.isEmpty {
-                        tips.append(NSLocalizedString("crop_tip_watch_plagues", comment: "") + " " + pl)
-                    }
-                    return tips
-                }()
-                if !quick.isEmpty {
-                    Divider().padding(.vertical, 6)
-                    Text(LocalizedStringKey("crop_quick_tips"))
-                        .font(.subheadline)
-                        .bold()
-                    VStack(alignment: .leading, spacing: 6) {
-                        ForEach(quick.indices, id: \.self) { idx in
-                            HStack(alignment: .top, spacing: 8) {
-                                Text("•").font(.body)
-                                Text(quick[idx]).font(.caption)
-                            }
-                        }
+                        let mapped = months.map { LocalizationHelper.shared.localized($0) }.joined(separator: ", ")
+                        Text("🌾 \(LocalizationHelper.shared.localized("crop_harvest_months")): \(mapped)")
                     }
                 }
             } else {
-                Text(LocalizedStringKey("crop_info_unavailable"))
+                Text(LocalizationHelper.shared.localized("crop_info_unavailable"))
                     .foregroundColor(.secondary)
             }
         }
     }
+}
 
-    // MARK: - Helpers & logic
-
+// MARK: - Helpers
+extension CropDetailView {
     private func onAppearActions() {
         if let userID = appState.currentUserID {
             if let cid = crop.cropID {
@@ -442,15 +397,8 @@ extension CropDetailView {
             loadStepProgress(for: userID)
         }
         loadProgressLogs()
-        
-        // 🔔 Alerta de temporada
-        if isRecommendedNow(), !seasonalTipSent {
-            NotificationHelper.scheduleSeasonalTip(for: crop)
-            seasonalTipSent = true
-        }
     }
 
-    // Filtrado por user + crop (FetchRequest trae todo; filtramos aquí)
     private var filteredTasks: [TaskEntity] {
         guard let uid = appState.currentUserID else { return [] }
         return fetchedTasks.filter { task in
@@ -486,12 +434,7 @@ extension CropDetailView {
     }
 
     private func toggleCollection() {
-        guard let userID = appState.currentUserID else { return }
-        guard let cid = crop.cropID else {
-            print("❌ toggleCollection: crop.cropID es nil")
-            return
-        }
-
+        guard let userID = appState.currentUserID, let cid = crop.cropID else { return }
         do {
             if UserCollectionHelper.isInCollection(cropID: cid, for: userID, context: viewContext) {
                 try UserCollectionHelper.removeCrop(cropID: cid, for: userID, context: viewContext)
@@ -502,98 +445,54 @@ extension CropDetailView {
             }
             isInCollection = UserCollectionHelper.isInCollection(cropID: cid, for: userID, context: viewContext)
             NotificationCenter.default.post(name: .userCollectionsChanged, object: nil)
-        } catch {
-            print("❌ toggleCollection error: \(error.localizedDescription)")
+        } catch { print("❌ toggleCollection error: \(error.localizedDescription)") }
+    }
+
+    private func localizedName() -> String {
+        return LocalizationHelper.shared.localized(crop.name ?? "crop_no_name")
+    }
+
+    private func localizedDifficultyKey(_ rawKey: String) -> String {
+        let raw = rawKey.lowercased()
+        switch raw {
+        case "crop_difficulty_very_easy": return LocalizationHelper.shared.localized("crop_difficulty_very_easy")
+        case "crop_difficulty_easy": return LocalizationHelper.shared.localized("crop_difficulty_easy")
+        case "crop_difficulty_medium": return LocalizationHelper.shared.localized("crop_difficulty_medium")
+        case "crop_difficulty_hard": return LocalizationHelper.shared.localized("crop_difficulty_hard")
+        default: return LocalizationHelper.shared.localized(rawKey)
         }
     }
 
-    private func localizedCategory(_ raw: String) -> String {
-        return raw
-    }
-
-    private func localizedDifficulty(_ raw: String) -> LocalizedStringKey {
-        switch raw.lowercased() {
-        case "muy fácil", "muy facil", "very easy":
-            return LocalizedStringKey("crop_difficulty_very_easy")
-        case "fácil", "facil", "easy":
-            return LocalizedStringKey("crop_difficulty_easy")
-        case "media", "medium":
-            return LocalizedStringKey("crop_difficulty_medium")
-        case "difícil", "dificil", "hard":
-            return LocalizedStringKey("crop_difficulty_hard")
-        default:
-            return LocalizedStringKey(raw)
-        }
-    }
-
-    private func difficultyColor(_ raw: String) -> Color {
-        switch raw.lowercased() {
-        case "muy fácil", "muy facil", "very easy": return .green
-        case "fácil", "facil", "easy": return .mint
-        case "media", "medium": return .orange
-        case "difícil", "dificil", "hard": return .red
+    private func difficultyColor(_ rawKey: String) -> Color {
+        let raw = rawKey.lowercased()
+        switch raw {
+        case "crop_difficulty_very_easy": return .green
+        case "crop_difficulty_easy": return .mint
+        case "crop_difficulty_medium": return .orange
+        case "crop_difficulty_hard": return .red
         default: return .gray
-        }
-    }
-
-    private func seasonDisplayString(for stored: String) -> String {
-        if stored.hasPrefix("season_") {
-            return NSLocalizedString(stored, comment: "")
-        } else {
-            return stored
         }
     }
 
     private func seasonEmoji(for stored: String) -> String {
         let key = stored.lowercased()
-        if key.contains("spring") || key.contains("primavera") { return "🌸" }
-        if key.contains("summer") || key.contains("verano") { return "☀️" }
-        if key.contains("autumn") || key.contains("fall") || key.contains("otoño") { return "🍂" }
-        if key.contains("winter") || key.contains("invierno") { return "❄️" }
+        if key.contains("spring") { return "🌸" }
+        if key.contains("summer") { return "☀️" }
+        if key.contains("autumn") || key.contains("fall") { return "🍂" }
+        if key.contains("winter") { return "❄️" }
         return "🗓"
-    }
-
-    private func currentSeasonKey() -> String {
-        let month = Calendar.current.component(.month, from: Date())
-        switch month {
-        case 3...5: return "season_spring"
-        case 6...8: return "season_summer"
-        case 9...11: return "season_autumn"
-        default: return "season_winter"
-        }
     }
 
     private func isRecommendedNow() -> Bool {
         guard let stored = crop.recommendedSeasons as? [String], !stored.isEmpty else { return false }
-        let currentKey = currentSeasonKey()
-        if stored.contains(currentKey) { return true }
-        let currentLocalized = NSLocalizedString(currentKey, comment: "")
-        return stored.contains(currentLocalized)
-    }
-
-
-    // Genera consejos rápidos (no toca el modelo, usa campos existentes)
-    private func generateQuickTips(from info: CropInfo) -> [String] {
-        var tips: [String] = []
-
-        // Priorizar consejos útiles y cortos
-        if let water = info.watering, !water.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tips.append(String(format: NSLocalizedString("tip_watering_template", comment: "Watering tip template"), water))
+        let currentMonth = Calendar.current.component(.month, from: Date())
+        let currentSeason: String
+        switch currentMonth {
+        case 3...5: currentSeason = "season_spring"
+        case 6...8: currentSeason = "season_summer"
+        case 9...11: currentSeason = "season_autumn"
+        default: currentSeason = "season_winter"
         }
-        if let fert = info.fertilizationTips, !fert.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tips.append(String(format: NSLocalizedString("tip_fertilization_template", comment: "Fertilization tip template"), fert))
-        }
-        if let soil = info.soilType, !soil.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tips.append(String(format: NSLocalizedString("tip_soil_template", comment: "Soil tip template"), soil))
-        }
-        if let sun = info.sunlight, !sun.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            tips.append(String(format: NSLocalizedString("tip_sunlight_template", comment: "Sunlight tip template"), sun))
-        }
-
-        // Limitar a 3 tips para mantener la sección compacta
-        if tips.count > 3 {
-            tips = Array(tips.prefix(3))
-        }
-        return tips
+        return stored.contains(currentSeason)
     }
 }

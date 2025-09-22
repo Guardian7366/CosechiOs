@@ -1,10 +1,11 @@
+// ExploreCropsView.swift
 import SwiftUI
 import CoreData
 
 struct ExploreCropsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var searchText = ""
-    @State private var selectedCategory: String? = nil
+    @State private var selectedCategoryKey: String? = nil
 
     @FetchRequest(
         entity: Crop.entity(),
@@ -17,12 +18,28 @@ struct ExploreCropsView: View {
             // Filtros
             HStack {
                 Menu {
-                    Button("filter_all") { selectedCategory = nil }
-                    Button("filter_vegetable") { selectedCategory = "Hortaliza" }
-                    Button("filter_herb") { selectedCategory = "Hierba" }
-                    Button("filter_fruit") { selectedCategory = "Fruta" }
+                    Button { selectedCategoryKey = nil } label: {
+                        Text(LocalizationHelper.shared.localized("filter_all"))
+                    }
+                    Button { selectedCategoryKey = "category_vegetable" } label: {
+                        Text(LocalizationHelper.shared.localized("filter_vegetable"))
+                    }
+                    Button { selectedCategoryKey = "category_herb" } label: {
+                        Text(LocalizationHelper.shared.localized("filter_herb"))
+                    }
+                    Button { selectedCategoryKey = "category_fruit" } label: {
+                        Text(LocalizationHelper.shared.localized("filter_fruit"))
+                    }
                 } label: {
-                    Label(selectedCategory ?? NSLocalizedString("filter_category", comment: ""), systemImage: "line.3.horizontal.decrease.circle")
+                    Label {
+                        if let key = selectedCategoryKey {
+                            Text(LocalizationHelper.shared.localized(key))
+                        } else {
+                            Text(LocalizationHelper.shared.localized("filter_category"))
+                        }
+                    } icon: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
                 }
                 Spacer()
             }
@@ -32,9 +49,9 @@ struct ExploreCropsView: View {
                 ForEach(filteredCrops, id: \.self) { crop in
                     NavigationLink(destination: CropDetailView(crop: crop)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(crop.name ?? NSLocalizedString("crop_no_name", comment: ""))
+                            Text(LocalizationHelper.shared.localized(crop.name ?? "crop_no_name"))
                                 .font(.headline)
-                            Text(crop.category ?? "")
+                            Text(LocalizationHelper.shared.localized(crop.category ?? ""))
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -43,14 +60,15 @@ struct ExploreCropsView: View {
             }
             .listStyle(.insetGrouped)
         }
-        .navigationTitle("menu_explore")
-        .searchable(text: $searchText, prompt: Text("search_crops"))
+        .navigationTitle(Text(LocalizationHelper.shared.localized("menu_explore")))
+        .searchable(text: $searchText, prompt: Text(LocalizationHelper.shared.localized("search_crops")))
     }
 
     private var filteredCrops: [Crop] {
         crops.filter { crop in
-            let matchCategory = selectedCategory == nil || crop.category == selectedCategory
-            let matchSearch = searchText.isEmpty || (crop.name?.localizedCaseInsensitiveContains(searchText) ?? false)
+            let matchCategory = selectedCategoryKey == nil || (crop.category == selectedCategoryKey)
+            let displayName = LocalizationHelper.shared.localized(crop.name ?? "")
+            let matchSearch = searchText.isEmpty || displayName.localizedCaseInsensitiveContains(searchText)
             return matchCategory && matchSearch
         }
     }

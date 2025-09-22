@@ -6,7 +6,6 @@ struct MyCropsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @State private var userCollections: [UserCollection] = []
-
     private var notificationCenter = NotificationCenter.default
 
     var body: some View {
@@ -21,7 +20,7 @@ struct MyCropsView: View {
                         if let crop = uc.crop {
                             NavigationLink(destination: CropDetailView(crop: crop)) {
                                 VStack(alignment: .leading) {
-                                    Text(crop.name ?? NSLocalizedString("crop_default", comment: ""))
+                                    Text(crop.name ?? NSLocalizedString("crop_default", comment: "Crop"))
                                         .font(.headline)
                                     Text(crop.category ?? "")
                                         .font(.subheadline)
@@ -56,9 +55,6 @@ struct MyCropsView: View {
             let results = (try? viewContext.fetch(fr)) ?? []
             DispatchQueue.main.async {
                 self.userCollections = results
-                for uc in results {
-                    print("📦 Loaded collection: crop=\(uc.crop?.name ?? "nil") uc=\(uc.collectionID?.uuidString ?? "nil")")
-                }
             }
         }
     }

@@ -1,611 +1,501 @@
-"intro_title" = "Bienvenido a CosechiOs";
-"intro_subtitle" = "Tu guía para cultivar en casa";
+// MARK: - LoadingView
+"loading_preparing" = "Preparando...";
+"loading_inserting" = "Insertando datos iniciales...";
+"loading_finalizing" = "Finalizando configuración...";
+"loading_ready" = "¡Listo para comenzar!";
+"progress_percent" = "%d%%";
 
-"register" = "Registrarse";
-"login" = "Iniciar Sesión";
-"logout" = "Cerrar Sesión";
-
-"menu_my_crops" = "Mis Cultivos";
-"menu_explore" = "Explorar Cultivos";
-"menu_tasks" = "Calendario de Tareas";
-"menu_profile" = "Perfil de Usuario";
-
-"profile_title" = "Perfil";
-"profile_username" = "Nombre de usuario";
-"profile_email" = "Correo";
-"profile_notifications" = "Notificaciones";
-"profile_language" = "Idioma";
-"profile_theme" = "Tema";
-"profile_delete_photo" = "Eliminar foto de perfil";
-"profile_export" = "Exportar datos (backup)";
-
-"task_summary_title" = "Resumen de Tareas";
-"task_completed" = "Completadas";
-"task_pending" = "Pendientes";
-"task_overdue" = "Atrasadas";
-"task_progress" = "Progreso";
-"task_no_tasks" = "No tienes tareas aún";
-
-"progress_note" = "Nota de progreso";
-"progress_photo" = "Foto opcional";
-"remove_photo" = "Eliminar foto";
-"add_photo" = "Añadir foto";
-"new_progress" = "Nuevo Progreso";
-"cancel" = "Cancelar";
-"save" = "Guardar";
-"progress_history" = "Historial de Progreso";
-"no_progress_yet" = "Todavía no hay registros de progreso.";
-"add_progress" = "Añadir progreso";
-
-"dashboard_title" = "Panel Principal";
-"dashboard_greeting" = "¡Hola!";
-"dashboard_greeting_name %@" = "¡Hola, %@!";
-"dashboard_subtitle" = "Aquí tienes un resumen de tu progreso";
-"dashboard_summary" = "Resumen de tareas";
-"dashboard_tasks" = "tareas";
-"dashboard_completed" = "Completadas";
-"dashboard_no_tasks" = "No tienes tareas todavía";
-"dashboard_overdue_count" = "%d tareas vencidas";
-
-"dashboard_action_add_task" = "Nueva Tarea";
-"dashboard_action_explore" = "Explorar";
-"dashboard_action_my_crops" = "Mis Cultivos";
-"dashboard_action_profile" = "Perfil";
-
-"dashboard_upcoming_tasks" = "Próximas tareas";
-"dashboard_no_upcoming" = "No hay tareas próximas";
-
-"dashboard_my_crops" = "Cultivos en mi colección";
-"dashboard_no_crops" = "No tienes cultivos guardados";
-
-"dashboard_recent_progress" = "Últimos registros de progreso";
-"dashboard_no_progress" = "Todavía no hay registros de progreso";
-"dashboard_progress_log_no_crop" = "Sin cultivo";
-"dashboard_progress_no_note" = "Sin nota";
-
-"progress_note" = "Nota de progreso";
-"progress_photo" = "Foto de progreso";
-"progress_category" = "Categoría";
-"new_progress" = "Nuevo progreso";
-"add_photo" = "Añadir foto";
-"remove_photo" = "Eliminar foto";
-"edit_progress" = "Editar progreso";
-
-"loading_preparing" = "Preparando la aplicación…";
-"loading_inserting" = "Insertando datos iniciales…";
-"loading_finalizing" = "Finalizando…";
-"loading_ready" = "Listo";
-"progress_percent %d" = "%d por ciento de progreso";
-
+// MARK: - RegisterView
 "register_title" = "Crear cuenta";
-"register_navtitle" = "Registro";
 "register_username" = "Nombre de usuario";
 "register_email" = "Correo electrónico";
 "register_password" = "Contraseña";
 "register_confirm_password" = "Confirmar contraseña";
 "register_button" = "Registrarse";
+"register_navtitle" = "Registro";
 "error_password_mismatch" = "Las contraseñas no coinciden.";
 
+// MARK: - LoginView
 "login_title" = "Iniciar sesión";
-"login_navtitle" = "Login";
 "login_email" = "Correo electrónico";
 "login_password" = "Contraseña";
 "login_button" = "Entrar";
+"login_navtitle" = "Acceso";
 
-"menu_all_tasks" = "Todas mis tareas";
-"app_name" = "CosechiOs";
+// MARK: - MainMenuView
+"dashboard_title" = "Panel de control";
+"menu_my_crops" = "Mis cultivos";
+"menu_explore" = "Explorar cultivos";
+"menu_tasks" = "Calendario de tareas";
+"menu_all_tasks" = "Todas las tareas";
+"menu_profile" = "Perfil";
+"logout" = "Cerrar sesión";
+"app_name" = "CosechiOS";
 
-"profile_gallery" = "Galería";
-"profile_camera" = "Cámara";
-"theme_auto" = "Automático";
-"theme_light" = "Claro";
-"theme_dark" = "Oscuro";
-"save" = "Guardar";
-"alert_title" = "Aviso";
-"ok" = "OK";
-"profile_saved_success" = "Perfil guardado correctamente.";
-"profile_saved_error" = "Error al guardar perfil: %@";
+// MARK: - RecommendationHelper (razones + estaciones)
+"recommendations_reason_season" = "Es ideal para la temporada de %@.";
+"recommendations_reason_new" = "Aún no lo has cultivado, podría interesarte.";
+"recommendations_reason_difficulty" = "Nivel de dificultad adecuado: %@.";
+"recommendations_reason_difficulty_default" = "intermedio";
 
-"task_filter" = "Filtro";
-"task_all" = "Todas";
-"task_today" = "Hoy";
-"task_upcoming" = "Próximas";
-"task_delete_title" = "Eliminar tarea";
-"task_delete_message" = "¿Eliminar esta tarea?";
-"delete" = "Eliminar";
-"task_no_title" = "Sin título";
-"task_crop_prefix" = "🌱 Cultivo:";
-
-"mycrops_empty" = "No tienes cultivos en tu colección.";
-"crop_default" = "Cultivo";
-"crop_no_name" = "Sin nombre";
-
-"filter_all" = "Todas";
-"filter_vegetable" = "Hortaliza";
-"filter_herb" = "Hierba";
-"filter_fruit" = "Fruta";
-"filter_category" = "Categoría";
-"search_crops" = "Buscar cultivos";
-
-"task_advanced_notification" = "Notificación avanzada";
-"task_repeat" = "Repetir";
-"repeat_none" = "Ninguna";
-"repeat_daily" = "Diaria";
-"repeat_weekly" = "Semanal";
-"repeat_monthly" = "Mensual";
-"task_remember_days_before" = "Recordar días antes";
-"task_days_before %d" = "%d días antes";
-"task_associated_crop" = "Cultivo asociado";
-"task_not_found" = "Tarea no encontrada";
-"task_not_found_message" = "La tarea que intentas editar ya no existe.";
-"ok" = "OK";
-
-"progress_note" = "Nota";
-"progress_category" = "Categoría";
-"progress_photo" = "Foto";
-"progress_general" = "General";
-"progress_irrigation" = "Riego";
-"progress_fertilization" = "Fertilización";
-"progress_pest" = "Plaga";
-"progress_harvest" = "Cosecha";
-"remove_photo" = "Eliminar foto";
-"add_photo" = "Añadir foto";
-"edit_progress" = "Editar progreso";
-"cancel" = "Cancelar";
-"save" = "Guardar";
-
-"crop_default" = "Cultivo";
-"crop_seasons" = "🌦️ Estaciones recomendadas:";
-"crop_remove_my" = "Quitar de Mis Cultivos";
-"crop_add_my" = "Añadir a Mis Cultivos";
-"crop_add_task" = "➕ Añadir Tarea";
-"crop_tasks_title" = "📅 Tareas de este cultivo";
-"task_default" = "Tarea";
-"crop_steps" = "📋 Pasos de cultivo";
-"step_default" = "Paso";
-"crop_progress_title" = "📖 Historial de Progreso";
-"crop_progress_empty" = "Todavía no hay registros de progreso.";
-"crop_add_progress" = "Añadir progreso";
-
-"task_info" = "Detalles de la tarea";
-"task_title" = "Título";
-"task_details" = "Descripción";
-"task_due_date" = "Fecha";
-"task_reminder" = "Recordatorio";
-
-"task_advanced_notification" = "Notificación avanzada";
-"task_repeat" = "Repetir";
-"repeat_none" = "Ninguna";
-"repeat_daily" = "Diaria";
-"repeat_weekly" = "Semanal";
-"repeat_monthly" = "Mensual";
-
-"task_remember_days_before" = "Recordar días antes";
-"task_days_before" = "%d días antes";
-"edit_task" = "Editar Tarea";
-"task_associated_crop" = "Cultivo asociado";
-"task_new" = "Nueva Tarea";
-
-"dashboard_title" = "Panel principal";
-"dashboard_greeting" = "Bienvenido de nuevo 👋";
-"dashboard_greeting_name" = "Hola, %@ 👋";
-"dashboard_subtitle" = "Aquí está el resumen de tu actividad";
-
-"dashboard_summary" = "Resumen";
-"dashboard_tasks" = "tareas";
-"dashboard_completed" = "Completadas";
-"dashboard_no_tasks" = "No tienes tareas aún.";
-"dashboard_overdue_count" = "%d tareas vencidas";
-
-"dashboard_upcoming_tasks" = "Próximas tareas";
-"dashboard_no_upcoming" = "No tienes tareas próximas.";
-
-"dashboard_my_crops" = "Mis Cultivos";
-"dashboard_no_crops" = "Todavía no tienes cultivos en tu colección.";
-
-"dashboard_recent_progress" = "Últimos registros de progreso";
-"dashboard_no_progress" = "Todavía no has añadido registros.";
-"dashboard_progress_no_note" = "Sin nota";
-"dashboard_progress_log_no_crop" = "Sin cultivo";
-
-"dashboard_action_add_task" = "Nueva tarea";
-"dashboard_action_explore" = "Explorar";
-"dashboard_action_my_crops" = "Mis cultivos";
-"dashboard_action_profile" = "Perfil";
-
-/* Crops */
-"crop_tomato_name" = "Tomate";
-"crop_tomato_desc" = "Planta de fruto rojo muy popular en huertos urbanos.";
-"crop_lettuce_name" = "Lechuga";
-"crop_lettuce_desc" = "Ideal para principiantes, crece rápido y ocupa poco espacio.";
-"crop_basil_name" = "Albahaca";
-"crop_basil_desc" = "Hierba aromática perfecta para macetas y balcones.";
-"crop_strawberry_name" = "Fresa";
-"crop_strawberry_desc" = "Produce frutos dulces; requiere sol y cuidados regulares.";
-
-"step_germination" = "Germinación";
-"step_transplant" = "Trasplante";
-"step_growth" = "Crecimiento vegetativo";
-"step_harvest" = "Cosecha";
-"step_sowing_direct" = "Siembra directa";
-"step_thinning" = "Raleo";
-"step_sowing" = "Siembra";
-"step_planting" = "Plantación";
-"step_vegetative" = "Crecimiento vegetativo";
-"step_flowering" = "Floración";
-
-"step_description_template" = "Descripción del paso: %@";
-
-/* Seasons */
 "season_spring" = "Primavera";
 "season_summer" = "Verano";
 "season_autumn" = "Otoño";
 "season_winter" = "Invierno";
 
-/* Crop UI labels */
+// MARK: - RecommendedCropsView
+"recommendations_title" = "Cultivos recomendados";
+"recommendations_subtitle" = "Basados en temporada, dificultad y tu experiencia";
+"recommendations_no_results" = "No se encontraron recomendaciones.";
+"recommendations_add" = "Añadir";
+"recommendations_error_not_logged" = "Debes iniciar sesión para añadir cultivos.";
+"recommendations_added" = "Cultivo añadido a tu colección.";
+"recommendations_in_collection" = "Este cultivo ya está en tu colección.";
 "crop_default" = "Cultivo";
-"crop_seasons" = "🌦️ Estaciones recomendadas:";
-"crop_seasons_none" = "No hay temporadas recomendadas.";
-"crop_add_my" = "Añadir a Mis Cultivos";
-"crop_remove_my" = "Quitar de Mis Cultivos";
-"crop_add_task" = "➕ Añadir Tarea";
-"crop_tasks_title" = "📅 Tareas de este cultivo";
-"crop_steps" = "📋 Pasos de cultivo";
-"crop_progress_title" = "📖 Historial de Progreso";
-"crop_progress_empty" = "Todavía no hay registros de progreso.";
-"crop_add_progress" = "Añadir progreso";
-"crop_recommended_now" = "Recomendado ahora";
 
-/* Difficulty */
+// MARK: - UserProfileView
+"profile_title" = "Perfil";
+"profile_username" = "Nombre de usuario";
+"profile_email" = "Correo electrónico";
+
+"profile_achievements_section" = "Logros";
+"profile_achievements_view_all" = "Ver todos los logros";
+
+"profile_language" = "Idioma";
+"profile_notifications_settings" = "Notificaciones";
+"profile_notifications" = "Activar notificaciones";
+"profile_notify_tasks" = "Recordar tareas";
+"profile_notify_crops" = "Recordar cultivos";
+"profile_notify_tips" = "Consejos y tips";
+"profile_notifications_history" = "Historial de notificaciones";
+
+"profile_theme" = "Apariencia";
+"theme_auto" = "Automático";
+"theme_light" = "Claro";
+"theme_dark" = "Oscuro";
+
+"profile_delete_photo" = "Eliminar foto de perfil";
+"profile_delete_photo_confirm" = "¿Deseas eliminar tu foto de perfil?";
+"profile_choose_image" = "Seleccionar imagen";
+"profile_take_photo" = "Tomar foto";
+"profile_choose_from_gallery" = "Elegir de la galería";
+
+"profile_export" = "Exportar datos";
+"profile_saved_success" = "Perfil guardado correctamente.";
+"profile_saved_error" = "Error al guardar el perfil: %@";
+"profile_image_saved" = "Imagen de perfil guardada.";
+"profile_image_save_error" = "Error al guardar la imagen: %@";
+"profile_camera_unavailable" = "La cámara no está disponible.";
+"profile_source_unavailable" = "Fuente no disponible.";
+
+"alert_title" = "Aviso";
+"ok" = "Aceptar";
+"cancel" = "Cancelar";
+"delete" = "Eliminar";
+"save" = "Guardar";
+
+"history_no_notifications" = "No hay notificaciones registradas.";
+"history_title" = "Historial de notificaciones";
+
+"notif_action_complete" = "Completar tarea";
+"notif_action_snooze" = "Posponer";
+"notif_action_view_crop" = "Ver cultivo";
+"notif_action_view_tips" = "Ver consejos";
+
+"task_summary_title" = "Resumen de tareas";
+"task_pending" = "Pendientes";
+"task_completed" = "Completadas";
+
+"task_filter" = "Filtro de tareas";
+"task_all" = "Todas";
+"task_today" = "Hoy";
+"task_upcoming" = "Próximas";
+
+"task_delete_title" = "Eliminar tarea";
+"task_delete_message" = "¿Seguro que deseas eliminar esta tarea?";
+
+"task_no_title" = "Sin título";
+"task_due_prefix" = "⏰";
+"task_crop_prefix" = "Cultivo:";
+
+"delete" = "Eliminar";
+"cancel" = "Cancelar";
+
+// (reutilizado)
+"task_no_title" = "Sin título";
+
+"statistics_title" = "Estadísticas";
+"statistics_subtitle" = "Resumen de tu actividad en la app";
+
+"statistics_range_7" = "7 días";
+"statistics_range_30" = "30 días";
+"statistics_range_90" = "90 días";
+"statistics_range_all" = "Todo";
+
+"statistics_export_csv" = "Exportar CSV";
+
+"statistics_tasks" = "Tareas";
+"statistics_no_tasks" = "No hay tareas registradas";
+
+"statistics_metrics_completed" = "Completadas";
+"statistics_metrics_pending" = "Pendientes";
+"statistics_metrics_overdue" = "Atrasadas";
+
+"statistics_progress" = "Progreso";
+"statistics_no_progress_logs" = "No hay registros de progreso";
+
+"statistics_top_crops" = "Cultivos más activos";
+"statistics_no_top_crops" = "No hay cultivos destacados";
+
+"statistics_notifications" = "Notificaciones";
+"statistics_no_notifications" = "No hay datos de notificaciones";
+
+"statistics_summary_total_tasks" = "Total de tareas";
+"statistics_summary_completed_pct" = "% Completadas";
+"statistics_summary_my_crops" = "Mis cultivos";
+
+"crop_default" = "Cultivo";
+"mycrops_empty" = "No tienes cultivos añadidos todavía";
+
+"crop_tomato_name" = "Tomate";
+"crop_tomato_desc" = "Planta de frutos rojos, jugosos y versátiles en la cocina.";
+
+"crop_lettuce_name" = "Lechuga";
+"crop_lettuce_desc" = "Hortaliza de hojas tiernas y frescas, ideal para ensaladas.";
+
+"crop_basil_name" = "Albahaca";
+"crop_basil_desc" = "Hierba aromática de sabor fresco, usada en salsas y aderezos.";
+
+"crop_strawberry_name" = "Fresa";
+"crop_strawberry_desc" = "Fruto rojo, dulce y pequeño, muy apreciado en postres.";
+
+"crop_cucumber_name" = "Pepino";
+"crop_cucumber_desc" = "Hortaliza refrescante, rica en agua, perfecta para ensaladas.";
+
+"crop_pepper_name" = "Pimiento";
+"crop_pepper_desc" = "Hortaliza de frutos carnosos y coloridos, ideal para ensaladas y guisos.";
+
+"crop_carrot_name" = "Zanahoria";
+"crop_carrot_desc" = "Raíz comestible rica en betacarotenos, fácil de cultivar en suelos sueltos.";
+
+"crop_onion_name" = "Cebolla";
+"crop_onion_desc" = "Bulbo aromático básico en la cocina, resistente al frío.";
+
+"crop_watermelon_name" = "Sandía";
+"crop_watermelon_desc" = "Fruto grande, dulce y jugoso, ideal en climas cálidos.";
+
+"crop_corn_name" = "Maíz";
+"crop_corn_desc" = "Cereal de granos nutritivos, base de muchos alimentos.";
+
+"category_vegetable" = "Hortaliza";
+"category_herb" = "Hierba";
+"category_fruit" = "Fruta";
+
 "crop_difficulty_very_easy" = "Muy fácil";
 "crop_difficulty_easy" = "Fácil";
 "crop_difficulty_medium" = "Media";
 "crop_difficulty_hard" = "Difícil";
 
-/* Small defaults */
-"task_default" = "Tarea";
-"step_default" = "Paso";
-"days_abbr" = "días";
-
-/* Recomendaciones dinámicas */
-"recommendations_title" = "Recomendados para ti";
-"recommendations_subtitle" = "Cultivos que podrían interesarte ahora";
-"recommendations_no_results" = "No hay recomendaciones por el momento.";
-"recommendations_add" = "Añadir a Mis Cultivos";
-"recommendations_added" = "Añadido a Mis Cultivos";
-"recommendations_in_collection" = "Ya está en tu colección";
-"recommendations_error_not_logged" = "Inicia sesión para añadir cultivos a tu colección.";
-"recommendations_reason_season" = "Temporada adecuada: %@";
-"recommendations_reason_difficulty" = "Dificultad: %@";
-"recommendations_reason_new" = "No está en tu colección";
-"recommendations_reason_difficulty_default" = "media";
-
-/* Estaciones (display) */
 "season_spring" = "Primavera";
 "season_summer" = "Verano";
 "season_autumn" = "Otoño";
 "season_winter" = "Invierno";
 
-"dashboard_metrics_title" = "Tus métricas";
+"month_april" = "Abril";
+"month_may" = "Mayo";
+"month_june" = "Junio";
+"month_july" = "Julio";
+"month_august" = "Agosto";
+"month_september" = "Septiembre";
+"month_october" = "Octubre";
+
+"step_germination" = "Germinación";
+"step_transplant" = "Trasplante";
+"step_growth" = "Crecimiento";
+"step_harvest" = "Cosecha";
+"step_sowing_direct" = "Siembra directa";
+"step_thinning" = "Aclareo";
+"step_sowing" = "Siembra";
+"step_planting" = "Plantación";
+"step_vegetative" = "Etapa vegetativa";
+"step_flowering" = "Floración";
+
+"step_germination_desc" = "Proceso en el que la semilla comienza a desarrollarse.";
+"step_transplant_desc" = "Traslado de la plántula a su lugar definitivo.";
+"step_growth_desc" = "Etapa de crecimiento vegetativo de la planta.";
+"step_harvest_desc" = "Recolección del cultivo en su punto óptimo.";
+"step_sowing_direct_desc" = "Siembra de semillas directamente en el terreno.";
+"step_thinning_desc" = "Eliminación de plántulas débiles para favorecer el desarrollo.";
+"step_sowing_desc" = "Colocación de las semillas para iniciar el cultivo.";
+"step_planting_desc" = "Acción de plantar los brotes o semillas en el campo.";
+"step_vegetative_desc" = "Periodo de desarrollo de hojas y tallos.";
+"step_flowering_desc" = "Etapa en la que la planta produce flores.";
+
+"soil_franco_organic" = "Suelo franco con materia orgánica";
+"soil_light_fertile" = "Suelo ligero y fértil";
+"soil_well_drained" = "Suelo bien drenado";
+"soil_sandy_fertile" = "Suelo arenoso y fértil";
+"soil_loose_well_drained" = "Suelo suelto y bien drenado";
+"soil_fertile_well_drained" = "Suelo fértil y bien drenado";
+"soil_loose_sandy" = "Suelo suelto y arenoso";
+"soil_loose_fertile" = "Suelo suelto y fértil";
+"soil_sandy_well_drained" = "Suelo arenoso bien drenado";
+
+"watering_every_2_3_days" = "Riego cada 2-3 días";
+"watering_keep_moist" = "Mantener el suelo húmedo";
+"watering_moderate_avoid_waterlogging" = "Riego moderado, evitar encharcamiento";
+"watering_regular_keep_moist" = "Riego regular, mantener humedad";
+"watering_consistent_avoid_drought" = "Riego constante, evitar sequía";
+"watering_abundant" = "Riego abundante";
+
+"watering_freq_every_2_3_days" = "Frecuencia de riego: cada 2-3 días";
+"watering_freq_every_1_2_days" = "Frecuencia de riego: cada 1-2 días";
+"watering_freq_every_2_days" = "Frecuencia de riego: cada 2 días";
+"watering_freq_every_3_days" = "Frecuencia de riego: cada 3 días";
+"watering_freq_every_day" = "Frecuencia de riego: diario";
+
+"sun_full_sun" = "Pleno sol";
+"sun_partial_or_full" = "Sol parcial o pleno";
+"sun_full_or_partial" = "Pleno sol o parcial";
+
+"temp_18_28" = "18°C - 28°C";
+"temp_10_20" = "10°C - 20°C";
+"temp_18_30" = "18°C - 30°C";
+"temp_15_25" = "15°C - 25°C";
+"temp_20_30" = "20°C - 30°C";
+"temp_10_25" = "10°C - 25°C";
+"temp_20_35" = "20°C - 35°C";
+
+"fert_compost_every_15_days" = "Aplicar compost cada 15 días";
+"fert_nitrogen_light" = "Fertilización ligera en nitrógeno";
+"fert_organic_every_20_days" = "Fertilizante orgánico cada 20 días";
+"fert_high_potassium_flowering" = "Fertilización rica en potasio en floración";
+"fert_high_potassium_fruiting" = "Fertilización rica en potasio durante fructificación";
+"fert_low_nitrogen" = "Fertilización baja en nitrógeno";
+"fert_balanced" = "Fertilización balanceada";
+"fert_nitrogen_high" = "Fertilización rica en nitrógeno";
+
+"climate_temperate_sensitive_frost" = "Clima templado, sensible a las heladas";
+"climate_cool_tolerates_frost" = "Clima fresco, tolera heladas";
+"climate_warm_not_frost_tolerant" = "Clima cálido, no tolera heladas";
+"climate_temperate_no_extreme_heat" = "Clima templado, no soporta calor extremo";
+"climate_warm_sensitive_cold" = "Clima cálido, sensible al frío";
+"climate_temperate_tolerates_cold" = "Clima templado, tolera frío";
+"climate_hot_sensitive_cold" = "Clima caluroso, sensible al frío";
+
+"plagues_tomato_common" = "Pulgones, mosca blanca, tizón";
+"plagues_lettuce_common" = "Caracoles, babosas, pulgones";
+"plagues_basil_common" = "Pulgones, mosca blanca, mildiu polvoriento";
+"plagues_strawberry_common" = "Caracoles, ácaros, botritis";
+"plagues_cucumber_common" = "Mosca blanca, oídio, ácaros";
+"plagues_pepper_common" = "Pulgones, trips, mosca blanca";
+"plagues_carrot_common" = "Mosca de la zanahoria, nematodos";
+"plagues_onion_common" = "Trips, mosca de la cebolla";
+"plagues_watermelon_common" = "Pulgones, araña roja, mildiu";
+"plagues_corn_common" = "Gusano cogollero, pulgones";
+
+"companions_tomato" = "Albahaca, zanahoria, cebolla";
+"companions_lettuce" = "Zanahoria, cebolla, rábano";
+"companions_basil" = "Tomate, pimientos";
+"companions_strawberry" = "Lechuga, espinaca";
+"companions_cucumber" = "Maíz, girasol";
+"companions_pepper" = "Albahaca, zanahoria, cebolla";
+"companions_carrot" = "Cebolla, puerro, lechuga";
+"companions_onion" = "Zanahoria, lechuga, fresa";
+"companions_watermelon" = "Maíz, girasol";
+"companions_corn" = "Calabaza, frijol";
+
+"filter_all" = "Todos";
+"filter_vegetable" = "Hortalizas";
+"filter_herb" = "Hierbas";
+"filter_fruit" = "Frutas";
+"filter_category" = "Categoría";
+
+"crop_no_name" = "Cultivo sin nombre";
+
+"menu_explore" = "Explorar";
+"search_crops" = "Buscar cultivos";
+
+"task_info" = "Información de la tarea";
+"task_date" = "Fecha y recordatorio";
+"task_advanced_notification" = "Notificaciones avanzadas";
+"task_associated_crop" = "Cultivo asociado";
+"task_title" = "Título de la tarea";
+"task_details" = "Detalles de la tarea";
+"task_due_date" = "Fecha de vencimiento";
+"task_reminder" = "Recordatorio";
+"task_repeat" = "Repetición";
+
+"repeat_none" = "Ninguna";
+"repeat_daily" = "Diaria";
+"repeat_weekly" = "Semanal";
+"repeat_monthly" = "Mensual";
+
+"task_remember_days_before" = "Recordar días antes";
+"task_days_before %d" = "Recordar %d días antes";
+
+"edit_task" = "Editar tarea";
+"cancel" = "Cancelar";
+"save" = "Guardar";
+
+"task_not_found" = "Tarea no encontrada";
+"task_not_found_message" = "No se encontró la tarea o ya no está disponible.";
+"ok" = "Aceptar";
+"task_new" = "Nueva tarea";
+
+"dashboard_title" = "Tablero";
+"dashboard_greeting" = "¡Hola!";
+"dashboard_greeting_name %@" = "¡Hola, %@!";
+"dashboard_subtitle" = "Tu resumen general";
+"dashboard_summary" = "Resumen de tareas";
+"dashboard_tasks" = "tareas";
+"dashboard_completed" = "Completadas";
+"dashboard_no_tasks" = "No tienes tareas registradas";
+"dashboard_overdue_count" = "%d tareas vencidas";
+"dashboard_action_add_task" = "Nueva tarea";
+"dashboard_action_explore" = "Explorar cultivos";
+"dashboard_action_my_crops" = "Mis cultivos";
+"dashboard_action_profile" = "Perfil";
+"dashboard_action_statistics" = "Estadísticas";
+
+"recommendations_title" = "Recomendaciones";
+"recommendations_no_results" = "No se encontraron recomendaciones";
+"recommendations_add" = "Añadir";
+"recommendations_error_not_logged" = "Debes iniciar sesión para añadir cultivos";
+"recommendations_added" = "Cultivo añadido a tu colección";
+"recommendations_in_collection" = "Este cultivo ya está en tu colección";
+"crop_default" = "Cultivo";
+
+"dashboard_upcoming_tasks" = "Próximas tareas";
+"dashboard_no_upcoming" = "No hay tareas próximas";
+"dashboard_my_crops" = "Mis cultivos";
+"dashboard_no_crops" = "No tienes cultivos guardados";
+"dashboard_recent_progress" = "Progreso reciente";
+"dashboard_no_progress" = "No hay registros de progreso";
+"dashboard_progress_log_no_crop" = "Cultivo desconocido";
+"dashboard_progress_no_note" = "Sin notas";
+
+"progress_general" = "General";
+"progress_irrigation" = "Riego";
+"progress_fertilization" = "Fertilización";
+"progress_pest" = "Plagas";
+"progress_harvest" = "Cosecha";
+"progress_note" = "Nota";
+"progress_category" = "Categoría";
+"progress_photo" = "Foto";
+"remove_photo" = "Eliminar foto";
+"add_photo" = "Añadir foto";
+"edit_progress" = "Editar progreso";
+
+"notif_level_up_title" = "¡Has subido de nivel!";
+"notif_level_up_body" = "¡Alcanzaste el nivel %d!";
+"notif_badge_unlocked_title" = "Insignia desbloqueada";
+"notif_badge_unlocked_body" = "Desbloqueado: %@";
+"level_up_message" = "¡Subiste de nivel!";
+"badge_unlocked" = "Insignia desbloqueada";
+"achievements_badges_count" = "%d insignias obtenidas";
+"achievements_title" = "Logros";
+"achievements_your_level" = "Tu nivel";
+"achievements_progress" = "Progreso hacia el siguiente nivel";
+"achievements_progress_pct" = "%d%% completado";
+"achievements_level_next" = "Siguiente nivel: %d";
+"achievements_badges" = "Insignias";
+"achievements_no_badges" = "Todavía no has desbloqueado insignias";
+
+"badge_first_task_title" = "Primera tarea";
+"badge_first_task_desc" = "Crea tu primera tarea";
+
+"badge_task_collector_title" = "Recolector de tareas";
+"badge_task_collector_desc" = "Completa 10 tareas";
+
+"badge_logger_novice_title" = "Registrador principiante";
+"badge_logger_novice_desc" = "Añade 5 registros de progreso";
+
+"badge_logger_master_title" = "Registrador maestro";
+"badge_logger_master_desc" = "Añade 50 registros de progreso";
+
+"badge_explorer_title" = "Explorador";
+"badge_explorer_desc" = "Acepta tu primera recomendación de cultivo";
+
+"badge_level_milestone_title" = "Hito de nivel";
+"badge_level_milestone_desc" = "Alcanza un nivel múltiplo de 3";
+
+"create_task" = "Crear tarea";
+"add_progress_log" = "Añadir registro de progreso";
+"accept_recommendation" = "Aceptar recomendación";
+
+"intro_title" = "Bienvenido a la aplicación";
+"intro_subtitle" = "Gestiona tus cultivos y tareas fácilmente";
+"register" = "Registrarse";
+"login" = "Iniciar sesión";
+
+"dashboard_metrics_title" = "Métricas";
 "dashboard_metrics_completed" = "Completadas";
 "dashboard_metrics_pending" = "Pendientes";
-"dashboard_metrics_overdue" = "Vencidas";
-"dashboard_metrics_progresslogs" = "Registros de progreso";
+"dashboard_metrics_overdue" = "Atrasadas";
 
-"crop_reminder_watering" = "¡No olvides regar tu cultivo hoy!";
-"crop_reminder_fertilize" = "Es momento de fertilizar tu cultivo.";
-"crop_reminder_harvest" = "¡Tu cultivo está listo para la cosecha!";
-"crop_reminder_generic" = "Recuerda cuidar tu cultivo.";
-"crop_season_tip" = "Es una buena temporada para %@, aprovéchalo.";
+"crop_lettuce_name" = "Lechuga";
+"crop_cucumber_name" = "Pepino";
+"crop_tomato_name" = "Tomate";
+"crop_basil_name" = "Albahaca";
+"crop_carrot_name" = "Zanahoria";
+"crop_spinach_name" = "Espinaca";
+"crop_potato_name" = "Papa";
+"crop_onion_name" = "Cebolla";
+"crop_pepper_name" = "Pimiento";
+"crop_sunflower_name" = "Girasol";
+"crop_corn_name" = "Maíz";
 
-"profile_notifications_settings" = "Configuración de notificaciones";
-"profile_notify_tasks" = "Recordatorios de tareas";
-"profile_notify_crops" = "Recordatorios de cultivos";
-"profile_notify_tips" = "Tips de temporada";
+"category_vegetable" = "Vegetal";
+"category_fruit" = "Fruta";
+"category_herb" = "Hierba";
+"category_grain" = "Grano";
+"category_flower" = "Flor";
 
-"debug_notifications_title" = "Depuración de notificaciones";
-"debug_section_tasks" = "Probar tareas";
-"debug_section_crops" = "Probar cultivos";
-"debug_section_tips" = "Probar tips";
-"debug_section_clear" = "Gestión rápida";
-"debug_section_log" = "Registro de pruebas";
-"debug_test_task_body" = "Este es un recordatorio de prueba de tarea";
-"debug_test_crop_body" = "Este es un recordatorio de prueba de cultivo";
-"debug_test_tip_body" = "Este es un tip de temporada de prueba";
+"crop_no_name" = "Sin nombre";
+"crop_recommended_now" = "Recomendado ahora";
 
-"history_title" = "Historial de notificaciones";
-"history_no_notifications" = "No hay notificaciones registradas";
-"profile_notifications_history" = "Historial de notificaciones";
+"crop_seasons" = "Estaciones recomendadas";
+"crop_seasons_none" = "No hay estaciones recomendadas";
 
-"notif_action_complete" = "Completar";
-"notif_action_view_crop" = "Ver cultivo";
-"notif_action_view_tips" = "Ver tips";
+"crop_add_my" = "Añadir a Mis Cultivos";
+"crop_remove_my" = "Eliminar de Mis Cultivos";
+"crop_add_task" = "Añadir tarea";
 
-"notif_action_complete" = "Completar";
-"notif_action_snooze" = "Posponer 15 min";
-"notif_action_view_crop" = "Ver cultivo";
-"notif_action_view_tips" = "Ver consejos";
+"crop_tasks_title" = "Tareas del cultivo";
+"task_default" = "Tarea sin título";
 
-"notif_log_action_title" = "Acción de notificación";
-"notif_log_action_body" = "El usuario realizó la acción %@ en la notificación";
+"crop_steps" = "Pasos de cultivo";
+"days_abbr" = "días";
 
-"dashboard_action_statistics" = "Estadísticas";
-"statistics_title" = "Panel de estadísticas";
-"statistics_tasks" = "Estado de tareas";
-"statistics_progress" = "Evolución del progreso";
-"statistics_notifications" = "Acciones de notificaciones";
-
-/* Statistics view */
-"statistics_title" = "Estadísticas";
-"statistics_tasks" = "Tareas";
-"statistics_progress" = "Progreso";
-"statistics_notifications" = "Notificaciones";
-"statistics_label_completed" = "Completadas";
-"statistics_label_pending" = "Pendientes";
-"statistics_label_overdue" = "Atrasadas";
-"statistics_no_progress" = "No hay registros de progreso aún.";
-"statistics_no_notifications_actions" = "No se han registrado acciones rápidas en notificaciones.";
-
-/* Debug notifications */
-"debug_notifications_title" = "Depuración de notificaciones";
-"debug_insert_demo" = "Insertar datos demo";
-"debug_insert_demo_success" = "Datos demo insertados y usuario demo seleccionado";
-"debug_insert_demo_exists" = "Ya existen datos demo en la base de datos";
-"debug_send_task_5s" = "Enviar recordatorio de tarea (5s)";
-"debug_send_crop_tip_5s" = "Enviar tip de cultivo (5s)";
-"debug_send_seasonal_tip_15s" = "Enviar tip de temporada (15s)";
-"debug_clear_pending" = "Borrar notificaciones pendientes";
-"debug_instructions" = "Triple-tap en el título del Dashboard para abrir este menú. Útil para pruebas rápidas.";
-"debug_alert_title" = "Debug";
-"debug_task_title" = "Recordatorio (demo)";
-"debug_task_body" = "Esto es una notificación de prueba de tarea.";
-"debug_crop_tip_body" = "Recordatorio de cuidado del cultivo (demo).";
-"debug_task_scheduled" = "Notificación de tarea programada (5s)";
-"debug_crop_scheduled" = "Notificación de cultivo programada (5s)";
-"debug_crop_scheduled_for_crop" = "Notificación programada para el cultivo: %@";
-"debug_seasonal_scheduled" = "Tip de temporada programado (15s)";
-"debug_send_error" = "Error al programar notificación: %@";
-"debug_cleared_pending_success" = "Notificaciones pendientes eliminadas";
-
-/* Statistics */
-"statistics_no_tasks" = "No hay tareas para mostrar";
-"statistics_no_progress_logs" = "No hay registros de progreso";
-"statistics_no_notifications" = "No hay acciones de notificación registradas";
-
-/* Statistics view */
-"statistics_title" = "Estadísticas";
-"statistics_subtitle" = "Resumen y métricas de tu huerto";
-"statistics_range_all" = "Todo";
-"statistics_range_7" = "7d";
-"statistics_range_30" = "30d";
-"statistics_range_90" = "90d";
-"statistics_summary_total_tasks" = "Tareas totales";
-"statistics_summary_completed_pct" = "Completadas (%)";
-"statistics_summary_my_crops" = "Cultivos guardados";
-"statistics_tasks" = "Estado de tareas";
-"statistics_progress" = "Evolución de registros";
-"statistics_notifications" = "Acciones en notificaciones";
-"statistics_top_crops" = "Cultivos más activos";
-"statistics_no_tasks" = "No hay tareas para mostrar.";
-"statistics_no_progress_logs" = "No hay registros de progreso en el periodo.";
-"statistics_no_notifications" = "No hay interacciones de notificación registradas.";
-"statistics_no_top_crops" = "No hay cultivos con actividad.";
-"statistics_export_csv" = "Exportar CSV";
-"statistics_export_success" = "CSV listo para compartir";
-"statistics_export_error" = "Error al generar CSV";
-
-/* metrics labels used in summary / small cards */
-"statistics_metrics_completed" = "Completadas";
-"statistics_metrics_pending" = "Pendientes";
-"statistics_metrics_overdue" = "Atrasadas";
-
-"profile_edit_photo" = "Editar foto";
-"profile_delete_photo_confirm" = "¿Eliminar tu foto de perfil?";
-"delete" = "Eliminar";
-"cancel" = "Cancelar";
-"profile_source_unavailable" = "Este origen no está disponible en tu dispositivo.";
-
-"profile_source_unavailable" = "Este origen no está disponible en tu dispositivo.";
-"profile_camera_unavailable" = "La cámara no está disponible en este dispositivo.";
-"profile_image_saved" = "Foto de perfil guardada.";
-"profile_image_save_error" = "Error al guardar la foto: %@";
-"profile_choose_image" = "Seleccionar imagen";
-"profile_take_photo" = "Tomar foto";
-"profile_choose_from_gallery" = "Elegir de la galería";
-"cancel" = "Cancelar";
-"save" = "Guardar";
-"delete" = "Eliminar";
-
-"profile_title" = "Perfil";
-"profile_username" = "Nombre";
-"profile_email" = "Correo";
-"profile_gallery" = "Galería";
-"profile_camera" = "Cámara";
-"profile_choose_image" = "Elegir imagen";
-"profile_take_photo" = "Tomar foto";
-"profile_choose_from_gallery" = "Elegir desde galería";
-"profile_delete_photo" = "Eliminar foto de perfil";
-"profile_delete_photo_confirm" = "¿Eliminar foto de perfil?";
-"profile_export" = "Exportar perfil";
-"profile_image_saved" = "Imagen guardada";
-"profile_image_save_error" = "Error guardando imagen: %@";
-"profile_camera_unavailable" = "La cámara no está disponible en este dispositivo.";
-"profile_source_unavailable" = "Fuente seleccionada no disponible.";
-"no_image" = "Sin imagen";
-"close" = "Cerrar";
-"save" = "Guardar";
-"cancel" = "Cancelar";
-
-/* Achievements */
-"achievements_title" = "Nivel y Logros";
-"achievements_subtitle" = "Motívate: sube de nivel completando acciones";
-"achievements_level" = "Nivel";
-"achievements_to_next" = "Faltan %d XP para el siguiente nivel";
-"achievements_badges" = "Insignias";
-"achievements_no_badges" = "Aún no tienes insignias. ¡Comienza realizando acciones!";
-
-/* Profile */
-"profile_achievements_title" = "Logros";
-"profile_achievements_sub" = "Nivel actual: %d";
-"profile_achievements_no_badges" = "Sin insignias aún";
-"profile_achievements_section" = "Logros y progreso";
-"profile_achievements_view_all" = "Ver todos los logros";
-
-/* Badges */
-"badge_first_task_title" = "Primer paso";
-"badge_first_task_desc" = "Has creado tu primera tarea.";
-"badge_task_collector_title" = "Creador de tareas";
-"badge_task_collector_desc" = "Has creado 10 tareas.";
-"badge_logger_novice_title" = "Registrador";
-"badge_logger_novice_desc" = "Has hecho 5 registros de progreso.";
-"badge_logger_master_title" = "Maestro del registro";
-"badge_logger_master_desc" = "50 registros de progreso.";
-"badge_explorer_title" = "Explorador";
-"badge_explorer_desc" = "Has aceptado recomendaciones.";
-"badge_level_milestone_title" = "Hito de nivel";
-"badge_level_milestone_desc" = "Alcanzaste un hito de nivel.";
-
-// Progreso usuario
-"profile_progress" = "Progreso";
-"profile_level" = "Nivel %d";
-"profile_no_progress" = "Sin progreso registrado";
-"profile_no_achievements" = "Aún no hay logros";
-
-// Achievements base
-"level_2" = "Nivel 2 alcanzado";
-"level_5" = "Nivel 5 alcanzado";
-"level_10" = "Nivel 10 alcanzado";
-
-"achievements_title" = "Logros";
-"achievements_your_level" = "Tu nivel";
-"achievements_progress" = "Progreso";
-"achievements_progress_pct" = "%d%% completado";
-"achievements_level_next" = "Siguiente: nivel %d";
-"achievements_badges" = "Insignias";
-"achievements_no_badges" = "Aún no tienes insignias";
-"achievements_badges_count" = "%d insignias";
-
-"badge_first_task_title" = "Primera tarea";
-"badge_first_task_desc" = "Creaste tu primera tarea";
-"badge_task_collector_title" = "Coleccionista de tareas";
-"badge_task_collector_desc" = "Has creado 10 tareas";
-"badge_logger_novice_title" = "Novato registrador";
-"badge_logger_novice_desc" = "Has añadido 5 registros de progreso";
-"badge_logger_master_title" = "Maestro registrador";
-"badge_logger_master_desc" = "Has añadido 50 registros de progreso";
-"badge_explorer_title" = "Explorador";
-"badge_explorer_desc" = "Aceptaste una recomendación";
-"badge_level_milestone_title" = "Hito de nivel";
-"badge_level_milestone_desc" = "Alcanzaste un nivel importante";
-
-/* Notifications */
-"notif_level_up_title" = "¡Subiste de nivel!";
-"notif_level_up_body" = "Has alcanzado el nivel %d. ¡Buen trabajo!";
-"notif_badge_unlocked_title" = "Insignia desbloqueada";
-"notif_badge_unlocked_body" = "Has desbloqueado: %@";
-
-/* Achievements UI */
-"achievements_title" = "Logros";
-"achievements_your_level" = "Tu nivel";
-"achievements_progress" = "Progreso";
-"achievements_progress_pct" = "%d%% completado";
-"achievements_level_next" = "Siguiente: nivel %d";
-"achievements_badges" = "Insignias";
-"achievements_no_badges" = "Aún no tienes insignias";
-"achievements_badges_count" = "%d insignias";
-
-/* Badges */
-"badge_first_task_title" = "Primera tarea";
-"badge_first_task_desc" = "Creaste tu primera tarea";
-"badge_task_collector_title" = "Coleccionista de tareas";
-"badge_task_collector_desc" = "Has creado 10 tareas";
-"badge_logger_novice_title" = "Novato registrador";
-"badge_logger_novice_desc" = "Has añadido 5 registros de progreso";
-"badge_logger_master_title" = "Maestro registrador";
-"badge_logger_master_desc" = "Has añadido 50 registros de progreso";
-"badge_explorer_title" = "Explorador";
-"badge_explorer_desc" = "Aceptaste una recomendación";
-"badge_level_milestone_title" = "Hito de nivel";
-"badge_level_milestone_desc" = "Alcanzaste un nivel importante";
-
-"level_up_message" = "🎉 ¡Has subido de nivel!";
-"badge_unlocked" = "🏅 ¡Nuevo logro desbloqueado!";
+"crop_progress_title" = "Historial de Progreso";
+"crop_progress_empty" = "Todavía no hay registros de progreso";
+"crop_add_progress" = "Añadir progreso";
 
 "crop_recommendations" = "Recomendaciones de cultivo";
+"crop_estimated_duration" = "Duración estimada: %d días";
 "crop_info_unavailable" = "Información no disponible";
-"crop_soil" = "Tipo de suelo";
-"crop_watering" = "Riego";
-"crop_sunlight" = "Exposición solar";
-"crop_temperature" = "Temperatura";
-"crop_fertilization" = "Fertilización";
 
-"crop_recommendations" = "Recomendaciones de cultivo";
-"crop_soil" = "Suelo";
+"crop_soil" = "Tipo de suelo";
 "crop_watering" = "Riego";
 "crop_sunlight" = "Luz solar";
 "crop_temperature" = "Temperatura";
 "crop_fertilization" = "Fertilización";
-"crop_info_unavailable" = "Información no disponible";
-
-"crop_cucumber_name" = "Pepino";
-"crop_cucumber_desc" = "Hortaliza trepadora que produce frutos alargados, frescos y crujientes.";
-
-"crop_pepper_name" = "Pimiento";
-"crop_pepper_desc" = "Hortaliza de colores variados, utilizada tanto en crudo como cocinada.";
-
-"crop_carrot_name" = "Zanahoria";
-"crop_carrot_desc" = "Raíz comestible rica en betacarotenos, de sabor dulce y textura crujiente.";
-
-"crop_onion_name" = "Cebolla";
-"crop_onion_desc" = "Bulbo aromático ampliamente usado en gastronomía, base de muchas preparaciones.";
-
-"crop_watermelon_name" = "Sandía";
-"crop_watermelon_desc" = "Fruta grande y jugosa con pulpa roja y semillas negras, ideal en verano.";
-
-"crop_corn_name" = "Maíz";
-"crop_corn_desc" = "Cereal básico cultivado en todo el mundo, con mazorcas amarillas o blancas.";
-
-"step_pollination" = "Polinización";
-"step_fruit_set" = "Fructificación";
-
-"crop_estimated_duration" = "Duración estimada: %d días";
-"crop_quick_tips" = "Consejos rápidos";
-
-"tip_watering_template" = "Riego: %@";
-"tip_fertilization_template" = "Fertilización: %@";
-"tip_soil_template" = "Suelo: %@";
-"tip_sunlight_template" = "Sol: %@";
-"crop_climate" = "Condiciones climáticas"; // ES
-/* Secciones y etiquetas */
-"crop_climate" = "Condiciones climáticas";
-"crop_quick_tips" = "Consejos rápidos";
+"crop_climate" = "Clima";
 "crop_plagues" = "Plagas comunes";
-"crop_estimated_duration" = "Duración estimada: %d días"; /* %d será el total de días */
-
-/* Tip interno */
-"crop_tip_watch_plagues" = "Vigilar plagas:";
-
-/* (si no existen ya) */
-"crop_recommendations" = "Recomendaciones de cultivo";
-"crop_soil" = "Suelo";
-"crop_watering" = "Riego";
-"crop_sunlight" = "Sol";
-"crop_temperature" = "Temperatura";
-"crop_fertilization" = "Fertilización";
-"crop_info_unavailable" = "Información no disponible";
-
-"crop_season_tip" = "🌸 ¡Es temporada de %@! Considera sembrarlos ahora.";
-"crop_recommended_now" = "Recomendado en esta temporada";
-
-"crop_companions" = "Compañeros de siembra";
-"crop_germination_days" = "Germina en %d días";
-
-"crop_companions" = "Compañeros de siembra";
+"crop_companions" = "Asociación de cultivos";
 "crop_germination_days" = "Germina en %d días";
 "crop_watering_frequency" = "Frecuencia de riego";
-"crop_harvest_months" = "Meses de cosecha ideales";
+"crop_harvest_months" = "Meses de cosecha";
 
-"crop_companions" = "Compañeros de siembra";
-"crop_germination_days" = "🌱 Germina en %d días";
-"crop_watering_frequency" = "Frecuencia de riego: %@";
-"crop_harvest_months" = "📅 Meses de cosecha: %@";
+"crop_difficulty_very_easy" = "Muy fácil";
+"crop_difficulty_easy" = "Fácil";
+"crop_difficulty_medium" = "Media";
+"crop_difficulty_hard" = "Difícil";
+
+"season_spring" = "Primavera";
+"season_summer" = "Verano";
+"season_autumn" = "Otoño";
+"season_winter" = "Invierno";
+
+"loading_hint" = "Consejo: Cuida tus cultivos para obtener mejores cosechas";

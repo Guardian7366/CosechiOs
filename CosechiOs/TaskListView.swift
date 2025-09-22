@@ -74,10 +74,8 @@ struct TaskListView: View {
             Alert(
                 title: Text("task_delete_title"),
                 message: Text("task_delete_message"),
-                primaryButton: .destructive(Text("delete")) {
-                    deleteTask(by: wrapper.id)
-                },
-                secondaryButton: .cancel()
+                primaryButton: .destructive(Text("delete")),
+                secondaryButton: .cancel(Text("cancel"))
             )
         }
     }
@@ -108,7 +106,7 @@ struct TaskListView: View {
                     .strikethrough(task.status == "completed")
 
                 if let due = task.dueDate {
-                    Text("⏰ \(due.formatted(date: .abbreviated, time: .shortened))")
+                    Text("task_due_prefix \(due.formatted(date: .abbreviated, time: .shortened))")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

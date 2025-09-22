@@ -1,316 +1,345 @@
 // SeedData.swift
+// Inserta seeds guardando KEYS (no textos localizados).
+// Versión NO destructiva: sólo inserta si no hay crops en Core Data.
+
 import Foundation
 import CoreData
 
 struct SeedData {
-    /// Inserta datos de ejemplo SOLO si no hay crops en Core Data.
     static func populateIfNeeded(context: NSManagedObjectContext) {
-        let request = NSFetchRequest<NSManagedObject>(entityName: "Crop")
+        // Verificar si ya existen crops
+        let request: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "Crop")
         request.fetchLimit = 1
-        if let count = try? context.count(for: request), count > 0 {
-            let all = try? context.fetch(NSFetchRequest<NSManagedObject>(entityName: "Crop"))
-                all?.forEach { context.delete($0) }        }
+        do {
+            let count = try context.count(for: request)
+            if count > 0 {
+                print("SeedData: ya existen crops (\(count)), no se insertan seeds.")
+                return
+            }
+        } catch {
+            print("SeedData: error comprobando crops existentes: \(error.localizedDescription)")
+        }
 
-        // Definición de seeds: datos base + info extendida
+        // Definición de semillas con KEYS (todas deben existir en Localizable.strings)
         let seeds: [(nameKey: String,
-                     category: String,
-                     difficulty: String,
+                     categoryKey: String,
+                     difficultyKey: String,
                      descKey: String,
                      seasons: [String],
                      steps: [String],
+                     stepDescriptions: [String],
                      stepDurations: [Int],
-                     soil: String,
-                     watering: String,
-                     sunlight: String,
-                     temperature: String,
-                     fertilization: String,
-                     climate: String,
-                     plagues: String,
+                     soilKey: String,
+                     wateringKey: String,
+                     sunlightKey: String,
+                     temperatureKey: String,
+                     fertilizationKey: String,
+                     climateKey: String,
+                     plaguesKey: String,
                      imageName: String,
-                     companions: String?,
+                     companionsKey: String?,
                      germinationDays: Int32,
-                     wateringFrequency: String?,
-                     harvestMonths: [String]?)] = [
+                     wateringFrequencyKey: String?,
+                     harvestMonthsKeys: [String]?)] = [
 
-            // TOMATE 🍅
+            // TOMATE
             (
                 nameKey: "crop_tomato_name",
-                category: "Hortaliza",
-                difficulty: "Fácil",
+                categoryKey: "category_vegetable",
+                difficultyKey: "crop_difficulty_easy",
                 descKey: "crop_tomato_desc",
                 seasons: ["season_spring", "season_summer"],
                 steps: ["step_germination", "step_transplant", "step_growth", "step_harvest"],
+                stepDescriptions: ["step_germination_desc", "step_transplant_desc", "step_growth_desc", "step_harvest_desc"],
                 stepDurations: [7, 14, 60, 14],
-                soil: "Suelo franco, rico en materia orgánica",
-                watering: "Riego frecuente, cada 2-3 días",
-                sunlight: "Pleno sol (6-8 horas)",
-                temperature: "18-28°C",
-                fertilization: "Aportar compost cada 15 días",
-                climate: "Clima templado, sensible a heladas",
-                plagues: "Pulgones, mosca blanca, mildiu, araña roja, gusano del tomate",
+                soilKey: "soil_franco_organic",
+                wateringKey: "watering_every_2_3_days",
+                sunlightKey: "sun_full_sun",
+                temperatureKey: "temp_18_28",
+                fertilizationKey: "fert_compost_every_15_days",
+                climateKey: "climate_temperate_sensitive_frost",
+                plaguesKey: "plagues_tomato_common",
                 imageName: "tomato",
-                companions: "✅ Albahaca, zanahoria, cebolla | ❌ Patatas, hinojo",
+                companionsKey: "companions_tomato",
                 germinationDays: 7,
-                wateringFrequency: "Cada 2-3 días",
-                harvestMonths: ["Julio", "Agosto", "Septiembre"]
+                wateringFrequencyKey: "watering_freq_every_2_3_days",
+                harvestMonthsKeys: ["month_july", "month_august", "month_september"]
             ),
 
-            // LECHUGA 🥬
+            // LECHUGA
             (
                 nameKey: "crop_lettuce_name",
-                category: "Hortaliza",
-                difficulty: "Muy fácil",
+                categoryKey: "category_vegetable",
+                difficultyKey: "crop_difficulty_very_easy",
                 descKey: "crop_lettuce_desc",
                 seasons: ["season_spring", "season_autumn"],
                 steps: ["step_sowing_direct", "step_thinning", "step_growth", "step_harvest"],
+                stepDescriptions: ["step_sowing_direct_desc", "step_thinning_desc", "step_growth_desc", "step_harvest_desc"],
                 stepDurations: [5, 7, 30, 7],
-                soil: "Suelo ligero y fértil",
-                watering: "Mantener humedad constante",
-                sunlight: "Sol parcial o pleno sol",
-                temperature: "10-20°C",
-                fertilization: "Abonar ligeramente con nitrógeno",
-                climate: "Prefiere clima fresco, tolera ligeras heladas",
-                plagues: "Pulgones, babosas/limacos, trips",
+                soilKey: "soil_light_fertile",
+                wateringKey: "watering_keep_moist",
+                sunlightKey: "sun_partial_or_full",
+                temperatureKey: "temp_10_20",
+                fertilizationKey: "fert_nitrogen_light",
+                climateKey: "climate_cool_tolerates_frost",
+                plaguesKey: "plagues_lettuce_common",
                 imageName: "lettuce",
-                companions: "✅ Zanahorias, rábanos | ❌ Apio",
+                companionsKey: "companions_lettuce",
                 germinationDays: 5,
-                wateringFrequency: "Cada 1-2 días",
-                harvestMonths: ["Abril", "Mayo", "Octubre"]
+                wateringFrequencyKey: "watering_freq_every_1_2_days",
+                harvestMonthsKeys: ["month_april", "month_may", "month_october"]
             ),
 
-            // ALBAHACA 🌿
+            // ALBAHACA
             (
                 nameKey: "crop_basil_name",
-                category: "Hierba",
-                difficulty: "Fácil",
+                categoryKey: "category_herb",
+                difficultyKey: "crop_difficulty_easy",
                 descKey: "crop_basil_desc",
                 seasons: ["season_summer"],
                 steps: ["step_sowing", "step_growth", "step_harvest"],
+                stepDescriptions: ["step_sowing_desc", "step_growth_desc", "step_harvest_desc"],
                 stepDurations: [7, 45, 7],
-                soil: "Suelo bien drenado",
-                watering: "Riego moderado, evitar encharcamiento",
-                sunlight: "Pleno sol",
-                temperature: "18-30°C",
-                fertilization: "Aplicar fertilizante orgánico cada 20 días",
-                climate: "Clima cálido, no tolera heladas",
-                plagues: "Pulgones, mosca blanca, oídio (moho polvoriento)",
+                soilKey: "soil_well_drained",
+                wateringKey: "watering_moderate_avoid_waterlogging",
+                sunlightKey: "sun_full_sun",
+                temperatureKey: "temp_18_30",
+                fertilizationKey: "fert_organic_every_20_days",
+                climateKey: "climate_warm_not_frost_tolerant",
+                plaguesKey: "plagues_basil_common",
                 imageName: "basil",
-                companions: "✅ Tomate, pimientos | ❌ Pepino, ruda",
+                companionsKey: "companions_basil",
                 germinationDays: 7,
-                wateringFrequency: "Cada 2-3 días",
-                harvestMonths: ["Junio", "Julio", "Agosto"]
+                wateringFrequencyKey: "watering_freq_every_2_3_days",
+                harvestMonthsKeys: ["month_june", "month_july", "month_august"]
             ),
 
-            // FRESA 🍓
+            // FRESA
             (
                 nameKey: "crop_strawberry_name",
-                category: "Fruta",
-                difficulty: "Media",
+                categoryKey: "category_fruit",
+                difficultyKey: "crop_difficulty_medium",
                 descKey: "crop_strawberry_desc",
                 seasons: ["season_spring", "season_summer"],
                 steps: ["step_planting", "step_vegetative", "step_flowering", "step_harvest"],
+                stepDescriptions: ["step_planting_desc", "step_vegetative_desc", "step_flowering_desc", "step_harvest_desc"],
                 stepDurations: [14, 60, 30, 14],
-                soil: "Suelo arenoso y fértil",
-                watering: "Riego regular, mantener suelo húmedo",
-                sunlight: "Pleno sol o semisombra ligera",
-                temperature: "15-25°C",
-                fertilization: "Aplicar potasio durante la floración",
-                climate: "Clima templado, no soporta calor extremo",
-                plagues: "Araña roja, babosas, botrytis (moho gris)",
+                soilKey: "soil_sandy_fertile",
+                wateringKey: "watering_regular_keep_moist",
+                sunlightKey: "sun_full_or_partial",
+                temperatureKey: "temp_15_25",
+                fertilizationKey: "fert_high_potassium_flowering",
+                climateKey: "climate_temperate_no_extreme_heat",
+                plaguesKey: "plagues_strawberry_common",
                 imageName: "strawberry",
-                companions: "✅ Espinaca, lechuga | ❌ Coles",
+                companionsKey: "companions_strawberry",
                 germinationDays: 14,
-                wateringFrequency: "Cada 2-3 días",
-                harvestMonths: ["Mayo", "Junio"]
+                wateringFrequencyKey: "watering_freq_every_2_3_days",
+                harvestMonthsKeys: ["month_may", "month_june"]
             ),
 
-            // PEPINO 🥒
+            // PEPINO
             (
                 nameKey: "crop_cucumber_name",
-                category: "Hortaliza",
-                difficulty: "Fácil",
+                categoryKey: "category_vegetable",
+                difficultyKey: "crop_difficulty_easy",
                 descKey: "crop_cucumber_desc",
                 seasons: ["season_spring", "season_summer"],
                 steps: ["step_sowing", "step_transplant", "step_growth", "step_harvest"],
+                stepDescriptions: ["step_sowing_desc", "step_transplant_desc", "step_growth_desc", "step_harvest_desc"],
                 stepDurations: [10, 15, 50, 12],
-                soil: "Suelo suelto y bien drenado",
-                watering: "Riego constante, evitar sequías",
-                sunlight: "Pleno sol",
-                temperature: "18-30°C",
-                fertilization: "Fertilización rica en potasio durante fructificación",
-                climate: "Clima cálido, sensible al frío",
-                plagues: "Pulgones, mosca blanca, ácaros, oídio, gusanos de cucurbitáceas",
+                soilKey: "soil_loose_well_drained",
+                wateringKey: "watering_consistent_avoid_drought",
+                sunlightKey: "sun_full_sun",
+                temperatureKey: "temp_18_30",
+                fertilizationKey: "fert_high_potassium_fruiting",
+                climateKey: "climate_warm_sensitive_cold",
+                plaguesKey: "plagues_cucumber_common",
                 imageName: "cucumber",
-                companions: "✅ Maíz, girasol | ❌ Patatas, hierbas aromáticas",
+                companionsKey: "companions_cucumber",
                 germinationDays: 10,
-                wateringFrequency: "Cada 2 días",
-                harvestMonths: ["Julio", "Agosto"]
+                wateringFrequencyKey: "watering_freq_every_2_days",
+                harvestMonthsKeys: ["month_july", "month_august"]
             ),
-
-            // PIMIENTO 🌶
+            
+            // PIMIENTO
             (
                 nameKey: "crop_pepper_name",
-                category: "Hortaliza",
-                difficulty: "Media",
+                categoryKey: "category_vegetable",
+                difficultyKey: "crop_difficulty_medium",
                 descKey: "crop_pepper_desc",
                 seasons: ["season_spring", "season_summer"],
-                steps: ["step_germination", "step_transplant", "step_growth", "step_harvest"],
-                stepDurations: [14, 20, 80, 20],
-                soil: "Suelo fértil con buen drenaje",
-                watering: "Riego moderado, evitar encharcamientos",
-                sunlight: "Pleno sol",
-                temperature: "20-30°C",
-                fertilization: "Aporte de nitrógeno y fósforo en crecimiento",
-                climate: "Clima cálido, no tolera heladas",
-                plagues: "Pulgones, ácaros, mosca blanca, nematodos",
+                steps: ["step_sowing", "step_transplant", "step_growth", "step_harvest"],
+                stepDescriptions: ["step_sowing_desc", "step_transplant_desc", "step_growth_desc", "step_harvest_desc"],
+                stepDurations: [10, 20, 70, 20],
+                soilKey: "soil_fertile_well_drained",
+                wateringKey: "watering_regular_keep_moist",
+                sunlightKey: "sun_full_sun",
+                temperatureKey: "temp_20_30",
+                fertilizationKey: "fert_high_potassium_fruiting",
+                climateKey: "climate_warm_sensitive_cold",
+                plaguesKey: "plagues_pepper_common",
                 imageName: "pepper",
-                companions: "✅ Albahaca, zanahoria | ❌ Judías",
-                germinationDays: 14,
-                wateringFrequency: "Cada 2-3 días",
-                harvestMonths: ["Agosto", "Septiembre"]
+                companionsKey: "companions_pepper",
+                germinationDays: 10,
+                wateringFrequencyKey: "watering_freq_every_2_3_days",
+                harvestMonthsKeys: ["month_august", "month_september"]
             ),
 
-            // ZANAHORIA 🥕
+            // ZANAHORIA
             (
                 nameKey: "crop_carrot_name",
-                category: "Hortaliza",
-                difficulty: "Muy fácil",
+                categoryKey: "category_vegetable",
+                difficultyKey: "crop_difficulty_easy",
                 descKey: "crop_carrot_desc",
                 seasons: ["season_spring", "season_autumn"],
                 steps: ["step_sowing_direct", "step_thinning", "step_growth", "step_harvest"],
-                stepDurations: [7, 14, 70, 15],
-                soil: "Suelo profundo, suelto y arenoso",
-                watering: "Mantener humedad ligera y constante",
-                sunlight: "Pleno sol",
-                temperature: "10-24°C",
-                fertilization: "Evitar exceso de nitrógeno para no deformar raíces",
-                climate: "Prefiere clima fresco, tolera heladas suaves",
-                plagues: "Mosca de la zanahoria, pulgones, gusanos de raíz",
+                stepDescriptions: ["step_sowing_direct_desc", "step_thinning_desc", "step_growth_desc", "step_harvest_desc"],
+                stepDurations: [7, 10, 60, 20],
+                soilKey: "soil_loose_sandy",
+                wateringKey: "watering_regular_keep_moist",
+                sunlightKey: "sun_full_or_partial",
+                temperatureKey: "temp_10_25",
+                fertilizationKey: "fert_low_nitrogen",
+                climateKey: "climate_cool_tolerates_frost",
+                plaguesKey: "plagues_carrot_common",
                 imageName: "carrot",
-                companions: "✅ Guisantes, lechugas | ❌ Eneldo",
+                companionsKey: "companions_carrot",
                 germinationDays: 7,
-                wateringFrequency: "Cada 3 días",
-                harvestMonths: ["Junio", "Julio", "Octubre"]
+                wateringFrequencyKey: "watering_freq_every_2_days",
+                harvestMonthsKeys: ["month_june", "month_july", "month_october"]
             ),
 
-            // CEBOLLA 🧅
+            // CEBOLLA
             (
                 nameKey: "crop_onion_name",
-                category: "Hortaliza",
-                difficulty: "Media",
+                categoryKey: "category_vegetable",
+                difficultyKey: "crop_difficulty_easy",
                 descKey: "crop_onion_desc",
                 seasons: ["season_winter", "season_spring"],
                 steps: ["step_sowing", "step_transplant", "step_growth", "step_harvest"],
-                stepDurations: [14, 20, 100, 20],
-                soil: "Suelo ligero y bien aireado",
-                watering: "Riego moderado, suspender antes de cosecha",
-                sunlight: "Pleno sol",
-                temperature: "12-25°C",
-                fertilization: "Fósforo y potasio al inicio del crecimiento",
-                climate: "Clima templado-frío, resistente a heladas leves",
-                plagues: "Trips, mosca de la cebolla, mildiu",
+                stepDescriptions: ["step_sowing_desc", "step_transplant_desc", "step_growth_desc", "step_harvest_desc"],
+                stepDurations: [14, 20, 90, 30],
+                soilKey: "soil_loose_fertile",
+                wateringKey: "watering_moderate_avoid_waterlogging",
+                sunlightKey: "sun_full_or_partial",
+                temperatureKey: "temp_10_25",
+                fertilizationKey: "fert_balanced",
+                climateKey: "climate_temperate_tolerates_cold",
+                plaguesKey: "plagues_onion_common",
                 imageName: "onion",
-                companions: "✅ Zanahorias, remolachas | ❌ Guisantes",
+                companionsKey: "companions_onion",
                 germinationDays: 14,
-                wateringFrequency: "Cada 3-4 días",
-                harvestMonths: ["Julio", "Agosto"]
+                wateringFrequencyKey: "watering_freq_every_3_days",
+                harvestMonthsKeys: ["month_july", "month_august", "month_september"]
             ),
 
-            // SANDÍA 🍉
+            // SANDÍA
             (
                 nameKey: "crop_watermelon_name",
-                category: "Fruta",
-                difficulty: "Difícil",
+                categoryKey: "category_fruit",
+                difficultyKey: "crop_difficulty_hard",
                 descKey: "crop_watermelon_desc",
-                seasons: ["season_summer"],
-                steps: ["step_sowing", "step_growth", "step_flowering", "step_fruit_set", "step_harvest"],
-                stepDurations: [10, 40, 20, 30, 20],
-                soil: "Suelo profundo, arenoso y rico en materia orgánica",
-                watering: "Riego abundante en crecimiento, reducir antes de cosecha",
-                sunlight: "Pleno sol (8h mínimo)",
-                temperature: "22-32°C",
-                fertilization: "Alto potasio en fructificación",
-                climate: "Clima cálido-seco, no soporta heladas",
-                plagues: "Pulgones, ácaros, gusanos del fruto, oídio",
+                seasons: ["season_spring", "season_summer"],
+                steps: ["step_sowing", "step_growth", "step_flowering", "step_harvest"],
+                stepDescriptions: ["step_sowing_desc", "step_growth_desc", "step_flowering_desc", "step_harvest_desc"],
+                stepDurations: [10, 60, 30, 20],
+                soilKey: "soil_sandy_well_drained",
+                wateringKey: "watering_abundant",
+                sunlightKey: "sun_full_sun",
+                temperatureKey: "temp_20_35",
+                fertilizationKey: "fert_high_potassium_fruiting",
+                climateKey: "climate_hot_sensitive_cold",
+                plaguesKey: "plagues_watermelon_common",
                 imageName: "watermelon",
-                companions: "✅ Maíz, girasol | ❌ Patatas",
+                companionsKey: "companions_watermelon",
                 germinationDays: 10,
-                wateringFrequency: "Cada 2-3 días",
-                harvestMonths: ["Agosto", "Septiembre"]
+                wateringFrequencyKey: "watering_freq_every_day",
+                harvestMonthsKeys: ["month_july", "month_august"]
             ),
 
-            // MAÍZ 🌽
+            // MAÍZ
             (
                 nameKey: "crop_corn_name",
-                category: "Hortaliza",
-                difficulty: "Fácil",
+                categoryKey: "category_vegetable",
+                difficultyKey: "crop_difficulty_medium",
                 descKey: "crop_corn_desc",
                 seasons: ["season_spring", "season_summer"],
-                steps: ["step_sowing_direct", "step_growth", "step_pollination", "step_harvest"],
-                stepDurations: [10, 45, 20, 30],
-                soil: "Suelo fértil y profundo",
-                watering: "Riego regular, especialmente en floración",
-                sunlight: "Pleno sol",
-                temperature: "18-30°C",
-                fertilization: "Requiere nitrógeno abundante",
-                climate: "Clima cálido-templado, sensible a heladas",
-                plagues: "Taladro del maíz, gusano cogollero, pulgones",
+                steps: ["step_sowing_direct", "step_growth", "step_harvest"],
+                stepDescriptions: ["step_sowing_direct_desc", "step_growth_desc", "step_harvest_desc"],
+                stepDurations: [10, 70, 20],
+                soilKey: "soil_fertile_well_drained",
+                wateringKey: "watering_regular_keep_moist",
+                sunlightKey: "sun_full_sun",
+                temperatureKey: "temp_18_30",
+                fertilizationKey: "fert_nitrogen_high",
+                climateKey: "climate_warm_sensitive_cold",
+                plaguesKey: "plagues_corn_common",
                 imageName: "corn",
-                companions: "✅ Calabaza, pepino | ❌ Tomate",
+                companionsKey: "companions_corn",
                 germinationDays: 10,
-                wateringFrequency: "Cada 2-3 días",
-                harvestMonths: ["Agosto", "Septiembre"]
+                wateringFrequencyKey: "watering_freq_every_2_days",
+                harvestMonthsKeys: ["month_august", "month_september"]
             )
+
+            // 👉 Aquí agregas también pepper, carrot, onion, watermelon, corn siguiendo el mismo esquema
         ]
 
+        // Insertar en Core Data
         for seed in seeds {
-            let cropEntity = Crop(context: context)
-            cropEntity.cropID = UUID()
-            cropEntity.name = NSLocalizedString(seed.nameKey, comment: "")
-            cropEntity.category = seed.category
-            cropEntity.difficulty = seed.difficulty
-            cropEntity.cropDescription = NSLocalizedString(seed.descKey, comment: "")
-            cropEntity.recommendedSeasons = seed.seasons as NSArray
-            cropEntity.createdAt = Date()
-            cropEntity.updatedAt = Date()
-            cropEntity.imageName = seed.imageName
+            guard let cropEntity = NSEntityDescription.entity(forEntityName: "Crop", in: context) else { continue }
+            let crop = Crop(entity: cropEntity, insertInto: context)
 
-            // Crear steps asociados
+            crop.cropID = UUID()
+            crop.name = seed.nameKey
+            crop.category = seed.categoryKey
+            crop.difficulty = seed.difficultyKey
+            crop.cropDescription = seed.descKey
+            crop.recommendedSeasons = seed.seasons as NSArray
+            crop.createdAt = Date()
+            crop.updatedAt = Date()
+            crop.imageName = seed.imageName
+
+            // Steps
             for (index, stepKey) in seed.steps.enumerated() {
-                let step = Step(context: context)
-                step.stepID = UUID()
-                step.title = NSLocalizedString(stepKey, comment: "")
-                let stepTitleLocalized = NSLocalizedString(stepKey, comment: "")
-                step.stepDescription = String(format: NSLocalizedString("step_description_template", comment: ""), stepTitleLocalized)
-                step.estimateDuration = Int32(seed.stepDurations[index])
-                step.order = Int16(index + 1)
-                step.crop = cropEntity
+                if let stepEntity = NSEntityDescription.entity(forEntityName: "Step", in: context) {
+                    let step = Step(entity: stepEntity, insertInto: context)
+                    step.stepID = UUID()
+                    step.title = stepKey
+                    step.stepDescription = seed.stepDescriptions[index]
+                    step.estimateDuration = Int32(seed.stepDurations[index])
+                    step.order = Int16(index + 1)
+                    step.crop = crop
+                }
             }
 
-            // Crear info asociada
+            // CropInfo
             if let cropInfoEntity = NSEntityDescription.entity(forEntityName: "CropInfo", in: context) {
-                let info = NSManagedObject(entity: cropInfoEntity, insertInto: context)
-                info.setValue(UUID(), forKey: "infoID")
-                info.setValue(seed.soil, forKey: "soilType")
-                info.setValue(seed.watering, forKey: "watering")
-                info.setValue(seed.sunlight, forKey: "sunlight")
-                info.setValue(seed.temperature, forKey: "temperatureRange")
-                info.setValue(seed.fertilization, forKey: "fertilizationTips")
-                info.setValue(seed.climate, forKey: "climate")
-                info.setValue(seed.plagues, forKey: "plagues")
-                info.setValue(seed.companions, forKey: "companions")
-                info.setValue(seed.germinationDays, forKey: "germinationDays")
-                info.setValue(seed.wateringFrequency, forKey: "wateringFrequency")
-                info.setValue(seed.harvestMonths, forKey: "harvestMonths")
-                // set relationships (KVC-safe)
-                info.setValue(cropEntity, forKey: "crop")
-                cropEntity.setValue(info, forKey: "info")
+                let info = CropInfo(entity: cropInfoEntity, insertInto: context)
+                info.infoID = UUID()
+                info.soilType = seed.soilKey
+                info.watering = seed.wateringKey
+                info.sunlight = seed.sunlightKey
+                info.temperatureRange = seed.temperatureKey
+                info.fertilizationTips = seed.fertilizationKey
+                info.climate = seed.climateKey
+                info.plagues = seed.plaguesKey
+                info.companions = seed.companionsKey
+                info.germinationDays = seed.germinationDays
+                info.wateringFrequency = seed.wateringFrequencyKey
+                if let monthsKeys = seed.harvestMonthsKeys {
+                    info.harvestMonths = monthsKeys as NSArray
+                }
+                info.crop = crop
             }
         }
 
+        // Guardar
         do {
-            try context.save()
-            print("🌱 SeedData: datos de ejemplo insertados (cultivos + pasos + info).")
+            if context.hasChanges {
+                try context.save()
+            }
+            print("🌱 SeedData: seeds insertadas (usando KEYS).")
         } catch {
             print("❌ SeedData: error guardando seeds: \(error.localizedDescription)")
         }

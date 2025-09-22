@@ -1,607 +1,501 @@
-"intro_title" = "Welcome to CosechiOs";
-"intro_subtitle" = "Your guide to grow at home";
+// MARK: - LoadingView
+"loading_preparing" = "Preparing...";
+"loading_inserting" = "Inserting initial data...";
+"loading_finalizing" = "Finalizing setup...";
+"loading_ready" = "Ready to start!";
+"progress_percent" = "%d%%";
 
-"register" = "Register";
-"login" = "Login";
-"logout" = "Logout";
-
-"menu_my_crops" = "My Crops";
-"menu_explore" = "Explore Crops";
-"menu_tasks" = "Task Calendar";
-"menu_profile" = "User Profile";
-
-"profile_title" = "Profile";
-"profile_username" = "Username";
-"profile_email" = "Email";
-"profile_notifications" = "Notifications";
-"profile_language" = "Language";
-"profile_theme" = "Theme";
-"profile_delete_photo" = "Remove profile photo";
-"profile_export" = "Export data (backup)";
-
-"task_summary_title" = "Task Summary";
-"task_completed" = "Completed";
-"task_pending" = "Pending";
-"task_overdue" = "Overdue";
-"task_progress" = "Progress";
-"task_no_tasks" = "No tasks yet";
-
-"progress_note" = "Progress note";
-"progress_photo" = "Optional photo";
-"remove_photo" = "Remove photo";
-"add_photo" = "Add photo";
-"new_progress" = "New Progress";
-"cancel" = "Cancel";
-"save" = "Save";
-"progress_history" = "Progress History";
-"no_progress_yet" = "No progress logs yet.";
-"add_progress" = "Add progress";
-
-"dashboard_title" = "Dashboard";
-"dashboard_greeting" = "Hello!";
-"dashboard_greeting_name %@" = "Hello, %@!";
-"dashboard_subtitle" = "Here’s a quick overview of your progress";
-"dashboard_summary" = "Task Summary";
-"dashboard_tasks" = "tasks";
-"dashboard_completed" = "Completed";
-"dashboard_no_tasks" = "No tasks yet";
-"dashboard_overdue_count" = "%d overdue tasks";
-
-"dashboard_action_add_task" = "New Task";
-"dashboard_action_explore" = "Explore";
-"dashboard_action_my_crops" = "My Crops";
-"dashboard_action_profile" = "Profile";
-
-"dashboard_upcoming_tasks" = "Upcoming Tasks";
-"dashboard_no_upcoming" = "No upcoming tasks";
-
-"dashboard_my_crops" = "Crops in My Collection";
-"dashboard_no_crops" = "You don’t have saved crops";
-
-"dashboard_recent_progress" = "Recent Progress Logs";
-"dashboard_no_progress" = "No progress logs yet";
-"dashboard_progress_log_no_crop" = "No crop";
-"dashboard_progress_no_note" = "No note";
-
-"progress_note" = "Progress note";
-"progress_photo" = "Progress photo";
-"progress_category" = "Category";
-"new_progress" = "New progress";
-"add_photo" = "Add photo";
-"remove_photo" = "Remove photo";
-"edit_progress" = "Edit progress";
-
-"loading_preparing" = "Preparing application…";
-"loading_inserting" = "Inserting initial data…";
-"loading_finalizing" = "Finalizing…";
-"loading_ready" = "Ready";
-"progress_percent %d" = "%d percent progress"; // (para accesibilidad)
-
-"register_title" = "Create Account";
-"register_navtitle" = "Register";
+// MARK: - RegisterView
+"register_title" = "Create account";
 "register_username" = "Username";
 "register_email" = "Email";
 "register_password" = "Password";
-"register_confirm_password" = "Confirm Password";
-"register_button" = "Register";
+"register_confirm_password" = "Confirm password";
+"register_button" = "Sign up";
+"register_navtitle" = "Register";
 "error_password_mismatch" = "Passwords do not match.";
 
-"login_title" = "Sign In";
-"login_navtitle" = "Login";
+// MARK: - LoginView
+"login_title" = "Login";
 "login_email" = "Email";
 "login_password" = "Password";
-"login_button" = "Login";
+"login_button" = "Sign in";
+"login_navtitle" = "Access";
 
-"menu_all_tasks" = "All My Tasks";
-"app_name" = "CosechiOs";
-
-"profile_gallery" = "Gallery";
-"profile_camera" = "Camera";
-"theme_auto" = "Automatic";
-"theme_light" = "Light";
-"theme_dark" = "Dark";
-"save" = "Save";
-"alert_title" = "Notice";
-"ok" = "OK";
-"profile_saved_success" = "Profile saved successfully.";
-"profile_saved_error" = "Error saving profile: %@";
-
-"task_filter" = "Filter";
-"task_all" = "All";
-"task_today" = "Today";
-"task_upcoming" = "Upcoming";
-"task_delete_title" = "Delete Task";
-"task_delete_message" = "Do you want to delete this task?";
-"delete" = "Delete";
-"task_no_title" = "Untitled";
-"task_crop_prefix" = "Crop:";
-"edit_task" = "Edit Task";
-"mycrops_empty" = "You don’t have crops in your collection.";
-"crop_default" = "Crop";
-"crop_no_name" = "No name";
-
-"filter_all" = "All";
-"filter_vegetable" = "Vegetable";
-"filter_herb" = "Herb";
-"filter_fruit" = "Fruit";
-"filter_category" = "Category";
-"search_crops" = "Search crops";
-
-"task_advanced_notification" = "Advanced Notification";
-"task_repeat" = "Repeat";
-"repeat_none" = "None";
-"repeat_daily" = "Daily";
-"repeat_weekly" = "Weekly";
-"repeat_monthly" = "Monthly";
-"task_remember_days_before" = "Remember days before";
-"task_days_before %d" = "%d days before";
-"task_associated_crop" = "Associated crop";
-"task_not_found" = "Task not found";
-"task_not_found_message" = "The task you are trying to edit no longer exists.";
-"ok" = "OK";
-
-// EditProgressLogView
-"progress_note" = "Progress note";
-"progress_category" = "Category";
-"progress_photo" = "Photo";
-"progress_general" = "General";
-"progress_irrigation" = "Irrigation";
-"progress_fertilization" = "Fertilization";
-"progress_pest" = "Pest";
-"progress_harvest" = "Harvest";
-"remove_photo" = "Remove photo";
-"add_photo" = "Add photo";
-"edit_progress" = "Edit progress";
-"cancel" = "Cancel";
-"save" = "Save";
-
-// CropDetailView
-"crop_default" = "Crop";
-"crop_seasons" = "🌦️ Recommended seasons:";
-"crop_remove_my" = "Remove from My Crops";
-"crop_add_my" = "Add to My Crops";
-"crop_add_task" = "➕ Add Task";
-"crop_tasks_title" = "📅 Tasks for this crop";
-"task_default" = "Task";
-"crop_steps" = "📋 Growing steps";
-"step_default" = "Step";
-"crop_progress_title" = "📖 Progress History";
-"crop_progress_empty" = "No progress logs yet.";
-"crop_add_progress" = "Add progress";
-
-// AddTaskView
-"task_info" = "Task details";
-"task_title" = "Title";
-"task_details" = "Description";
-"task_due_date" = "Date";
-"task_reminder" = "Reminder";
-
-"task_advanced_notification" = "Advanced notification";
-"task_repeat" = "Repeat";
-"repeat_none" = "None";
-"repeat_daily" = "Daily";
-"repeat_weekly" = "Weekly";
-"repeat_monthly" = "Monthly";
-
-"task_remember_days_before" = "Remember days before";
-"task_days_before" = "%d days before";
-
-"task_associated_crop" = "Associated crop";
-"task_new" = "New Task";
-
-// DashboardView
+// MARK: - MainMenuView
 "dashboard_title" = "Dashboard";
-"dashboard_greeting" = "Welcome back 👋";
-"dashboard_greeting_name" = "Hello, %@ 👋";
-"dashboard_subtitle" = "Here’s your activity summary";
+"menu_my_crops" = "My crops";
+"menu_explore" = "Explore crops";
+"menu_tasks" = "Task calendar";
+"menu_all_tasks" = "All tasks";
+"menu_profile" = "Profile";
+"logout" = "Log out";
+"app_name" = "CosechiOS";
 
-"dashboard_summary" = "Summary";
-"dashboard_tasks" = "tasks";
-"dashboard_completed" = "Completed";
-"dashboard_no_tasks" = "No tasks yet.";
-"dashboard_overdue_count" = "%d overdue tasks";
+// MARK: - RecommendationHelper (reasons + seasons)
+"recommendations_reason_season" = "It’s ideal for the %@ season.";
+"recommendations_reason_new" = "You haven’t grown this yet, it might interest you.";
+"recommendations_reason_difficulty" = "Suitable difficulty level: %@.";
+"recommendations_reason_difficulty_default" = "intermediate";
 
-"dashboard_upcoming_tasks" = "Upcoming tasks";
-"dashboard_no_upcoming" = "No upcoming tasks.";
-
-"dashboard_my_crops" = "My Crops";
-"dashboard_no_crops" = "You don’t have crops in your collection yet.";
-
-"dashboard_recent_progress" = "Recent progress logs";
-"dashboard_no_progress" = "No progress logs yet.";
-"dashboard_progress_no_note" = "No note";
-"dashboard_progress_log_no_crop" = "No crop";
-
-"dashboard_action_add_task" = "New task";
-"dashboard_action_explore" = "Explore";
-"dashboard_action_my_crops" = "My crops";
-"dashboard_action_profile" = "Profile";
-
-/* Crops */
-"crop_tomato_name" = "Tomato";
-"crop_tomato_desc" = "A red-fruited plant popular in urban gardens.";
-"crop_lettuce_name" = "Lettuce";
-"crop_lettuce_desc" = "Great for beginners — fast-growing and low-space.";
-"crop_basil_name" = "Basil";
-"crop_basil_desc" = "Aromatic herb ideal for pots and balconies.";
-"crop_strawberry_name" = "Strawberry";
-"crop_strawberry_desc" = "Sweet fruits; needs sun and regular care.";
-
-"step_germination" = "Germination";
-"step_transplant" = "Transplant";
-"step_growth" = "Vegetative growth";
-"step_harvest" = "Harvest";
-"step_sowing_direct" = "Direct sowing";
-"step_thinning" = "Thinning";
-"step_sowing" = "Sowing";
-"step_planting" = "Planting";
-"step_vegetative" = "Vegetative growth";
-"step_flowering" = "Flowering";
-
-"step_description_template" = "Step: %@";
-
-/* Seasons */
 "season_spring" = "Spring";
 "season_summer" = "Summer";
 "season_autumn" = "Autumn";
 "season_winter" = "Winter";
 
-/* Crop UI labels */
+// MARK: - RecommendedCropsView
+"recommendations_title" = "Recommended crops";
+"recommendations_subtitle" = "Based on season, difficulty, and your experience";
+"recommendations_no_results" = "No recommendations found.";
+"recommendations_add" = "Add";
+"recommendations_error_not_logged" = "You must log in to add crops.";
+"recommendations_added" = "Crop added to your collection.";
+"recommendations_in_collection" = "This crop is already in your collection.";
 "crop_default" = "Crop";
-"crop_seasons" = "🌦️ Recommended seasons:";
-"crop_seasons_none" = "No recommended seasons.";
-"crop_add_my" = "Add to My Crops";
-"crop_remove_my" = "Remove from My Crops";
-"crop_add_task" = "➕ Add Task";
-"crop_tasks_title" = "📅 Tasks for this crop";
-"crop_steps" = "📋 Crop steps";
-"crop_progress_title" = "📖 Progress history";
-"crop_progress_empty" = "No progress logs yet.";
-"crop_add_progress" = "Add progress";
-"crop_recommended_now" = "Recommended now";
 
-/* Difficulty */
+// MARK: - UserProfileView
+"profile_title" = "Profile";
+"profile_username" = "Username";
+"profile_email" = "Email";
+
+"profile_achievements_section" = "Achievements";
+"profile_achievements_view_all" = "View all achievements";
+
+"profile_language" = "Language";
+"profile_notifications_settings" = "Notifications";
+"profile_notifications" = "Enable notifications";
+"profile_notify_tasks" = "Remind tasks";
+"profile_notify_crops" = "Remind crops";
+"profile_notify_tips" = "Tips and advice";
+"profile_notifications_history" = "Notification history";
+
+"profile_theme" = "Appearance";
+"theme_auto" = "Automatic";
+"theme_light" = "Light";
+"theme_dark" = "Dark";
+
+"profile_delete_photo" = "Delete profile photo";
+"profile_delete_photo_confirm" = "Do you want to delete your profile photo?";
+"profile_choose_image" = "Select image";
+"profile_take_photo" = "Take photo";
+"profile_choose_from_gallery" = "Choose from gallery";
+
+"profile_export" = "Export data";
+"profile_saved_success" = "Profile saved successfully.";
+"profile_saved_error" = "Error saving profile: %@";
+"profile_image_saved" = "Profile image saved.";
+"profile_image_save_error" = "Error saving image: %@";
+"profile_camera_unavailable" = "The camera is not available.";
+"profile_source_unavailable" = "Source not available.";
+
+"alert_title" = "Notice";
+"ok" = "OK";
+"cancel" = "Cancel";
+"delete" = "Delete";
+"save" = "Save";
+
+"history_no_notifications" = "No notifications recorded.";
+"history_title" = "Notification history";
+
+"notif_action_complete" = "Complete task";
+"notif_action_snooze" = "Snooze";
+"notif_action_view_crop" = "View crop";
+"notif_action_view_tips" = "View tips";
+
+"task_summary_title" = "Task summary";
+"task_pending" = "Pending";
+"task_completed" = "Completed";
+
+"task_filter" = "Task filter";
+"task_all" = "All";
+"task_today" = "Today";
+"task_upcoming" = "Upcoming";
+
+"task_delete_title" = "Delete task";
+"task_delete_message" = "Are you sure you want to delete this task?";
+
+"task_no_title" = "Untitled";
+"task_due_prefix" = "⏰";
+"task_crop_prefix" = "Crop:";
+
+"delete" = "Delete";
+"cancel" = "Cancel";
+
+// (reused)
+"task_no_title" = "Untitled";
+
+"statistics_title" = "Statistics";
+"statistics_subtitle" = "Summary of your activity in the app";
+
+"statistics_range_7" = "7 days";
+"statistics_range_30" = "30 days";
+"statistics_range_90" = "90 days";
+"statistics_range_all" = "All";
+
+"statistics_export_csv" = "Export CSV";
+
+"statistics_tasks" = "Tasks";
+"statistics_no_tasks" = "No tasks recorded";
+
+"statistics_metrics_completed" = "Completed";
+"statistics_metrics_pending" = "Pending";
+"statistics_metrics_overdue" = "Overdue";
+
+"statistics_progress" = "Progress";
+"statistics_no_progress_logs" = "No progress records";
+
+"statistics_top_crops" = "Most active crops";
+"statistics_no_top_crops" = "No featured crops";
+
+"statistics_notifications" = "Notifications";
+"statistics_no_notifications" = "No notification data";
+
+"statistics_summary_total_tasks" = "Total tasks";
+"statistics_summary_completed_pct" = "% Completed";
+"statistics_summary_my_crops" = "My crops";
+
+"crop_default" = "Crop";
+"mycrops_empty" = "You haven’t added any crops yet";
+
+"crop_tomato_name" = "Tomato";
+"crop_tomato_desc" = "Plant with red, juicy fruits, versatile in cooking.";
+
+"crop_lettuce_name" = "Lettuce";
+"crop_lettuce_desc" = "Vegetable with tender, fresh leaves, ideal for salads.";
+
+"crop_basil_name" = "Basil";
+"crop_basil_desc" = "Aromatic herb with a fresh flavor, used in sauces and dressings.";
+
+"crop_strawberry_name" = "Strawberry";
+"crop_strawberry_desc" = "Small, sweet red fruit, highly valued in desserts.";
+
+"crop_cucumber_name" = "Cucumber";
+"crop_cucumber_desc" = "Refreshing vegetable, rich in water, perfect for salads.";
+
+"crop_pepper_name" = "Pepper";
+"crop_pepper_desc" = "Vegetable with fleshy and colorful fruits, great for salads and stews.";
+
+"crop_carrot_name" = "Carrot";
+"crop_carrot_desc" = "Edible root rich in beta-carotene, easy to grow in loose soils.";
+
+"crop_onion_name" = "Onion";
+"crop_onion_desc" = "Aromatic bulb, essential in cooking, resistant to cold.";
+
+"crop_watermelon_name" = "Watermelon";
+"crop_watermelon_desc" = "Large, sweet, and juicy fruit, ideal in warm climates.";
+
+"crop_corn_name" = "Corn";
+"crop_corn_desc" = "Nutritious grain cereal, a staple in many foods.";
+
+"category_vegetable" = "Vegetable";
+"category_herb" = "Herb";
+"category_fruit" = "Fruit";
+
 "crop_difficulty_very_easy" = "Very easy";
 "crop_difficulty_easy" = "Easy";
 "crop_difficulty_medium" = "Medium";
 "crop_difficulty_hard" = "Hard";
 
-/* Small defaults */
-"task_default" = "Task";
-"step_default" = "Step";
-"days_abbr" = "days";
-
-/* Dynamic recommendations */
-"recommendations_title" = "Recommended for you";
-"recommendations_subtitle" = "Crops that might suit you right now";
-"recommendations_no_results" = "No recommendations at the moment.";
-"recommendations_add" = "Add to My Crops";
-"recommendations_added" = "Added to My Crops";
-"recommendations_in_collection" = "Already in your collection";
-"recommendations_error_not_logged" = "Please log in to add crops to your collection.";
-"recommendations_reason_season" = "Suitable season: %@";
-"recommendations_reason_difficulty" = "Difficulty: %@";
-"recommendations_reason_new" = "New to you";
-"recommendations_reason_difficulty_default" = "medium";
-
-/* Seasons */
 "season_spring" = "Spring";
 "season_summer" = "Summer";
 "season_autumn" = "Autumn";
 "season_winter" = "Winter";
 
-"dashboard_metrics_title" = "Your metrics";
+"month_april" = "April";
+"month_may" = "May";
+"month_june" = "June";
+"month_july" = "July";
+"month_august" = "August";
+"month_september" = "September";
+"month_october" = "October";
+
+"step_germination" = "Germination";
+"step_transplant" = "Transplant";
+"step_growth" = "Growth";
+"step_harvest" = "Harvest";
+"step_sowing_direct" = "Direct sowing";
+"step_thinning" = "Thinning";
+"step_sowing" = "Sowing";
+"step_planting" = "Planting";
+"step_vegetative" = "Vegetative stage";
+"step_flowering" = "Flowering";
+
+"step_germination_desc" = "Process in which the seed begins to develop.";
+"step_transplant_desc" = "Moving the seedling to its final place.";
+"step_growth_desc" = "Stage of vegetative plant growth.";
+"step_harvest_desc" = "Harvesting the crop at its optimal point.";
+"step_sowing_direct_desc" = "Sowing seeds directly in the soil.";
+"step_thinning_desc" = "Removing weak seedlings to promote development.";
+"step_sowing_desc" = "Placing seeds to start the crop.";
+"step_planting_desc" = "Action of planting sprouts or seeds in the field.";
+"step_vegetative_desc" = "Period of leaf and stem development.";
+"step_flowering_desc" = "Stage when the plant produces flowers.";
+
+"soil_franco_organic" = "Loam soil with organic matter";
+"soil_light_fertile" = "Light and fertile soil";
+"soil_well_drained" = "Well-drained soil";
+"soil_sandy_fertile" = "Sandy and fertile soil";
+"soil_loose_well_drained" = "Loose, well-drained soil";
+"soil_fertile_well_drained" = "Fertile, well-drained soil";
+"soil_loose_sandy" = "Loose, sandy soil";
+"soil_loose_fertile" = "Loose, fertile soil";
+"soil_sandy_well_drained" = "Sandy, well-drained soil";
+
+"watering_every_2_3_days" = "Watering every 2-3 days";
+"watering_keep_moist" = "Keep soil moist";
+"watering_moderate_avoid_waterlogging" = "Moderate watering, avoid waterlogging";
+"watering_regular_keep_moist" = "Regular watering, keep moisture";
+"watering_consistent_avoid_drought" = "Consistent watering, avoid drought";
+"watering_abundant" = "Abundant watering";
+
+"watering_freq_every_2_3_days" = "Watering frequency: every 2-3 days";
+"watering_freq_every_1_2_days" = "Watering frequency: every 1-2 days";
+"watering_freq_every_2_days" = "Watering frequency: every 2 days";
+"watering_freq_every_3_days" = "Watering frequency: every 3 days";
+"watering_freq_every_day" = "Watering frequency: daily";
+
+"sun_full_sun" = "Full sun";
+"sun_partial_or_full" = "Partial or full sun";
+"sun_full_or_partial" = "Full or partial sun";
+
+"temp_18_28" = "18°C - 28°C";
+"temp_10_20" = "10°C - 20°C";
+"temp_18_30" = "18°C - 30°C";
+"temp_15_25" = "15°C - 25°C";
+"temp_20_30" = "20°C - 30°C";
+"temp_10_25" = "10°C - 25°C";
+"temp_20_35" = "20°C - 35°C";
+
+"fert_compost_every_15_days" = "Apply compost every 15 days";
+"fert_nitrogen_light" = "Light nitrogen fertilization";
+"fert_organic_every_20_days" = "Organic fertilizer every 20 days";
+"fert_high_potassium_flowering" = "High-potassium fertilization during flowering";
+"fert_high_potassium_fruiting" = "High-potassium fertilization during fruiting";
+"fert_low_nitrogen" = "Low-nitrogen fertilization";
+"fert_balanced" = "Balanced fertilization";
+"fert_nitrogen_high" = "High-nitrogen fertilization";
+
+"climate_temperate_sensitive_frost" = "Temperate climate, frost-sensitive";
+"climate_cool_tolerates_frost" = "Cool climate, frost-tolerant";
+"climate_warm_not_frost_tolerant" = "Warm climate, not frost-tolerant";
+"climate_temperate_no_extreme_heat" = "Temperate climate, no extreme heat";
+"climate_warm_sensitive_cold" = "Warm climate, sensitive to cold";
+"climate_temperate_tolerates_cold" = "Temperate climate, cold-tolerant";
+"climate_hot_sensitive_cold" = "Hot climate, sensitive to cold";
+
+"plagues_tomato_common" = "Aphids, whiteflies, blight";
+"plagues_lettuce_common" = "Snails, slugs, aphids";
+"plagues_basil_common" = "Aphids, whiteflies, powdery mildew";
+"plagues_strawberry_common" = "Snails, mites, botrytis";
+"plagues_cucumber_common" = "Whiteflies, powdery mildew, mites";
+"plagues_pepper_common" = "Aphids, thrips, whiteflies";
+"plagues_carrot_common" = "Carrot fly, nematodes";
+"plagues_onion_common" = "Thrips, onion fly";
+"plagues_watermelon_common" = "Aphids, red spider mites, downy mildew";
+"plagues_corn_common" = "Fall armyworm, aphids";
+
+"companions_tomato" = "Basil, carrot, onion";
+"companions_lettuce" = "Carrot, onion, radish";
+"companions_basil" = "Tomato, peppers";
+"companions_strawberry" = "Lettuce, spinach";
+"companions_cucumber" = "Corn, sunflower";
+"companions_pepper" = "Basil, carrot, onion";
+"companions_carrot" = "Onion, leek, lettuce";
+"companions_onion" = "Carrot, lettuce, strawberry";
+"companions_watermelon" = "Corn, sunflower";
+"companions_corn" = "Squash, beans";
+
+"filter_all" = "All";
+"filter_vegetable" = "Vegetables";
+"filter_herb" = "Herbs";
+"filter_fruit" = "Fruits";
+"filter_category" = "Category";
+
+"crop_no_name" = "Unnamed crop";
+
+"menu_explore" = "Explore";
+"search_crops" = "Search crops";
+
+"task_info" = "Task information";
+"task_date" = "Date & reminder";
+"task_advanced_notification" = "Advanced notifications";
+"task_associated_crop" = "Associated crop";
+"task_title" = "Task title";
+"task_details" = "Task details";
+"task_due_date" = "Due date";
+"task_reminder" = "Reminder";
+"task_repeat" = "Repeat";
+
+"repeat_none" = "None";
+"repeat_daily" = "Daily";
+"repeat_weekly" = "Weekly";
+"repeat_monthly" = "Monthly";
+
+"task_remember_days_before" = "Remember days before";
+"task_days_before %d" = "Remember %d days before";
+
+"edit_task" = "Edit task";
+"cancel" = "Cancel";
+"save" = "Save";
+
+"task_not_found" = "Task not found";
+"task_not_found_message" = "The task could not be found or is no longer available.";
+"ok" = "OK";
+"task_new" = "New task";
+
+"dashboard_title" = "Dashboard";
+"dashboard_greeting" = "Hello!";
+"dashboard_greeting_name %@" = "Hello, %@!";
+"dashboard_subtitle" = "Your general overview";
+"dashboard_summary" = "Task summary";
+"dashboard_tasks" = "tasks";
+"dashboard_completed" = "Completed";
+"dashboard_no_tasks" = "You have no tasks registered";
+"dashboard_overdue_count" = "%d overdue tasks";
+"dashboard_action_add_task" = "New task";
+"dashboard_action_explore" = "Explore crops";
+"dashboard_action_my_crops" = "My crops";
+"dashboard_action_profile" = "Profile";
+"dashboard_action_statistics" = "Statistics";
+
+"recommendations_title" = "Recommendations";
+"recommendations_no_results" = "No recommendations found";
+"recommendations_add" = "Add";
+"recommendations_error_not_logged" = "You must log in to add crops";
+"recommendations_added" = "Crop added to your collection";
+"recommendations_in_collection" = "This crop is already in your collection";
+"crop_default" = "Crop";
+
+"dashboard_upcoming_tasks" = "Upcoming tasks";
+"dashboard_no_upcoming" = "No upcoming tasks";
+"dashboard_my_crops" = "My crops";
+"dashboard_no_crops" = "You have no saved crops";
+"dashboard_recent_progress" = "Recent progress";
+"dashboard_no_progress" = "No progress records";
+"dashboard_progress_log_no_crop" = "Unknown crop";
+"dashboard_progress_no_note" = "No notes";
+
+"progress_general" = "General";
+"progress_irrigation" = "Irrigation";
+"progress_fertilization" = "Fertilization";
+"progress_pest" = "Pests";
+"progress_harvest" = "Harvest";
+"progress_note" = "Note";
+"progress_category" = "Category";
+"progress_photo" = "Photo";
+"remove_photo" = "Remove photo";
+"add_photo" = "Add photo";
+"edit_progress" = "Edit progress";
+
+"notif_level_up_title" = "You leveled up!";
+"notif_level_up_body" = "You reached level %d!";
+"notif_badge_unlocked_title" = "Badge unlocked";
+"notif_badge_unlocked_body" = "Unlocked: %@";
+"level_up_message" = "You leveled up!";
+"badge_unlocked" = "Badge unlocked";
+"achievements_badges_count" = "%d badges earned";
+"achievements_title" = "Achievements";
+"achievements_your_level" = "Your level";
+"achievements_progress" = "Progress to next level";
+"achievements_progress_pct" = "%d%% completed";
+"achievements_level_next" = "Next level: %d";
+"achievements_badges" = "Badges";
+"achievements_no_badges" = "You haven’t unlocked any badges yet";
+
+"badge_first_task_title" = "First task";
+"badge_first_task_desc" = "Create your first task";
+
+"badge_task_collector_title" = "Task collector";
+"badge_task_collector_desc" = "Complete 10 tasks";
+
+"badge_logger_novice_title" = "Novice logger";
+"badge_logger_novice_desc" = "Add 5 progress logs";
+
+"badge_logger_master_title" = "Master logger";
+"badge_logger_master_desc" = "Add 50 progress logs";
+
+"badge_explorer_title" = "Explorer";
+"badge_explorer_desc" = "Accept your first crop recommendation";
+
+"badge_level_milestone_title" = "Level milestone";
+"badge_level_milestone_desc" = "Reach a level that is a multiple of 3";
+
+"create_task" = "Create task";
+"add_progress_log" = "Add progress log";
+"accept_recommendation" = "Accept recommendation";
+
+"intro_title" = "Welcome to the app";
+"intro_subtitle" = "Easily manage your crops and tasks";
+"register" = "Register";
+"login" = "Log in";
+
+"dashboard_metrics_title" = "Metrics";
 "dashboard_metrics_completed" = "Completed";
 "dashboard_metrics_pending" = "Pending";
 "dashboard_metrics_overdue" = "Overdue";
-"dashboard_metrics_progresslogs" = "Progress logs";
 
-"crop_reminder_watering" = "Don’t forget to water your crop today!";
-"crop_reminder_fertilize" = "It’s time to fertilize your crop.";
-"crop_reminder_harvest" = "Your crop is ready for harvest!";
-"crop_reminder_generic" = "Remember to take care of your crop.";
-"crop_season_tip" = "It’s a great season for %@, make the most of it.";
+"crop_lettuce_name" = "Lettuce";
+"crop_cucumber_name" = "Cucumber";
+"crop_tomato_name" = "Tomato";
+"crop_basil_name" = "Basil";
+"crop_carrot_name" = "Carrot";
+"crop_spinach_name" = "Spinach";
+"crop_potato_name" = "Potato";
+"crop_onion_name" = "Onion";
+"crop_pepper_name" = "Pepper";
+"crop_sunflower_name" = "Sunflower";
+"crop_corn_name" = "Corn";
 
-"profile_notifications_settings" = "Notification settings";
-"profile_notify_tasks" = "Task reminders";
-"profile_notify_crops" = "Crop reminders";
-"profile_notify_tips" = "Seasonal tips";
+"category_vegetable" = "Vegetable";
+"category_fruit" = "Fruit";
+"category_herb" = "Herb";
+"category_grain" = "Grain";
+"category_flower" = "Flower";
 
-"debug_notifications_title" = "Notification Debug";
-"debug_section_tasks" = "Test tasks";
-"debug_section_crops" = "Test crops";
-"debug_section_tips" = "Test tips";
-"debug_section_clear" = "Quick management";
-"debug_section_log" = "Test log";
-"debug_test_task_body" = "This is a test task reminder";
-"debug_test_crop_body" = "This is a test crop reminder";
-"debug_test_tip_body" = "This is a test seasonal tip";
+"crop_no_name" = "No name";
+"crop_recommended_now" = "Recommended now";
 
-"history_title" = "Notification history";
-"history_no_notifications" = "No notifications recorded";
-"profile_notifications_history" = "Notification history";
+"crop_seasons" = "Recommended seasons";
+"crop_seasons_none" = "No recommended seasons";
 
-"notif_action_complete" = "Complete";
-"notif_action_view_crop" = "View crop";
-"notif_action_view_tips" = "View tips";
+"crop_add_my" = "Add to My Crops";
+"crop_remove_my" = "Remove from My Crops";
+"crop_add_task" = "Add task";
 
-"notif_action_complete" = "Complete";
-"notif_action_snooze" = "Snooze 15 min";
-"notif_action_view_crop" = "View crop";
-"notif_action_view_tips" = "View tips";
+"crop_tasks_title" = "Crop tasks";
+"task_default" = "Untitled task";
 
-"notif_log_action_title" = "Notification action";
-"notif_log_action_body" = "User performed action %@ on notification";
+"crop_steps" = "Cultivation steps";
+"days_abbr" = "days";
 
-"dashboard_action_statistics" = "Statistics";
-"statistics_title" = "Statistics Panel";
-"statistics_tasks" = "Task status";
-"statistics_progress" = "Progress evolution";
-"statistics_notifications" = "Notification actions";
+"crop_progress_title" = "Progress history";
+"crop_progress_empty" = "No progress records yet";
+"crop_add_progress" = "Add progress";
 
-/* Statistics view */
-"statistics_title" = "Statistics";
-"statistics_tasks" = "Tasks";
-"statistics_progress" = "Progress";
-"statistics_notifications" = "Notifications";
-"statistics_label_completed" = "Completed";
-"statistics_label_pending" = "Pending";
-"statistics_label_overdue" = "Overdue";
-"statistics_no_progress" = "No progress logs yet.";
-"statistics_no_notifications_actions" = "No notification action events recorded.";
-
-/* Debug notifications */
-"debug_notifications_title" = "Debug Notifications";
-"debug_insert_demo" = "Insert demo data";
-"debug_insert_demo_success" = "Demo data inserted and demo user selected";
-"debug_insert_demo_exists" = "Demo data already present in database";
-"debug_send_task_5s" = "Send task reminder (5s)";
-"debug_send_crop_tip_5s" = "Send crop tip (5s)";
-"debug_send_seasonal_tip_15s" = "Send seasonal tip (15s)";
-"debug_clear_pending" = "Clear pending notifications";
-"debug_instructions" = "Triple-tap the Dashboard title to open this menu. Useful for quick tests.";
-"debug_alert_title" = "Debug";
-"debug_task_title" = "Reminder (demo)";
-"debug_task_body" = "This is a test task notification.";
-"debug_crop_tip_body" = "Crop care reminder (demo).";
-"debug_task_scheduled" = "Task notification scheduled (5s)";
-"debug_crop_scheduled" = "Crop notification scheduled (5s)";
-"debug_crop_scheduled_for_crop" = "Notification scheduled for crop: %@";
-"debug_seasonal_scheduled" = "Seasonal tip scheduled (15s)";
-"debug_send_error" = "Error scheduling notification: %@";
-"debug_cleared_pending_success" = "Pending notifications cleared";
-
-/* Statistics */
-"statistics_no_tasks" = "No tasks to show";
-"statistics_no_progress_logs" = "No progress logs";
-"statistics_no_notifications" = "No notification actions recorded";
-
-/* Statistics view */
-"statistics_title" = "Statistics";
-"statistics_subtitle" = "Summary & metrics for your garden";
-"statistics_range_all" = "All";
-"statistics_range_7" = "7d";
-"statistics_range_30" = "30d";
-"statistics_range_90" = "90d";
-"statistics_summary_total_tasks" = "Total tasks";
-"statistics_summary_completed_pct" = "Completed (%)";
-"statistics_summary_my_crops" = "Saved crops";
-"statistics_tasks" = "Task status";
-"statistics_progress" = "Progress over time";
-"statistics_notifications" = "Notification actions";
-"statistics_top_crops" = "Top crops by activity";
-"statistics_no_tasks" = "No tasks to show.";
-"statistics_no_progress_logs" = "No progress logs in range.";
-"statistics_no_notifications" = "No notification interactions recorded.";
-"statistics_no_top_crops" = "No crops with activity.";
-"statistics_export_csv" = "Export CSV";
-"statistics_export_success" = "CSV ready to share";
-"statistics_export_error" = "Error generating CSV";
-
-/* metrics labels used in summary / small cards */
-"statistics_metrics_completed" = "Completed";
-"statistics_metrics_pending" = "Pending";
-"statistics_metrics_overdue" = "Overdue";
-
-"profile_edit_photo" = "Edit photo";
-"profile_delete_photo_confirm" = "Delete your profile photo?";
-"delete" = "Delete";
-"cancel" = "Cancel";
-"profile_source_unavailable" = "This source is not available on your device.";
-
-"profile_source_unavailable" = "This source is not available on your device.";
-"profile_camera_unavailable" = "Camera is not available on this device.";
-"profile_image_saved" = "Profile photo saved.";
-"profile_image_save_error" = "Error saving photo: %@";
-"profile_choose_image" = "Choose image";
-"profile_take_photo" = "Take photo";
-"profile_choose_from_gallery" = "Choose from gallery";
-"cancel" = "Cancel";
-"save" = "Save";
-"delete" = "Delete";
-
-"profile_title" = "Profile";
-"profile_username" = "Name";
-"profile_email" = "Email";
-"profile_gallery" = "Gallery";
-"profile_camera" = "Camera";
-"profile_choose_image" = "Choose image";
-"profile_take_photo" = "Take photo";
-"profile_choose_from_gallery" = "Choose from gallery";
-"profile_delete_photo" = "Delete profile photo";
-"profile_delete_photo_confirm" = "Delete profile photo?";
-"profile_export" = "Export profile";
-"profile_image_saved" = "Profile image saved";
-"profile_image_save_error" = "Failed saving image: %@";
-"profile_camera_unavailable" = "Camera is not available on this device.";
-"profile_source_unavailable" = "Selected source is not available.";
-"no_image" = "No image";
-"close" = "Close";
-"save" = "Save";
-"cancel" = "Cancel";
-
-"achievements_title" = "Level & Achievements";
-"achievements_subtitle" = "Get motivated: level up by doing actions";
-"achievements_level" = "Level";
-"achievements_to_next" = "%d XP to next level";
-"achievements_badges" = "Badges";
-"achievements_no_badges" = "No badges yet. Start doing actions!";
-"profile_achievements_title" = "Achievements";
-"profile_achievements_sub" = "Current level: %d";
-"profile_achievements_no_badges" = "No badges yet";
-"profile_achievements_section" = "Achievements & Progress";
-"profile_achievements_view_all" = "View all achievements";
-
-"badge_first_task_title" = "First Step";
-"badge_first_task_desc" = "You created your first task.";
-"badge_task_collector_title" = "Task Collector";
-"badge_task_collector_desc" = "You created 10 tasks.";
-"badge_logger_novice_title" = "Logger";
-"badge_logger_novice_desc" = "You added 5 progress logs.";
-"badge_logger_master_title" = "Logging Master";
-"badge_logger_master_desc" = "50 progress logs.";
-"badge_explorer_title" = "Explorer";
-"badge_explorer_desc" = "You accepted recommendations.";
-"badge_level_milestone_title" = "Level Milestone";
-"badge_level_milestone_desc" = "You reached a level milestone.";
-
-// User progress
-"profile_progress" = "Progress";
-"profile_level" = "Level %d";
-"profile_no_progress" = "No progress recorded";
-"profile_no_achievements" = "No achievements yet";
-
-// Achievements base
-"level_2" = "Level 2 reached";
-"level_5" = "Level 5 reached";
-"level_10" = "Level 10 reached";
-
-"achievements_title" = "Achievements";
-"achievements_your_level" = "Your level";
-"achievements_progress" = "Progress";
-"achievements_progress_pct" = "%d%% completed";
-"achievements_level_next" = "Next: level %d";
-"achievements_badges" = "Badges";
-"achievements_no_badges" = "You don’t have any badges yet";
-"achievements_badges_count" = "%d badges";
-
-"badge_first_task_title" = "First task";
-"badge_first_task_desc" = "You created your first task";
-"badge_task_collector_title" = "Task collector";
-"badge_task_collector_desc" = "You have created 10 tasks";
-"badge_logger_novice_title" = "Logger novice";
-"badge_logger_novice_desc" = "You added 5 progress logs";
-"badge_logger_master_title" = "Logger master";
-"badge_logger_master_desc" = "You added 50 progress logs";
-"badge_explorer_title" = "Explorer";
-"badge_explorer_desc" = "You accepted a recommendation";
-"badge_level_milestone_title" = "Level milestone";
-"badge_level_milestone_desc" = "You reached an important level";
-
-/* Notifications */
-"notif_level_up_title" = "Level up!";
-"notif_level_up_body" = "You reached level %d. Great job!";
-"notif_badge_unlocked_title" = "Badge unlocked";
-"notif_badge_unlocked_body" = "You unlocked: %@";
-
-/* Achievements UI */
-"achievements_title" = "Achievements";
-"achievements_your_level" = "Your level";
-"achievements_progress" = "Progress";
-"achievements_progress_pct" = "%d%% completed";
-"achievements_level_next" = "Next: level %d";
-"achievements_badges" = "Badges";
-"achievements_no_badges" = "You don’t have any badges yet";
-"achievements_badges_count" = "%d badges";
-
-/* Badges */
-"badge_first_task_title" = "First task";
-"badge_first_task_desc" = "You created your first task";
-"badge_task_collector_title" = "Task collector";
-"badge_task_collector_desc" = "You created 10 tasks";
-"badge_logger_novice_title" = "Logger novice";
-"badge_logger_novice_desc" = "You added 5 progress logs";
-"badge_logger_master_title" = "Logger master";
-"badge_logger_master_desc" = "You added 50 progress logs";
-"badge_explorer_title" = "Explorer";
-"badge_explorer_desc" = "You accepted a recommendation";
-"badge_level_milestone_title" = "Level milestone";
-"badge_level_milestone_desc" = "You reached an important level";
-
-"level_up_message" = "🎉 You leveled up!";
-"badge_unlocked" = "🏅 New achievement unlocked!";
-
-"crop_recommendations" = "Growing recommendations";
+"crop_recommendations" = "Crop recommendations";
+"crop_estimated_duration" = "Estimated duration: %d days";
 "crop_info_unavailable" = "Information not available";
+
 "crop_soil" = "Soil type";
 "crop_watering" = "Watering";
 "crop_sunlight" = "Sunlight";
 "crop_temperature" = "Temperature";
 "crop_fertilization" = "Fertilization";
-
-"crop_recommendations" = "Crop recommendations";
-"crop_soil" = "Soil";
-"crop_watering" = "Watering";
-"crop_sunlight" = "Sunlight";
-"crop_temperature" = "Temperature";
-"crop_fertilization" = "Fertilization";
-"crop_info_unavailable" = "Information not available";
-
-"crop_cucumber_name" = "Cucumber";
-"crop_cucumber_desc" = "Climbing vegetable that produces elongated, fresh, and crunchy fruits.";
-
-"crop_pepper_name" = "Pepper";
-"crop_pepper_desc" = "Vegetable in various colors, used both raw and cooked.";
-
-"crop_carrot_name" = "Carrot";
-"crop_carrot_desc" = "Edible root rich in beta-carotene, sweet in flavor and crunchy in texture.";
-
-"crop_onion_name" = "Onion";
-"crop_onion_desc" = "Aromatic bulb widely used in gastronomy, base of many preparations.";
-
-"crop_watermelon_name" = "Watermelon";
-"crop_watermelon_desc" = "Large, juicy fruit with red flesh and black seeds, ideal in summer.";
-
-"crop_corn_name" = "Corn";
-"crop_corn_desc" = "Staple cereal cultivated worldwide, with yellow or white cobs.";
-
-"step_pollination" = "Pollination";
-"step_fruit_set" = "Fruit set";
-
-"crop_estimated_duration" = "Estimated duration: %d days";
-"crop_quick_tips" = "Quick tips";
-
-"tip_watering_template" = "Watering: %@";
-"tip_fertilization_template" = "Fertilization: %@";
-"tip_soil_template" = "Soil: %@";
-"tip_sunlight_template" = "Sun: %@";
-
-"crop_climate" = "Climate conditions";     // EN
-"crop_climate" = "Climate conditions";
-"crop_quick_tips" = "Quick tips";
+"crop_climate" = "Climate";
 "crop_plagues" = "Common pests";
-"crop_estimated_duration" = "Estimated duration: %d days";
-"crop_tip_watch_plagues" = "Watch for pests:";
-"crop_recommendations" = "Growing recommendations";
-"crop_soil" = "Soil";
-"crop_watering" = "Watering";
-"crop_sunlight" = "Sunlight";
-"crop_temperature" = "Temperature";
-"crop_fertilization" = "Fertilization";
-"crop_info_unavailable" = "Information not available";
-
-"crop_season_tip" = "🌸 It’s %@ season! Consider planting them now.";
-"crop_recommended_now" = "Recommended this season";
-
-"crop_companions" = "Companion planting";
-"crop_germination_days" = "Germinates in %d days";
-
-"crop_companions" = "Companion planting";
+"crop_companions" = "Crop companions";
 "crop_germination_days" = "Germinates in %d days";
 "crop_watering_frequency" = "Watering frequency";
-"crop_harvest_months" = "Ideal harvest months";
+"crop_harvest_months" = "Harvest months";
 
-"crop_companions" = "Companion planting";
-"crop_germination_days" = "🌱 Germinates in %d days";
-"crop_watering_frequency" = "Watering frequency: %@";
-"crop_harvest_months" = "📅 Harvest months: %@";
+"crop_difficulty_very_easy" = "Very easy";
+"crop_difficulty_easy" = "Easy";
+"crop_difficulty_medium" = "Medium";
+"crop_difficulty_hard" = "Hard";
+
+"season_spring" = "Spring";
+"season_summer" = "Summer";
+"season_autumn" = "Autumn";
+"season_winter" = "Winter";
+
+"loading_hint" = "Tip: Take care of your crops for better harvests";
