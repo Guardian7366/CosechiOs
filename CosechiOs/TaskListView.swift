@@ -1,10 +1,11 @@
+// TaskListView.swift
 import SwiftUI
 import CoreData
 
 struct TaskListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
-
+    
     @FetchRequest(
         entity: TaskEntity.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \TaskEntity.dueDate, ascending: true)],
@@ -19,51 +20,64 @@ struct TaskListView: View {
     private var today: Date { Calendar.current.startOfDay(for: Date()) }
 
     var body: some View {
-        VStack {
-            Picker("task_filter", selection: $filter) {
-                Text("task_pending").tag("pending")
-                Text("task_completed").tag("completed")
-                Text("task_all").tag("all")
+        FrutigerAeroBackground {
+            VStack {
+                // 🔹 Filtro de tareas
+                Picker("task_filter", selection: $filter) {
+                    Text("task_pending").tag("pending")
+                    Text("task_completed").tag("completed")
+                    Text("task_all").tag("all")
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white.opacity(0.12))
+                )
+                .padding(.top, 12)
+
+                // 🔹 Lista de tareas
+                List {
+                    // HOY
+                    let todayTasks = filteredTasks.filter {
+                        $0.dueDate != nil && Calendar.current.isDateInToday($0.dueDate!)
+                    }
+                    if !todayTasks.isEmpty {
+                        Section(header: Text("task_today").font(.headline)) {
+                            ForEach(todayTasks, id: \.objectID) { task in
+                                taskRow(task)
+                            }
+                            .listRowBackground(Color.clear)
+                        }
+                    }
+
+                    // PRÓXIMAS
+                    let upcoming = filteredTasks.filter {
+                        $0.dueDate != nil && $0.dueDate! > today
+                    }
+                    if !upcoming.isEmpty {
+                        Section(header: Text("task_upcoming").font(.headline)) {
+                            ForEach(upcoming, id: \.objectID) { task in
+                                taskRow(task)
+                            }
+                            .listRowBackground(Color.clear)
+                        }
+                    }
+
+                    // COMPLETADAS
+                    let completed = filteredTasks.filter { $0.status == "completed" }
+                    if !completed.isEmpty {
+                        Section(header: Text("task_completed").font(.headline)) {
+                            ForEach(completed, id: \.objectID) { task in
+                                taskRow(task)
+                            }
+                            .listRowBackground(Color.clear)
+                        }
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden) // 👈 elimina fondo gris por defecto
             }
-            .pickerStyle(.segmented)
-            .padding()
-
-            List {
-                // HOY
-                let todayTasks = filteredTasks.filter {
-                    $0.dueDate != nil && Calendar.current.isDateInToday($0.dueDate!)
-                }
-                if !todayTasks.isEmpty {
-                    Section(header: Text("task_today")) {
-                        ForEach(todayTasks, id: \.objectID) { task in
-                            taskRow(task)
-                        }
-                    }
-                }
-
-                // PRÓXIMAS
-                let upcoming = filteredTasks.filter {
-                    $0.dueDate != nil && $0.dueDate! > today
-                }
-                if !upcoming.isEmpty {
-                    Section(header: Text("task_upcoming")) {
-                        ForEach(upcoming, id: \.objectID) { task in
-                            taskRow(task)
-                        }
-                    }
-                }
-
-                // COMPLETADAS
-                let completed = filteredTasks.filter { $0.status == "completed" }
-                if !completed.isEmpty {
-                    Section(header: Text("task_completed")) {
-                        ForEach(completed, id: \.objectID) { task in
-                            taskRow(task)
-                        }
-                    }
-                }
-            }
-            .listStyle(.insetGrouped)
         }
         .navigationTitle("menu_all_tasks")
         .sheet(item: $selectedTaskID) { wrapper in
@@ -74,7 +88,9 @@ struct TaskListView: View {
             Alert(
                 title: Text("task_delete_title"),
                 message: Text("task_delete_message"),
-                primaryButton: .destructive(Text("delete")),
+                primaryButton: .destructive(Text("delete")) {
+                    deleteTask(by: wrapper.id)
+                },
                 secondaryButton: .cancel(Text("cancel"))
             )
         }
@@ -99,52 +115,60 @@ struct TaskListView: View {
 
     @ViewBuilder
     private func taskRow(_ task: TaskEntity) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(task.title ?? NSLocalizedString("task_no_title", comment: ""))
-                    .font(.headline)
-                    .strikethrough(task.status == "completed")
+        GlassCard {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(task.title ?? NSLocalizedString("task_no_title", comment: ""))
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                        .strikethrough(task.status == "completed")
 
-                if let due = task.dueDate {
-                    Text("task_due_prefix \(due.formatted(date: .abbreviated, time: .shortened))")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    if let due = task.dueDate {
+                        Text("task_due_prefix \(due.formatted(date: .abbreviated, time: .shortened))")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    if let crop = task.crop {
+                        Text("\(NSLocalizedString("task_crop_prefix", comment: "")) \(crop.name ?? "-")")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                Spacer()
+
+                if task.status == "pending" {
+                    Button {
+                        completeTask(task)
+                    } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .aeroIcon(size: 22)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    Image(systemName: "checkmark.circle")
+                        .foregroundColor(.gray)
+                        .aeroIcon(size: 22)
                 }
 
-                if let crop = task.crop {
-                    Text("\(NSLocalizedString("task_crop_prefix", comment: "")) \(crop.name ?? "-")")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-            }
-            Spacer()
-
-            if task.status == "pending" {
                 Button {
-                    completeTask(task)
+                    selectedTaskID = ManagedObjectIDWrapper(id: task.objectID)
                 } label: {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+                    Image(systemName: "pencil")
+                        .aeroIcon(size: 20)
                 }
                 .buttonStyle(.plain)
-            } else {
-                Image(systemName: "checkmark.circle")
-                    .foregroundColor(.gray)
-            }
 
-            Button {
-                selectedTaskID = ManagedObjectIDWrapper(id: task.objectID)
-            } label: {
-                Image(systemName: "pencil")
+                Button(role: .destructive) {
+                    showDeleteAlertFor = ManagedObjectIDWrapper(id: task.objectID)
+                } label: {
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
+                        .aeroIcon(size: 20)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
-
-            Button(role: .destructive) {
-                showDeleteAlertFor = ManagedObjectIDWrapper(id: task.objectID)
-            } label: {
-                Image(systemName: "trash")
-            }
-            .buttonStyle(.plain)
         }
         .padding(.vertical, 4)
     }

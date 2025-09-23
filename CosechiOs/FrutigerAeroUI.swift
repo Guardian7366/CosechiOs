@@ -236,3 +236,19 @@ public extension View {
         self.modifier(AeroTextField())
     }
 }
+
+// MARK: - AeroIcon: estilo universal para iconos
+public struct AeroIcon: ViewModifier {
+    let size: CGFloat
+    public func body(content: Content) -> some View {
+        content
+            .font(.system(size: size, weight: .regular))
+            .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1)
+    }
+}
+
+public extension View {
+    func aeroIcon(size: CGFloat = 28) -> some View {
+        self.modifier(AeroIcon(size: size))
+    }
+}
