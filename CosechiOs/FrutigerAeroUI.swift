@@ -18,7 +18,7 @@ public final class AeroTheme: ObservableObject {
         variant == .soft ? Color(hex: "00D4FF") : Color(hex: "00F0FF")
     }
     public var accent: Color {
-        variant == .soft ? Color(hex: "FF8C42") : Color(hex: "FFB26B")
+        variant == .soft ? Color(hex: "00C37A") : Color(hex: "00E08A")
     }
     public var mint: Color { Color(hex: "00C37A") }
 
