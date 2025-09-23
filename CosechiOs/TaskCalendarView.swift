@@ -18,14 +18,12 @@ struct TaskCalendarView: View {
     var body: some View {
         FrutigerAeroBackground {
             VStack(spacing: 16) {
-                // 🔹 Resumen en tarjeta de vidrio
-                GlassCard {
-                    TaskSummaryView()
-                        .environment(\.managedObjectContext, viewContext)
-                }
-                .padding(.horizontal)
+                // 🔹 Resumen directamente con su propio estilo
+                TaskSummaryView()
+                    .environment(\.managedObjectContext, viewContext)
+                    .padding(.horizontal)
 
-                // 🔹 Lista de tareas agrupadas por fecha
+                // 🔹 Lista de tareas agrupadas
                 List {
                     ForEach(groupedDates, id: \.self) { date in
                         Section(header: Text(formattedDate(date))
@@ -67,7 +65,7 @@ struct TaskCalendarView: View {
         }
     }
 
-    // MARK: - Computed helpers
+    // MARK: - Helpers
     private var tasksForUser: [TaskEntity] {
         guard let uid = appState.currentUserID else { return [] }
         return allTasks.filter { $0.user?.userID == uid }
@@ -93,12 +91,9 @@ struct TaskCalendarView: View {
     private func taskRow(_ task: TaskEntity) -> some View {
         GlassCard {
             HStack {
-                // toggle completado
                 Button {
                     TaskHelper.toggleCompletion(for: task.objectID, context: viewContext) {
-                        DispatchQueue.main.async {
-                            withAnimation { }
-                        }
+                        DispatchQueue.main.async { withAnimation {} }
                     }
                 } label: {
                     Image(systemName: task.status == "completed" ? "checkmark.circle.fill" : "circle")

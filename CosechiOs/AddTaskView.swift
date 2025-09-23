@@ -1,3 +1,4 @@
+// AddTaskView.swift
 import SwiftUI
 import CoreData
 
@@ -5,6 +6,7 @@ struct AddTaskView: View {
     var crop: Crop? = nil
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var theme: AeroTheme
     @Environment(\.dismiss) private var dismiss
 
     @State private var title: String = ""
@@ -17,38 +19,57 @@ struct AddTaskView: View {
     @State private var relativeDays: Int = 0
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: Text("task_info")) {
-                    TextField("task_title", text: $title)
-                    TextField("task_details", text: $details)
-                    DatePicker("task_due_date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
-                    Toggle("task_reminder", isOn: $reminder)
-                }
-
-                Section(header: Text("task_advanced_notification")) {
-                    Picker("task_repeat", selection: $recurrence) {
-                        Text("repeat_none").tag("none")
-                        Text("repeat_daily").tag("daily")
-                        Text("repeat_weekly").tag("weekly")
-                        Text("repeat_monthly").tag("monthly")
+        FrutigerAeroBackground {
+            ScrollView {
+                VStack(spacing: 16) {
+                    GlassCard {
+                        VStack(spacing: 12) {
+                            TextField("task_title", text: $title)
+                                .aeroTextField()
+                            TextField("task_details", text: $details)
+                                .aeroTextField()
+                        }
                     }
-                    .pickerStyle(.segmented)
 
-                    Toggle("task_remember_days_before", isOn: $useRelative)
-                    if useRelative {
-                        Stepper(value: $relativeDays, in: 0...30) {
-                            Text("task_days_before \(relativeDays)")
+                    GlassCard {
+                        VStack(spacing: 12) {
+                            DatePicker("task_due_date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                                .foregroundColor(.white)
+                            Toggle("task_reminder", isOn: $reminder)
+                                .foregroundColor(.white)
+                        }
+                    }
+
+                    GlassCard {
+                        VStack(spacing: 12) {
+                            Picker("task_repeat", selection: $recurrence) {
+                                Text("repeat_none").tag("none")
+                                Text("repeat_daily").tag("daily")
+                                Text("repeat_weekly").tag("weekly")
+                                Text("repeat_monthly").tag("monthly")
+                            }
+                            .pickerStyle(.segmented)
+
+                            Toggle("task_remember_days_before", isOn: $useRelative)
+                                .foregroundColor(.white)
+
+                            if useRelative {
+                                Stepper(value: $relativeDays, in: 0...30) {
+                                    Text("task_days_before \(relativeDays)")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                    }
+
+                    if let crop = crop {
+                        GlassCard {
+                            Text("\(NSLocalizedString("task_associated_crop", comment: "")): \(crop.name ?? "—")")
+                                .foregroundColor(.secondary)
                         }
                     }
                 }
-
-                if let crop = crop {
-                    Section(header: Text("task_associated_crop")) {
-                        Text(crop.name ?? "—")
-                            .foregroundColor(.secondary)
-                    }
-                }
+                .padding()
             }
             .navigationTitle("task_new")
             .toolbar {
@@ -56,15 +77,13 @@ struct AddTaskView: View {
                     Button("cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("save") {
-                        saveTask()
-                    }
-                    .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Button("save") { saveTask() }
+                        .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
     }
-    
+
     private func saveTask() {
         let task = TaskEntity(context: viewContext)
         task.taskID = UUID()
@@ -91,17 +110,12 @@ struct AddTaskView: View {
 
         do {
             try viewContext.save()
-            if reminder {
-                NotificationHelper.scheduleNotification(for: task)
-            }
-            
-            // --- Otorgar XP por crear tarea
+            if reminder { NotificationHelper.scheduleNotification(for: task) }
             if let user = task.user {
                 AchievementManager.award(action: .createTask, to: user.userID ?? UUID(), context: viewContext)
             }
             dismiss()
         } catch {
-            print("❌ Error guardando tarea: \(error.localizedDescription)")
             viewContext.rollback()
         }
     }

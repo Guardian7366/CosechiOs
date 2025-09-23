@@ -1,9 +1,12 @@
+
+// TaskSummaryView.swift
 import SwiftUI
 import CoreData
 
 struct TaskSummaryView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var theme: AeroTheme
 
     @FetchRequest(
         entity: TaskEntity.entity(),
@@ -26,21 +29,29 @@ struct TaskSummaryView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("task_summary_title")
                 .font(.headline)
+                .foregroundColor(.white)
 
             HStack {
                 Text("\(NSLocalizedString("task_pending", comment: "")): \(pendingTasks)")
-                    .foregroundColor(.orange)
+                    .foregroundColor(theme.accent)
                 Spacer()
                 Text("\(NSLocalizedString("task_completed", comment: "")): \(completedTasks)")
-                    .foregroundColor(.green)
+                    .foregroundColor(theme.mint)
             }
-            .font(.subheadline)
+            .font(.subheadline).bold()
         }
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.08))
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                )
+        )
+        .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 2)
     }
 }

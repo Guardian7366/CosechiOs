@@ -1,3 +1,4 @@
+// EditProgressLogView.swift
 import SwiftUI
 import CoreData
 import UIKit
@@ -5,6 +6,7 @@ import UIKit
 struct EditProgressLogView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var theme: AeroTheme
 
     @State private var note: String
     @State private var image: UIImage?
@@ -27,38 +29,43 @@ struct EditProgressLogView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("progress_note") {
-                    TextEditor(text: $note)
-                        .frame(minHeight: 100)
-                }
+        FrutigerAeroBackground {
+            ScrollView {
+                VStack(spacing: 16) {
+                    GlassCard {
+                        TextEditor(text: $note)
+                            .frame(minHeight: 100)
+                            .foregroundColor(.white)
+                    }
 
-                Section("progress_category") {
-                    Picker("progress_category", selection: $category) {
-                        ForEach(categories, id: \.self) { cat in
-                            Text(LocalizedStringKey(cat)).tag(cat)
+                    GlassCard {
+                        Picker("progress_category", selection: $category) {
+                            ForEach(categories, id: \.self) { cat in
+                                Text(LocalizedStringKey(cat)).tag(cat)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .foregroundColor(.white)
+                    }
+
+                    GlassCard {
+                        if let img = image {
+                            VStack {
+                                Image(uiImage: img)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 200)
+                                Button("remove_photo") {
+                                    image = nil
+                                }
+                                .foregroundColor(.red)
+                            }
+                        } else {
+                            Button("add_photo") { showImagePicker = true }
                         }
                     }
-                    .pickerStyle(.menu)
                 }
-
-                Section("progress_photo") {
-                    if let img = image {
-                        Image(uiImage: img)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 200)
-                        Button("remove_photo") {
-                            image = nil
-                        }
-                        .foregroundColor(.red)
-                    } else {
-                        Button("add_photo") {
-                            showImagePicker = true
-                        }
-                    }
-                }
+                .padding()
             }
             .navigationTitle("edit_progress")
             .toolbar {

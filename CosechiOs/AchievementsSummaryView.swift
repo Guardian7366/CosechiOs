@@ -4,6 +4,7 @@ import CoreData
 
 struct AchievementsSummaryView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var theme: AeroTheme
     let userID: UUID?
 
     @State private var xp: Int = 0
@@ -12,29 +13,40 @@ struct AchievementsSummaryView: View {
     @State private var badgesCount: Int = 0
 
     var body: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .stroke(lineWidth: 8)
-                    .opacity(0.15)
-                    .frame(width: 72, height: 72)
-                Circle()
-                    .trim(from: 0, to: CGFloat(progress))
-                    .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .frame(width: 72, height: 72)
-                Text("\(level)")
-                    .font(.headline)
-            }
+        GlassCard {
+            HStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .stroke(theme.primaryStart.opacity(0.2), lineWidth: 8)
+                        .frame(width: 72, height: 72)
 
-            VStack(alignment: .leading) {
-                Text("\(xp) XP")
-                    .font(.subheadline)
-                Text(String(format: NSLocalizedString("achievements_badges_count", comment: ""), badgesCount))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    Circle()
+                        .trim(from: 0, to: CGFloat(progress))
+                        .stroke(
+                            LinearGradient(colors: [theme.primaryStart, theme.primaryEnd],
+                                           startPoint: .topLeading,
+                                           endPoint: .bottomTrailing),
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                        .frame(width: 72, height: 72)
+
+                    Text("\(level)")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(xp) XP")
+                        .font(.subheadline)
+                        .foregroundColor(theme.accent)
+
+                    Text(String(format: NSLocalizedString("achievements_badges_count", comment: ""), badgesCount))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
             }
-            Spacer()
         }
         .onAppear(perform: load)
         .onReceive(NotificationCenter.default.publisher(for: .didUpdateAchievements)) { _ in load() }

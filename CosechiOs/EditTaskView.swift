@@ -1,3 +1,4 @@
+// EditTaskView.swift
 import SwiftUI
 import CoreData
 import UserNotifications
@@ -5,6 +6,7 @@ import UserNotifications
 struct EditTaskView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var theme: AeroTheme
 
     let taskID: NSManagedObjectID
 
@@ -21,40 +23,57 @@ struct EditTaskView: View {
     @State private var showMissingAlert = false
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section(header: Text("task_info")) {
-                    TextField("task_title", text: $title)
-                    TextField("task_details", text: $details)
-                }
-
-                Section(header: Text("task_date")) {
-                    DatePicker("task_due_date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
-                    Toggle("task_reminder", isOn: $reminder)
-                }
-
-                Section(header: Text("task_advanced_notification")) {
-                    Picker("task_repeat", selection: $recurrence) {
-                        Text("repeat_none").tag("none")
-                        Text("repeat_daily").tag("daily")
-                        Text("repeat_weekly").tag("weekly")
-                        Text("repeat_monthly").tag("monthly")
+        FrutigerAeroBackground {
+            ScrollView {
+                VStack(spacing: 16) {
+                    GlassCard {
+                        VStack(spacing: 12) {
+                            TextField("task_title", text: $title)
+                                .aeroTextField()
+                            TextField("task_details", text: $details)
+                                .aeroTextField()
+                        }
                     }
-                    .pickerStyle(.segmented)
 
-                    Toggle("task_remember_days_before", isOn: $useRelative)
-                    if useRelative {
-                        Stepper(value: $relativeDays, in: 0...30) {
-                            Text("task_days_before \(relativeDays)")
+                    GlassCard {
+                        VStack(spacing: 12) {
+                            DatePicker("task_due_date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                                .foregroundColor(.white)
+                            Toggle("task_reminder", isOn: $reminder)
+                                .foregroundColor(.white)
+                        }
+                    }
+
+                    GlassCard {
+                        VStack(spacing: 12) {
+                            Picker("task_repeat", selection: $recurrence) {
+                                Text("repeat_none").tag("none")
+                                Text("repeat_daily").tag("daily")
+                                Text("repeat_weekly").tag("weekly")
+                                Text("repeat_monthly").tag("monthly")
+                            }
+                            .pickerStyle(.segmented)
+
+                            Toggle("task_remember_days_before", isOn: $useRelative)
+                                .foregroundColor(.white)
+
+                            if useRelative {
+                                Stepper(value: $relativeDays, in: 0...30) {
+                                    Text("task_days_before \(relativeDays)")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                    }
+
+                    if let crop = liveTask?.crop {
+                        GlassCard {
+                            Text("\(NSLocalizedString("task_associated_crop", comment: "")): \(crop.name ?? "—")")
+                                .foregroundColor(.secondary)
                         }
                     }
                 }
-
-                if let crop = liveTask?.crop {
-                    Section(header: Text("task_associated_crop")) {
-                        Text(crop.name ?? "—").foregroundColor(.secondary)
-                    }
-                }
+                .padding()
             }
             .navigationTitle("edit_task")
             .toolbar {
@@ -81,7 +100,6 @@ struct EditTaskView: View {
         do {
             let obj = try viewContext.existingObject(with: taskID)
             guard let t = obj as? TaskEntity else {
-                print("⚠️ EditTaskView: object with id is not TaskEntity")
                 showMissingAlert = true
                 return
             }
@@ -95,7 +113,6 @@ struct EditTaskView: View {
             self.relativeDays = rd
             self.useRelative = rd > 0
         } catch {
-            print("❌ EditTaskView load error: \(error)")
             showMissingAlert = true
         }
     }
@@ -118,12 +135,7 @@ struct EditTaskView: View {
                 NotificationHelper.cancelNotification(for: t)
             }
 
-            do {
-                try viewContext.save()
-                print("✅ EditTaskView saved changes for task: \(t.title ?? "no title")")
-            } catch {
-                print("❌ Error saving edited task: \(error)")
-            }
+            do { try viewContext.save() } catch { viewContext.rollback() }
         }
     }
 }
