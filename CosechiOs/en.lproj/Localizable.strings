@@ -517,3 +517,4 @@
 
 /* Dashboard progress logs metric */
 "dashboard_metrics_progresslogs" = "Progress logs";
+"new_progress" = "New history";

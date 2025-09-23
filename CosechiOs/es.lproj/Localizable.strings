@@ -517,3 +517,4 @@
 
 /* Métrica de logs de progreso en dashboard */
 "dashboard_metrics_progresslogs" = "Registros de progreso";
+"new_progress" = "Nueva historia";

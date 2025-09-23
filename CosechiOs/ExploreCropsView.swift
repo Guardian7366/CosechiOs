@@ -48,7 +48,7 @@ struct ExploreCropsView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.black.opacity(0.35)) // 🔹 contraste extra
+                        .background(Color.green.opacity(0.35)) // 🔹 contraste extra
                         .cornerRadius(6)
                         .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
                         .font(.headline)
@@ -103,7 +103,7 @@ private struct FilterMenuView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 6)
                 .padding(.vertical, 4)
-                .background(Color.black.opacity(0.35)) // 🔹 mejor visibilidad
+                .background(Color.green.opacity(0.35)) // 🔹 mejor visibilidad
                 .cornerRadius(6)
                 .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
             }
@@ -145,7 +145,7 @@ private struct CropCardView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(Color.black.opacity(0.4)) // 🔹 fondo semitransparente
+                    .background(Color.green.opacity(0.4)) // 🔹 fondo semitransparente
                     .cornerRadius(4)
                     .lineLimit(1)
 
@@ -155,7 +155,7 @@ private struct CropCardView: View {
                         .foregroundColor(.white.opacity(0.95))
                         .padding(.horizontal, 4)
                         .padding(.vertical, 1)
-                        .background(Color.black.opacity(0.35)) // 🔹 contraste en subtítulo
+                        .background(Color.green.opacity(0.35)) // 🔹 contraste en subtítulo
                         .cornerRadius(3)
                 }
             }

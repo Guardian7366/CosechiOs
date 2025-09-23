@@ -1,3 +1,4 @@
+
 // AchievementsView.swift
 import SwiftUI
 import CoreData
@@ -45,7 +46,7 @@ struct AchievementsView: View {
                 Text("\(level)")
                     .font(.system(size: 46, weight: .bold))
                     .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 1)
+                    .shadow(color: .green.opacity(0.5), radius: 3, x: 0, y: 1) // 🔹 sombra más fuerte
 
                 Text("\(xp) XP")
                     .font(.subheadline)
@@ -61,6 +62,11 @@ struct AchievementsView: View {
                 Text(LocalizedStringKey("achievements_progress"))
                     .font(.headline)
                     .foregroundColor(.white)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.35)) // 🔹 contraste extra
+                    .cornerRadius(4)
+                    .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
 
                 ProgressView(value: progress)
                     .frame(height: 14)
@@ -86,6 +92,11 @@ struct AchievementsView: View {
                 Text(LocalizedStringKey("achievements_badges"))
                     .font(.headline)
                     .foregroundColor(.white)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.35)) // 🔹 fondo detrás del título
+                    .cornerRadius(4)
+                    .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
 
                 if badges.isEmpty {
                     Text(LocalizedStringKey("achievements_no_badges"))
@@ -119,10 +130,17 @@ struct AchievementsView: View {
                     .fill(Color.white.opacity(0.08))
                     .frame(width: 60, height: 60)
             }
+
+            // 🔹 Texto del badge con fondo para asegurar visibilidad
             Text(LocalizedStringKey(meta?.titleKey ?? id))
                 .font(.caption2)
                 .foregroundColor(.white)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(Color.green.opacity(0.45)) // 🔹 fondo semitransparente
+                .cornerRadius(4)
                 .multilineTextAlignment(.center)
+                .shadow(color: .black.opacity(0.7), radius: 2, x: 0, y: 1)
         }
     }
 
