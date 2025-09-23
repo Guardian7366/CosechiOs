@@ -1,3 +1,4 @@
+// StatisticsView.swift
 import SwiftUI
 import CoreData
 import Charts
@@ -44,17 +45,14 @@ struct StatisticsView: View {
         guard let uid = appState.currentUserID else { return [] }
         return allTasks.filter { $0.user?.userID == uid }
     }
-
     private var userLogs: [ProgressLog] {
         guard let uid = appState.currentUserID else { return [] }
         return allProgressLogs.filter { $0.user?.userID == uid }
     }
-
     private var userNotifs: [NotificationLog] {
         guard let uid = appState.currentUserID else { return [] }
         return Array(allNotifLogs).filter { $0.user?.userID == uid }
     }
-
     private var userCollectionsCount: Int {
         guard let uid = appState.currentUserID else { return 0 }
         return allUserCollections.filter { $0.user?.userID == uid }.count
@@ -68,170 +66,165 @@ struct StatisticsView: View {
     private var logsInRange: [ProgressLog] {
         if let th = dateThreshold() {
             return userLogs.filter { ($0.date ?? Date.distantPast) >= th }
-        } else {
-            return userLogs
-        }
+        } else { return userLogs }
     }
-
     private var tasksInRange: [TaskEntity] {
         if let th = dateThreshold() {
             return userTasks.filter { ($0.createdAt ?? Date.distantPast) >= th }
-        } else {
-            return userTasks
-        }
+        } else { return userTasks }
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                headerSection
-
-                HStack {
-                    Picker("", selection: $selectedRange) {
-                        ForEach(RangeOption.allCases) { r in
-                            Text(LocalizedStringKey(r.titleKey)).tag(r)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+        FrutigerAeroBackground {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // 📌 Header
+                    AeroHeader(
+                        LocalizationHelper.shared.localized("statistics_title"),
+                        subtitle: LocalizationHelper.shared.localized("statistics_subtitle")
+                    )
                     .padding(.horizontal)
 
-                    Spacer()
-
-                    Button {
-                        exportCSV()
-                    } label: {
-                        Label(LocalizedStringKey("statistics_export_csv"), systemImage: "square.and.arrow.up")
-                    }
-                    .padding(.trailing)
-                }
-
-                summaryCards
-                    .padding(.horizontal)
-
-                section("statistics_tasks") {
-                    if userTasks.isEmpty {
-                        placeholderText("statistics_no_tasks")
-                    } else {
+                    // 📌 Filtros + Export
+                    GlassCard {
                         HStack {
-                            PieChartView(completed: completedCount, pending: pendingCount, overdue: overdueCount)
-                                .frame(width: 160, height: 160)
-
-                            VStack(alignment: .leading, spacing: 8) {
-                                metricRow(color: .green, value: completedCount, key: "statistics_metrics_completed")
-                                metricRow(color: .blue, value: pendingCount, key: "statistics_metrics_pending")
-                                metricRow(color: .red, value: overdueCount, key: "statistics_metrics_overdue")
-                            }
-                            .padding(.leading)
-                            Spacer()
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                }
-
-                section("statistics_progress") {
-                    if logsInRange.isEmpty {
-                        placeholderText("statistics_no_progress_logs")
-                    } else {
-                        LogsLineChart(logs: logsInRange, days: selectedRange == .all ? 30 : selectedRange.rawValue)
-                            .frame(height: 200)
-                    }
-                }
-
-                section("statistics_top_crops") {
-                    let top = topCrops.prefix(6)
-                    if top.isEmpty {
-                        placeholderText("statistics_no_top_crops")
-                    } else {
-                        Chart {
-                            ForEach(Array(top.enumerated()), id: \.offset) { idx, item in
-                                BarMark(
-                                    x: .value("Count", item.count),
-                                    y: .value("Crop", item.name)
-                                )
-                                .annotation(position: .trailing) {
-                                    Text("\(item.count)").font(.caption2)
+                            Picker("", selection: $selectedRange) {
+                                ForEach(RangeOption.allCases) { r in
+                                    Text(LocalizationHelper.shared.localized(r.titleKey)).tag(r)
                                 }
                             }
-                        }
-                        .frame(height: min(240, CGFloat(top.count * 40)))
-                    }
-                }
+                            .pickerStyle(.segmented)
 
-                section("statistics_notifications") {
-                    if actionCounts.isEmpty {
-                        placeholderText("statistics_no_notifications")
-                    } else {
-                        Chart {
-                            ForEach(actionCounts.keys.sorted(), id: \.self) { action in
-                                BarMark(
-                                    x: .value("Count", actionCounts[action] ?? 0),
-                                    y: .value("Action", action)
-                                )
+                            Spacer()
+
+                            Button {
+                                exportCSV()
+                            } label: {
+                                Image(systemName: "square.and.arrow.up")
+                                Text(LocalizationHelper.shared.localized("statistics_export_csv"))
+                            }
+                            .font(.caption)
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    // 📌 Summary Cards
+                    HStack(spacing: 12) {
+                        summaryCard(color: .green, titleKey: "statistics_summary_total_tasks", valueText: "\(userTasks.count)")
+                        summaryCard(color: .blue, titleKey: "statistics_summary_completed_pct", valueText: completedPercentage)
+                        summaryCard(color: .teal, titleKey: "statistics_summary_my_crops", valueText: "\(userCollectionsCount)")
+                    }
+                    .padding(.horizontal)
+
+                    // 📊 Tasks
+                    section("statistics_tasks") {
+                        if userTasks.isEmpty {
+                            placeholderText("statistics_no_tasks")
+                        } else {
+                            HStack {
+                                PieChartView(completed: completedCount, pending: pendingCount, overdue: overdueCount)
+                                    .frame(width: 160, height: 160)
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    metricRow(color: .green, value: completedCount, key: "statistics_metrics_completed")
+                                    metricRow(color: .blue, value: pendingCount, key: "statistics_metrics_pending")
+                                    metricRow(color: .red, value: overdueCount, key: "statistics_metrics_overdue")
+                                }
+                                .padding(.leading)
+                                Spacer()
                             }
                         }
-                        .frame(height: 200)
                     }
-                }
 
-                Spacer(minLength: 32)
+                    // 📈 Progress Logs
+                    section("statistics_progress") {
+                        if logsInRange.isEmpty {
+                            placeholderText("statistics_no_progress_logs")
+                        } else {
+                            LogsLineChart(logs: logsInRange, days: selectedRange == .all ? 30 : selectedRange.rawValue)
+                                .frame(height: 220)
+                        }
+                    }
+
+                    // 🌱 Top Crops
+                    section("statistics_top_crops") {
+                        let top = topCrops.prefix(6)
+                        if top.isEmpty {
+                            placeholderText("statistics_no_top_crops")
+                        } else {
+                            GlassCard {
+                                Chart {
+                                    ForEach(Array(top.enumerated()), id: \.offset) { _, item in
+                                        BarMark(
+                                            x: .value("Count", item.count),
+                                            y: .value("Crop", item.name)
+                                        )
+                                        .annotation(position: .trailing) {
+                                            Text("\(item.count)").font(.caption2)
+                                        }
+                                    }
+                                }
+                                .frame(height: min(240, CGFloat(top.count * 40)))
+                            }
+                        }
+                    }
+
+                    // 🔔 Notifications
+                    section("statistics_notifications") {
+                        if actionCounts.isEmpty {
+                            placeholderText("statistics_no_notifications")
+                        } else {
+                            GlassCard {
+                                Chart {
+                                    ForEach(actionCounts.keys.sorted(), id: \.self) { action in
+                                        BarMark(
+                                            x: .value("Count", actionCounts[action] ?? 0),
+                                            y: .value("Action", action)
+                                        )
+                                    }
+                                }
+                                .frame(height: 200)
+                            }
+                        }
+                    }
+
+                    Spacer(minLength: 40)
+                }
+                .padding(.vertical)
             }
-            .padding(.top)
-        }
-        .navigationTitle(LocalizedStringKey("statistics_title"))
-        .sheet(isPresented: $showShareSheet) {
-            ActivityView(activityItems: shareItems)
+            .navigationTitle(LocalizationHelper.shared.localized("statistics_title"))
+            .sheet(isPresented: $showShareSheet) {
+                ActivityView(activityItems: shareItems)
+            }
         }
     }
 
-    private var headerSection: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(LocalizedStringKey("statistics_title"))
-                    .font(.largeTitle)
-                    .bold()
-                Text(LocalizedStringKey("statistics_subtitle"))
+    // MARK: - UI Helpers
+    private func summaryCard(color: Color, titleKey: String, valueText: String) -> some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(LocalizationHelper.shared.localized(titleKey))
                     .font(.caption)
                     .foregroundColor(.secondary)
+                Text(valueText)
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(color)
             }
-            Spacer()
+            .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal)
-    }
-
-    private var summaryCards: some View {
-        HStack(spacing: 12) {
-            summaryCard(color: .green, titleKey: "statistics_summary_total_tasks", valueText: "\(userTasks.count)")
-            summaryCard(color: .blue, titleKey: "statistics_summary_completed_pct", valueText: completedPercentage)
-            summaryCard(color: .teal, titleKey: "statistics_summary_my_crops", valueText: "\(userCollectionsCount)")
-        }
-    }
-
-    private func summaryCard(color: Color, titleKey: String, valueText: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(LocalizedStringKey(titleKey))
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text(valueText)
-                .font(.title2)
-                .bold()
-                .foregroundColor(color)
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
     }
 
     private func placeholderText(_ key: String) -> some View {
-        Text(LocalizedStringKey(key))
+        Text(LocalizationHelper.shared.localized(key))
             .foregroundColor(.secondary)
-            .padding(.horizontal)
+            .padding(.vertical, 8)
     }
 
     private func metricRow(color: Color, value: Int, key: String) -> some View {
         HStack {
             Circle().fill(color).frame(width: 10, height: 10)
-            Text(LocalizedStringKey(key))
+            Text(LocalizationHelper.shared.localized(key))
                 .font(.subheadline)
             Spacer()
             Text("\(value)")
@@ -240,6 +233,7 @@ struct StatisticsView: View {
         }
     }
 
+    // MARK: - Computed values
     private var completedCount: Int {
         userTasks.filter { $0.status == "completed" }.count
     }
@@ -250,13 +244,11 @@ struct StatisticsView: View {
         let now = Date()
         return userTasks.filter { ($0.status ?? "") != "completed" && ($0.dueDate ?? now) < now }.count
     }
-
     private var completedPercentage: String {
         let total = max(userTasks.count, 1)
         let pct = Int((Double(completedCount) / Double(total)) * 100.0)
         return "\(pct)%"
     }
-
     private var actionCounts: [String: Int] {
         var dict: [String: Int] = [:]
         for log in userNotifs {
@@ -267,17 +259,17 @@ struct StatisticsView: View {
         }
         return dict
     }
-
     private var topCrops: [(name: String, count: Int, crop: Crop?)] {
         var map: [String: (Int, Crop?)] = [:]
         for log in userLogs {
-            let name = log.crop?.name ?? NSLocalizedString("crop_default", comment: "Crop")
+            let name = log.crop?.name ?? NSLocalizedString("crop_default", comment: "")
             map[name, default: (0, log.crop)] = (map[name, default: (0, nil)].0 + 1, map[name, default: (0, nil)].1 ?? log.crop)
         }
-        let arr = map.map { (name, pair) in (name, pair.0, pair.1) }
-        return arr.sorted { $0.1 > $1.1 }
+        return map.map { (name, pair) in (name, pair.0, pair.1) }
+            .sorted { $0.1 > $1.1 }
     }
 
+    // MARK: - CSV Export
     private func exportCSV() {
         var csv = "Metric,Value\n"
         csv += "Total Tasks,\(userTasks.count)\n"
@@ -322,17 +314,15 @@ struct StatisticsView: View {
     @ViewBuilder
     private func section(_ key: String, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(LocalizedStringKey(key))
+            Text(LocalizationHelper.shared.localized(key))
                 .font(.headline)
                 .padding(.horizontal)
             content()
-                .padding(.horizontal)
         }
     }
 }
 
-// MARK: - Small charts as subcomponents
-
+// MARK: - Charts
 private struct PieChartView: View {
     let completed: Int
     let pending: Int
@@ -358,33 +348,23 @@ private struct PieChartView: View {
 
 private struct LogsLineChart: View {
     let logs: [ProgressLog]
-    let days: Int // used for smoothing / x-axis window
+    let days: Int
 
     private var dailyCounts: [(Date, Int)] {
         let cal = Calendar.current
-        // determine start date
-        let start: Date
-        if days <= 0 {
-            // last 30 default
-            start = cal.date(byAdding: .day, value: -30, to: Date()) ?? Date()
-        } else {
-            start = cal.date(byAdding: .day, value: -days, to: Date()) ?? Date()
-        }
+        let start: Date = days <= 0 ? cal.date(byAdding: .day, value: -30, to: Date()) ?? Date() : cal.date(byAdding: .day, value: -days, to: Date()) ?? Date()
         var dict: [Date: Int] = [:]
         for log in logs {
             let d = cal.startOfDay(for: log.date ?? Date())
             if d < start { continue }
             dict[d, default: 0] += 1
         }
-        // build contiguous days from start..today
         var arr: [(Date, Int)] = []
         var cur = start
         let today = cal.startOfDay(for: Date())
         while cur <= today {
             arr.append((cur, dict[cur] ?? 0))
-            if let next = cal.date(byAdding: .day, value: 1, to: cur) {
-                cur = next
-            } else { break }
+            cur = cal.date(byAdding: .day, value: 1, to: cur) ?? today.addingTimeInterval(86400)
         }
         return arr
     }
@@ -392,10 +372,7 @@ private struct LogsLineChart: View {
     var body: some View {
         Chart {
             ForEach(dailyCounts, id: \.0) { item in
-                LineMark(
-                    x: .value("Date", item.0),
-                    y: .value("Count", item.1)
-                )
+                LineMark(x: .value("Date", item.0), y: .value("Count", item.1))
                 PointMark(x: .value("Date", item.0), y: .value("Count", item.1))
             }
         }
@@ -409,15 +386,13 @@ private struct LogsLineChart: View {
     }
 }
 
-// MARK: - ActivityView for share
+// MARK: - ActivityView for Share
 private struct ActivityView: UIViewControllerRepresentable {
     let activityItems: [Any]
     var applicationActivities: [UIActivity]? = nil
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        let av = UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
-        return av
+        UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
     }
-
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
