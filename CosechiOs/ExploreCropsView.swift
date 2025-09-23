@@ -26,7 +26,7 @@ struct ExploreCropsView: View {
                     FilterMenuView(selectedCategoryKey: $selectedCategoryKey)
                 }
                 .padding(.horizontal)
-                .frame(maxWidth: 480) // 🔹 más compacto
+                .frame(maxWidth: 220, maxHeight: 50) // 🔹 más pequeño y rectangular
 
                 // 📌 Catálogo de cultivos
                 ScrollView {
@@ -46,7 +46,11 @@ struct ExploreCropsView: View {
                 ToolbarItem(placement: .principal) {
                     Text(LocalizationHelper.shared.localized("menu_explore"))
                         .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.black.opacity(0.35)) // 🔹 contraste extra
+                        .cornerRadius(6)
+                        .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
                         .font(.headline)
                 }
             }
@@ -97,7 +101,11 @@ private struct FilterMenuView: View {
                     Image(systemName: "line.3.horizontal.decrease.circle")
                 }
                 .foregroundColor(.white)
-                .shadow(color: .black.opacity(0.4), radius: 2, x: 0, y: 1)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(Color.black.opacity(0.35)) // 🔹 mejor visibilidad
+                .cornerRadius(6)
+                .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
             }
             Spacer()
         }
@@ -131,18 +139,24 @@ private struct CropCardView: View {
                     .cornerRadius(10)
                 }
 
-                // Nombre y categoría
+                // Nombre y categoría con fondo para legibilidad
                 Text(LocalizationHelper.shared.localized(crop.name ?? "crop_no_name"))
                     .font(.headline)
                     .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.7), radius: 2, x: 0, y: 1)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.black.opacity(0.4)) // 🔹 fondo semitransparente
+                    .cornerRadius(4)
                     .lineLimit(1)
 
                 if let category = crop.category {
                     Text(LocalizationHelper.shared.localized(category))
                         .font(.caption)
-                        .foregroundColor(.white.opacity(0.9))
-                        .shadow(color: .black.opacity(0.6), radius: 1, x: 0, y: 1)
+                        .foregroundColor(.white.opacity(0.95))
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(Color.black.opacity(0.35)) // 🔹 contraste en subtítulo
+                        .cornerRadius(3)
                 }
             }
             .padding(8)

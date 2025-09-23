@@ -26,231 +26,102 @@ struct DashboardView: View {
 
     @State private var showAddTask = false
     @State private var showExplore = false
-    @State private var showDebugMenu = false // NUEVO
-    
+    @State private var showDebugMenu = false
+
     // Recomendaciones
     @State private var recommendations: [CropRecommendation] = []
     @State private var isLoadingRecommendations = false
     @State private var recMessage: String? = nil
-    
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    headerView
-                    
-                    // Resumen rápido
-                    summaryCard
-                        .padding(.horizontal)
-                    
-                    metricsCard
-                        .padding(.horizontal)
+            FrutigerAeroBackground {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        headerView
 
-                    // Accesos rápidos
-                    quickActions
-                        .padding(.horizontal)
-
-                    // --- Recomendaciones compactas (nueva sección) ---
-                    sectionTitle("recommendations_title")
-                        .padding(.horizontal)
-                        .padding(.top, 6)
-
-                    VStack(spacing: 8) {
-                        if isLoadingRecommendations {
-                            ProgressView().padding(.horizontal)
-                        } else if recommendations.isEmpty {
-                            Text("recommendations_no_results")
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                        } else {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 12) {
-                                    ForEach(recommendations.prefix(4)) { rec in
-                                        VStack(alignment: .leading, spacing: 6) {
-                                            if let data = rec.crop.imageData, let ui = UIImage(data: data) {
-                                                Image(uiImage: ui)
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 140, height: 80)
-                                                    .clipped()
-                                                    .cornerRadius(8)
-                                            } else {
-                                                ZStack {
-                                                    Color(.systemGray5)
-                                                    Image(systemName: "leaf.fill")
-                                                        .font(.largeTitle)
-                                                        .foregroundColor(.white)
-                                                }
-                                                .frame(width: 140, height: 80)
-                                                .cornerRadius(8)
-                                            }
-
-                                            Text(rec.crop.name ?? NSLocalizedString("crop_default", comment: "Crop"))
-                                                .font(.subheadline)
-                                                .bold()
-                                            Text(rec.crop.category ?? "")
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-
-                                            HStack {
-                                                Button {
-                                                    addCropToCollection(rec.crop)
-                                                } label: {
-                                                    Text(LocalizedStringKey("recommendations_add"))
-                                                        .font(.caption2)
-                                                }
-                                                .buttonStyle(.borderedProminent)
-
-                                                Spacer()
-
-                                                Text("\(Int(rec.score))")
-                                                    .font(.caption2)
-                                                    .padding(6)
-                                                    .background(Color(.systemGray6))
-                                                    .cornerRadius(8)
-                                            }
-                                        }
-                                        .frame(width: 160)
-                                        .padding(8)
-                                        .background(Color(.systemBackground))
-                                        .cornerRadius(10)
-                                        .shadow(color: Color.black.opacity(0.02), radius: 1, x: 0, y: 1)
-                                    }
-
-                                    NavigationLink(destination: RecommendedCropsView().environmentObject(appState)) {
-                                        VStack {
-                                            ZStack {
-                                                Circle().fill(Color(.systemGray6)).frame(width: 64, height: 64)
-                                                Image(systemName: "chevron.right")
-                                            }
-                                            Text(LocalizedStringKey("recommendations_title"))
-                                                .font(.caption2)
-                                        }
-                                        .frame(width: 120, height: 120)
-                                    }
-                                }
-                                .padding(.horizontal)
-                            }
+                        // Resumen rápido - tarjeta compacta
+                        GlassCard {
+                            summaryCardContent
                         }
-                    }
-
-                    // Próximas tareas
-                    sectionTitle("dashboard_upcoming_tasks")
                         .padding(.horizontal)
-                        .padding(.top, 6)
 
-                    VStack(spacing: 8) {
-                        if upcomingTasks.isEmpty {
-                            Text("dashboard_no_upcoming")
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                        } else {
-                            ForEach(upcomingTasks.prefix(5), id: \.objectID) { task in
-                                NavigationLink(destination: destinationForTask(task)) {
-                                    TaskRowCompact(task: task) {
-                                        // toggle completion inline
-                                        TaskHelper.completeTask(task, context: viewContext)
-                                    }
-                                }
-                                .buttonStyle(.plain)
-                                .padding(.horizontal)
-                            }
+                        // Metrics - tarjetas horizontales
+                        GlassCard {
+                            metricsCardContent
                         }
-                    }
-
-                    // Cultivos en colección (rápidos)
-                    sectionTitle("dashboard_my_crops")
                         .padding(.horizontal)
-                        .padding(.top, 12)
 
-                    ScrollView(.horizontal, showsIndicators: false) {
+                        // Quick actions (botones en fila)
+                        GlassCard {
+                            quickActions
+                        }
+                        .padding(.horizontal)
+
+                        // Recomendaciones compactas
+                        sectionTitle("recommendations_title")
+                            .padding(.horizontal)
+                            .padding(.top, 6)
+
+                        recommendationsStrip
+
+                        // Próximas tareas
+                        sectionTitle("dashboard_upcoming_tasks")
+                            .padding(.horizontal)
+                            .padding(.top, 6)
+
+                        upcomingTasksList
+
+                        // Cultivos en colección (rápidos)
+                        sectionTitle("dashboard_my_crops")
+                            .padding(.horizontal)
+                            .padding(.top, 12)
+
+                        cropsCollectionStrip
+
+                        // Últimos logs
+                        sectionTitle("dashboard_recent_progress")
+                            .padding(.horizontal)
+                            .padding(.top, 12)
+
+                        recentProgressList
+
+                        Spacer(minLength: 24)
+                    }
+                    .padding(.top)
+                } // ScrollView
+                .navigationTitle(LocalizedStringKey("dashboard_title"))
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text(LocalizedStringKey("dashboard_title"))
+                            .font(.headline)
+                            .onTapGesture(count: 3) { showDebugMenu = true }
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 12) {
-                            if cropsInCollection.isEmpty {
-                                Text("dashboard_no_crops")
-                                    .foregroundColor(.secondary)
-                                    .padding(.horizontal)
-                            } else {
-                                ForEach(cropsInCollection, id: \.objectID) { crop in
-                                    NavigationLink(destination: CropDetailView(crop: crop)
-                                                    .environment(\.managedObjectContext, viewContext)
-                                                    .environmentObject(appState)
-                                    ) {
-                                        CropCardView(crop: crop)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
+                            Button { showAddTask = true } label: {
+                                Image(systemName: "plus")
                             }
-                        }
-                        .padding(.horizontal)
-                    }
-
-                    // Últimos logs de progreso
-                    sectionTitle("dashboard_recent_progress")
-                        .padding(.horizontal)
-                        .padding(.top, 12)
-
-                    VStack(spacing: 10) {
-                        if recentProgress.isEmpty {
-                            Text("dashboard_no_progress")
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal)
-                        } else {
-                            ForEach(recentProgress.prefix(6), id: \.objectID) { log in
-                                ProgressLogRow(log: log)
-                                    .padding(.horizontal)
+                            NavigationLink(destination: UserProfileView()) {
+                                Image(systemName: "person.crop.circle")
                             }
                         }
                     }
-
-                    Spacer(minLength: 24)
                 }
-                .padding(.top)
-            }
-            .navigationTitle("dashboard_title")
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(LocalizedStringKey("dashboard_title"))
-                        .font(.headline)
-                        .onTapGesture(count: 3) { // triple tap en el título
-                            showDebugMenu = true
-                        }
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
-                        Button {
-                            showAddTask = true
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-
-                        NavigationLink(destination: UserProfileView()) {
-                            Image(systemName: "person.crop.circle")
-                        }
-                    }
-                }
-            }
-            // Present AddTaskView
-            .sheet(isPresented: $showAddTask) {
-                AddTaskView()
+                .sheet(isPresented: $showAddTask) {
+                    AddTaskView()
                         .environment(\.managedObjectContext, viewContext)
                         .environmentObject(appState)
-            }
-            .onAppear {
-                loadRecommendations()
-            }
-            .onChange(of: appState.currentUserID) { _ in
-                loadRecommendations()
-            }
-        }
+                }
+                .onAppear { loadRecommendations() }
+                .onChange(of: appState.currentUserID) { _ in loadRecommendations() }
+            } // FrutigerAeroBackground
+        } // NavigationStack
         .navigationDestination(isPresented: $showDebugMenu) {
             DebugNotificationsView()
                 .environment(\.managedObjectContext, viewContext)
                 .environmentObject(appState)
         }
-
     }
 
     // MARK: - Computed data filtered por usuario
@@ -289,16 +160,16 @@ struct DashboardView: View {
             (a.dueDate ?? Date.distantFuture) < (b.dueDate ?? Date.distantFuture)
         }
     }
-    
+
     /// Estadísticas rápidas
-        private var totalTasksCount: Int { tasksRelevant.count }
-        private var completedTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "completed" }.count }
-        private var pendingTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "pending" }.count }
-        private var overdueCount: Int {
-            let now = Date()
-            return tasksRelevant.filter { ($0.status ?? "") != "completed" && ($0.dueDate ?? Date()) < now }.count
-        }
-    
+    private var totalTasksCount: Int { tasksRelevant.count }
+    private var completedTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "completed" }.count }
+    private var pendingTasksCount: Int { tasksRelevant.filter { ($0.status ?? "") == "pending" }.count }
+    private var overdueCount: Int {
+        let now = Date()
+        return tasksRelevant.filter { ($0.status ?? "") != "completed" && ($0.dueDate ?? Date()) < now }.count
+    }
+
     /// Progress logs del usuario (filtrados)
     private var recentProgress: [ProgressLog] {
         guard let uid = appState.currentUserID else { return [] }
@@ -306,24 +177,26 @@ struct DashboardView: View {
             log.user?.userID == uid
         }
     }
-    
+
     private var progressLogsCount: Int { recentProgress.count }
-    
-    // MARK: - UI Subviews
+
+    // MARK: - Subviews & parts
+
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading) {
                 if let user = currentUser {
-                    Text("dashboard_greeting_name \(user.username ?? "")")
+                    // nombre + saludo (mantenemos clave)
+                    Text("\(LocalizationHelper.shared.localized("dashboard_greeting")) \(user.username ?? "")")
                         .font(.title2)
                         .bold()
                 } else {
-                    Text("dashboard_greeting")
+                    Text(LocalizationHelper.shared.localized("dashboard_greeting"))
                         .font(.title2)
                         .bold()
                 }
 
-                Text("dashboard_subtitle")
+                Text(LocalizationHelper.shared.localized("dashboard_subtitle"))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -332,13 +205,14 @@ struct DashboardView: View {
         .padding(.horizontal)
     }
 
-    private var summaryCard: some View {
+    // Summary content (para insertar dentro de GlassCard)
+    private var summaryCardContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("dashboard_summary")
+                    Text(LocalizationHelper.shared.localized("dashboard_summary"))
                         .font(.headline)
-                    Text("\(totalTasksCount) " + NSLocalizedString("dashboard_tasks", comment: "tasks"))
+                    Text("\(totalTasksCount) " + LocalizationHelper.shared.localized("dashboard_tasks"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -347,7 +221,7 @@ struct DashboardView: View {
                     Text("\(completedTasksCount)/\(totalTasksCount)")
                         .font(.title3)
                         .bold()
-                    Text("dashboard_completed")
+                    Text(LocalizationHelper.shared.localized("dashboard_completed"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -358,7 +232,7 @@ struct DashboardView: View {
                 ProgressView(value: Double(completedTasksCount), total: Double(max(totalTasksCount, 1)))
                     .progressViewStyle(.linear)
             } else {
-                Text("dashboard_no_tasks")
+                Text(LocalizationHelper.shared.localized("dashboard_no_tasks"))
                     .foregroundColor(.secondary)
             }
 
@@ -367,89 +241,223 @@ struct DashboardView: View {
                 HStack {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(.yellow)
-                    Text(String(format: NSLocalizedString("dashboard_overdue_count", comment: ""), overdueCount))
+                    Text(String(format: LocalizationHelper.shared.localized("dashboard_overdue_count"), overdueCount))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .shadow(radius: 1)
     }
-    
-    // NUEVO: Metrics Panel
-        private var metricsCard: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("dashboard_metrics_title")
-                    .font(.headline)
 
-                HStack(spacing: 16) {
-                    metricColumn(color: .green, value: completedTasksCount, key: "dashboard_metrics_completed")
-                    metricColumn(color: .blue, value: pendingTasksCount, key: "dashboard_metrics_pending")
-                    metricColumn(color: .red, value: overdueCount, key: "dashboard_metrics_overdue")
-                }
+    // Metrics card content
+    private var metricsCardContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(LocalizationHelper.shared.localized("dashboard_metrics_title"))
+                .font(.headline)
 
-                Divider()
-
-                HStack {
-                    Image(systemName: "chart.bar.fill")
-                        .foregroundColor(.blue)
-                    Text("\(progressLogsCount) " + NSLocalizedString("dashboard_metrics_progresslogs", comment: ""))
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
+            HStack(spacing: 16) {
+                metricColumn(color: .green, value: completedTasksCount, key: "dashboard_metrics_completed")
+                metricColumn(color: .blue, value: pendingTasksCount, key: "dashboard_metrics_pending")
+                metricColumn(color: .red, value: overdueCount, key: "dashboard_metrics_overdue")
             }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
-            .shadow(radius: 1)
-        }
-    private func metricColumn(color: Color, value: Int, key: String) -> some View {
-            VStack {
-                Text("\(value)")
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(color)
-                Text(LocalizedStringKey(key))
-                    .font(.caption)
+
+            Divider()
+
+            HStack {
+                Image(systemName: "chart.bar.fill")
+                    .foregroundColor(.blue)
+                Text("\(progressLogsCount) " + LocalizationHelper.shared.localized("dashboard_metrics_progresslogs"))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            .frame(maxWidth: .infinity)
         }
-    
-    
+    }
+
+    private func metricColumn(color: Color, value: Int, key: String) -> some View {
+        VStack {
+            Text("\(value)")
+                .font(.title2)
+                .bold()
+                .foregroundColor(color)
+            Text(LocalizationHelper.shared.localized(key))
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     private var quickActions: some View {
-            HStack(spacing: 12) {
-                NavigationLink(destination: AddTaskView().environment(\.managedObjectContext, viewContext)) {
-                    QuickActionButton(icon: "plus.circle.fill", titleKey: "dashboard_action_add_task", color: .green)
-                }
-                NavigationLink(destination: ExploreCropsView().environment(\.managedObjectContext, viewContext)) {
-                    QuickActionButton(icon: "leaf.circle.fill", titleKey: "dashboard_action_explore", color: .blue)
-                }
-                NavigationLink(destination: MyCropsView().environment(\.managedObjectContext, viewContext)) {
-                    QuickActionButton(icon: "tray.full.fill", titleKey: "dashboard_action_my_crops", color: .teal)
-                }
-                NavigationLink(destination: UserProfileView().environmentObject(appState)) {
-                    QuickActionButton(icon: "person.crop.circle.fill", titleKey: "dashboard_action_profile", color: .gray)
-                }
-                NavigationLink(destination: StatisticsView()
-                    .environment(\.managedObjectContext, viewContext)
-                    .environmentObject(appState)) {
-                    QuickActionButton(icon: "chart.bar.fill", titleKey: "dashboard_action_statistics", color: .purple)
+        HStack(spacing: 12) {
+            NavigationLink(destination: AddTaskView().environment(\.managedObjectContext, viewContext)) {
+                QuickActionButton(icon: "plus.circle.fill", titleKey: "dashboard_action_add_task", color: .green)
+            }
+            NavigationLink(destination: ExploreCropsView().environment(\.managedObjectContext, viewContext)) {
+                QuickActionButton(icon: "leaf.circle.fill", titleKey: "dashboard_action_explore", color: .blue)
+            }
+            NavigationLink(destination: MyCropsView().environment(\.managedObjectContext, viewContext)) {
+                QuickActionButton(icon: "tray.full.fill", titleKey: "dashboard_action_my_crops", color: .teal)
+            }
+            NavigationLink(destination: UserProfileView().environmentObject(appState)) {
+                QuickActionButton(icon: "person.crop.circle.fill", titleKey: "dashboard_action_profile", color: .gray)
+            }
+            NavigationLink(destination: StatisticsView()
+                .environment(\.managedObjectContext, viewContext)
+                .environmentObject(appState)) {
+                QuickActionButton(icon: "chart.bar.fill", titleKey: "dashboard_action_statistics", color: .purple)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Recommendations strip
+    private var recommendationsStrip: some View {
+        VStack(spacing: 8) {
+            if isLoadingRecommendations {
+                ProgressView().padding(.horizontal)
+            } else if recommendations.isEmpty {
+                Text(LocalizationHelper.shared.localized("recommendations_no_results"))
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(recommendations.prefix(4)) { rec in
+                            VStack(alignment: .leading, spacing: 6) {
+                                if let data = rec.crop.imageData, let ui = UIImage(data: data) {
+                                    Image(uiImage: ui)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 140, height: 80)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                } else {
+                                    ZStack {
+                                        Color(.systemGray5)
+                                        Image(systemName: "leaf.fill")
+                                            .font(.largeTitle)
+                                            .foregroundColor(.white)
+                                    }
+                                    .frame(width: 140, height: 80)
+                                    .cornerRadius(8)
+                                }
+
+                                Text(LocalizationHelper.shared.localized(rec.crop.name ?? "crop_default"))
+                                    .font(.subheadline)
+                                    .bold()
+                                Text(LocalizationHelper.shared.localized(rec.crop.category ?? ""))
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+
+                                HStack {
+                                    Button {
+                                        addCropToCollection(rec.crop)
+                                    } label: {
+                                        Text(LocalizedStringKey("recommendations_add"))
+                                            .font(.caption2)
+                                    }
+                                    .buttonStyle(.borderedProminent)
+
+                                    Spacer()
+
+                                    Text("\(Int(rec.score))")
+                                        .font(.caption2)
+                                        .padding(6)
+                                        .background(Color(.systemGray6))
+                                        .cornerRadius(8)
+                                }
+                            }
+                            .frame(width: 160)
+                            .padding(8)
+                            .background(Color(.systemBackground))
+                            .cornerRadius(10)
+                            .shadow(color: Color.black.opacity(0.02), radius: 1, x: 0, y: 1)
+                        }
+
+                        NavigationLink(destination: RecommendedCropsView().environmentObject(appState)) {
+                            VStack {
+                                ZStack {
+                                    Circle().fill(Color(.systemGray6)).frame(width: 64, height: 64)
+                                    Image(systemName: "chevron.right")
+                                }
+                                Text(LocalizedStringKey("recommendations_title"))
+                                    .font(.caption2)
+                            }
+                            .frame(width: 120, height: 120)
+                        }
+                    }
+                    .padding(.horizontal)
                 }
             }
-            .frame(maxWidth: .infinity)
         }
-    
-    
+    }
+
+    // MARK: - Upcoming tasks list
+    private var upcomingTasksList: some View {
+        VStack(spacing: 8) {
+            if upcomingTasks.isEmpty {
+                Text(LocalizationHelper.shared.localized("dashboard_no_upcoming"))
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+            } else {
+                ForEach(upcomingTasks.prefix(5), id: \.objectID) { task in
+                    NavigationLink(destination: destinationForTask(task)) {
+                        TaskRowCompact(task: task) {
+                            TaskHelper.completeTask(task, context: viewContext)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal)
+                }
+            }
+        }
+    }
+
+    // MARK: - Crops in collection strip
+    private var cropsCollectionStrip: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                if cropsInCollection.isEmpty {
+                    Text(LocalizationHelper.shared.localized("dashboard_no_crops"))
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                } else {
+                    ForEach(cropsInCollection, id: \.objectID) { crop in
+                        NavigationLink(destination: CropDetailView(crop: crop)
+                                        .environment(\.managedObjectContext, viewContext)
+                                        .environmentObject(appState)
+                        ) {
+                            CropCardView(crop: crop)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    // MARK: - Recent progress list
+    private var recentProgressList: some View {
+        VStack(spacing: 10) {
+            if recentProgress.isEmpty {
+                Text(LocalizationHelper.shared.localized("dashboard_no_progress"))
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+            } else {
+                ForEach(recentProgress.prefix(6), id: \.objectID) { log in
+                    ProgressLogRow(log: log)
+                        .padding(.horizontal)
+                }
+            }
+        }
+    }
+
     // MARK: - Helper UI components (internos)
 
     @ViewBuilder
     private func sectionTitle(_ key: String) -> some View {
         HStack {
-            Text(LocalizedStringKey(key))
+            Text(LocalizationHelper.shared.localized(key))
                 .font(.headline)
             Spacer()
         }
@@ -485,7 +493,7 @@ struct DashboardView: View {
             }
             Spacer()
             if let crop = task.crop {
-                Text(crop.name ?? "")
+                Text(LocalizationHelper.shared.localized(crop.name ?? ""))
                     .font(.caption2)
                     .padding(6)
                     .background(Color(.systemGray5))
@@ -498,7 +506,6 @@ struct DashboardView: View {
         .shadow(color: Color.black.opacity(0.02), radius: 1, x: 0, y: 1)
     }
 
-    // Crop card compact
     private func CropCardView(crop: Crop) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             if let data = crop.imageData, let ui = UIImage(data: data) {
@@ -519,10 +526,10 @@ struct DashboardView: View {
                 .cornerRadius(8)
             }
 
-            Text(crop.name ?? "")
-                .font(.subheadline)
-                .bold()
-            Text(crop.category ?? "")
+            // Localización para nombre y categoría
+            Text(LocalizationHelper.shared.localized(crop.name ?? ""))
+                .font(.subheadline).bold()
+            Text(LocalizationHelper.shared.localized(crop.category ?? ""))
                 .font(.caption2)
                 .foregroundColor(.secondary)
         }
@@ -533,7 +540,6 @@ struct DashboardView: View {
         .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
     }
 
-    // Row for a ProgressLog
     private func ProgressLogRow(log: ProgressLog) -> some View {
         HStack(alignment: .top, spacing: 12) {
             if let data = log.imageData, let ui = UIImage(data: data) {
@@ -552,9 +558,8 @@ struct DashboardView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text(log.crop?.name ?? NSLocalizedString("dashboard_progress_log_no_crop", comment: "No crop"))
-                        .font(.subheadline)
-                        .bold()
+                    Text(LocalizationHelper.shared.localized(log.crop?.name ?? "dashboard_progress_log_no_crop"))
+                        .font(.subheadline).bold()
                     Spacer()
                     Text(log.date ?? Date(), style: .time)
                         .font(.caption2)
@@ -562,8 +567,7 @@ struct DashboardView: View {
                 }
 
                 if let note = log.note {
-                    Text(note)
-                        .font(.caption)
+                    Text(note).font(.caption)
                 } else {
                     Text(LocalizedStringKey("dashboard_progress_no_note"))
                         .font(.caption)
@@ -575,13 +579,16 @@ struct DashboardView: View {
         .background(Color(.systemGray6))
         .cornerRadius(10)
     }
-    
-    // MARK: - Recomendaciones: funciones
 
+    // MARK: - Recomendaciones: funciones (lógica intacta)
     private func loadRecommendations() {
         isLoadingRecommendations = true
         DispatchQueue.global(qos: .userInitiated).async {
-            let recs = RecommendationHelper.recommendCrops(context: viewContext, forUserID: appState.currentUserID, maxResults: 8)
+            let recs = RecommendationHelper.recommendCrops(
+                context: viewContext,
+                forUserID: appState.currentUserID,
+                maxResults: 8
+            )
             DispatchQueue.main.async {
                 self.recommendations = recs
                 self.isLoadingRecommendations = false
@@ -597,7 +604,11 @@ struct DashboardView: View {
             return
         }
         do {
-            let added = try RecommendationHelper.addCropToUserCollection(crop: crop, userID: uid, context: viewContext)
+            let added = try RecommendationHelper.addCropToUserCollection(
+                crop: crop,
+                userID: uid,
+                context: viewContext
+            )
             if added {
                 recMessage = NSLocalizedString("recommendations_added", comment: "")
                 if let id = crop.cropID { RecommendationAnalytics.logAccepted(cropID: id) }
@@ -612,29 +623,29 @@ struct DashboardView: View {
             recMessage = error.localizedDescription
         }
     }
-}
 
-// MARK: - QuickActionButton small component
-private struct QuickActionButton: View {
-    let icon: String
-    let titleKey: String
-    let color: Color
+    // MARK: - QuickActionButton
+    private struct QuickActionButton: View {
+        let icon: String
+        let titleKey: String
+        let color: Color
 
-    var body: some View {
-        VStack {
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.2))
-                    .frame(width: 48, height: 48)
-                Image(systemName: icon)
-                    .font(.title2)
-                    .foregroundColor(color)
+        var body: some View {
+            VStack {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.18))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: icon)
+                        .font(.title2)
+                        .foregroundColor(color)
+                }
+                Text(LocalizationHelper.shared.localized(titleKey))
+                    .font(.caption2)
+                    .lineLimit(1)
             }
-            Text(LocalizedStringKey(titleKey))
-                .font(.caption2)
-                .lineLimit(1)
+            .frame(width: 70)
         }
-        .frame(width: 70)
     }
 }
 
@@ -643,4 +654,5 @@ private struct QuickActionButton: View {
     DashboardView()
         .environment(\.managedObjectContext, PersistenceController.shared.container.viewContext)
         .environmentObject(AppState())
+        .environmentObject(AeroTheme(variant: .soft))
 }

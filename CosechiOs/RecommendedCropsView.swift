@@ -1,3 +1,4 @@
+// RecommendedCropsView.swift
 import SwiftUI
 import CoreData
 
@@ -17,7 +18,7 @@ struct RecommendedCropsView: View {
                 ProgressView()
                     .padding()
             } else if recommendations.isEmpty {
-                Text("recommendations_no_results")
+                Text(LocalizedStringKey("recommendations_no_results"))
                     .foregroundColor(.secondary)
                     .padding()
             } else {
@@ -76,7 +77,7 @@ struct RecommendedCropsView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text(rec.crop.name ?? NSLocalizedString("crop_default", comment: ""))
+                    Text(LocalizationHelper.shared.localized(rec.crop.name ?? "crop_default"))
                         .font(.headline)
                     Spacer()
                     Text(String(format: "%.0f", rec.score))
@@ -87,14 +88,14 @@ struct RecommendedCropsView: View {
                 }
 
                 if let cat = rec.crop.category, !cat.isEmpty {
-                    Text(cat)
+                    Text(LocalizationHelper.shared.localized(cat))
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
 
                 // Reasons
                 ForEach(rec.reasons.prefix(3), id: \.self) { reason in
-                    Text(reason)
+                    Text(LocalizationHelper.shared.localized(reason))
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
@@ -102,7 +103,7 @@ struct RecommendedCropsView: View {
 
             Spacer()
 
-            // Add button (si ya está en colección RecommendationHelper no la añadirá)
+            // Add button
             Button(action: onAdd) {
                 Text(LocalizedStringKey("recommendations_add"))
             }
