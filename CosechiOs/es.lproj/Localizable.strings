@@ -499,3 +499,21 @@
 "season_winter" = "Invierno";
 
 "loading_hint" = "Consejo: Cuida tus cultivos para obtener mejores cosechas";
+
+/* Información general de la tarea */
+"task_info_section" = "Información de la tarea";
+
+/* Programación de la tarea */
+"task_schedule_section" = "Programación";
+
+/* Repetición de la tarea */
+"task_repeat_section" = "Repetición";
+
+/* Días antes */
+"task_days_before" = "Días antes:";
+
+/* Prefijo para fechas relativas */
+"task_due_prefix" = "Vence en";
+
+/* Métrica de logs de progreso en dashboard */
+"dashboard_metrics_progresslogs" = "Registros de progreso";

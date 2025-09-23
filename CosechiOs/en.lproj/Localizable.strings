@@ -499,3 +499,21 @@
 "season_winter" = "Winter";
 
 "loading_hint" = "Tip: Take care of your crops for better harvests";
+
+/* Task general information */
+"task_info_section" = "Task information";
+
+/* Task schedule */
+"task_schedule_section" = "Schedule";
+
+/* Task repetition */
+"task_repeat_section" = "Repetition";
+
+/* Days before */
+"task_days_before" = "Days before:";
+
+/* Relative date prefix */
+"task_due_prefix" = "Due in";
+
+/* Dashboard progress logs metric */
+"dashboard_metrics_progresslogs" = "Progress logs";

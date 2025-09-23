@@ -23,75 +23,95 @@ struct EditTaskView: View {
     @State private var showMissingAlert = false
 
     var body: some View {
-        FrutigerAeroBackground {
-            ScrollView {
-                VStack(spacing: 16) {
-                    GlassCard {
-                        VStack(spacing: 12) {
-                            TextField("task_title", text: $title)
-                                .aeroTextField()
-                            TextField("task_details", text: $details)
-                                .aeroTextField()
-                        }
-                    }
-
-                    GlassCard {
-                        VStack(spacing: 12) {
-                            DatePicker("task_due_date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
-                                .foregroundColor(.white)
-                            Toggle("task_reminder", isOn: $reminder)
-                                .foregroundColor(.white)
-                        }
-                    }
-
-                    GlassCard {
-                        VStack(spacing: 12) {
-                            Picker("task_repeat", selection: $recurrence) {
-                                Text("repeat_none").tag("none")
-                                Text("repeat_daily").tag("daily")
-                                Text("repeat_weekly").tag("weekly")
-                                Text("repeat_monthly").tag("monthly")
+        NavigationStack {
+            FrutigerAeroBackground {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // 📌 Sección Título y Detalles
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(LocalizationHelper.shared.localized("task_info_section"))
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                TextField(LocalizationHelper.shared.localized("task_title"), text: $title)
+                                    .aeroTextField()
+                                TextField(LocalizationHelper.shared.localized("task_details"), text: $details)
+                                    .aeroTextField()
                             }
-                            .pickerStyle(.segmented)
+                        }
 
-                            Toggle("task_remember_days_before", isOn: $useRelative)
-                                .foregroundColor(.white)
+                        // 📌 Sección Fecha y Recordatorio
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(LocalizationHelper.shared.localized("task_schedule_section"))
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                DatePicker(LocalizationHelper.shared.localized("task_due_date"), selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                                    .foregroundColor(.white)
+                                Toggle(LocalizationHelper.shared.localized("task_reminder"), isOn: $reminder)
+                                    .foregroundColor(.white)
+                            }
+                        }
 
-                            if useRelative {
-                                Stepper(value: $relativeDays, in: 0...30) {
-                                    Text("task_days_before \(relativeDays)")
+                        // 📌 Sección Repetición
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(LocalizationHelper.shared.localized("task_repeat_section"))
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Picker(LocalizationHelper.shared.localized("task_repeat"), selection: $recurrence) {
+                                    Text(LocalizationHelper.shared.localized("repeat_none")).tag("none")
+                                    Text(LocalizationHelper.shared.localized("repeat_daily")).tag("daily")
+                                    Text(LocalizationHelper.shared.localized("repeat_weekly")).tag("weekly")
+                                    Text(LocalizationHelper.shared.localized("repeat_monthly")).tag("monthly")
+                                }
+                                .pickerStyle(.segmented)
+
+                                Toggle(LocalizationHelper.shared.localized("task_remember_days_before"), isOn: $useRelative)
+                                    .foregroundColor(.white)
+
+                                if useRelative {
+                                    Stepper(value: $relativeDays, in: 0...30) {
+                                        Text("\(LocalizationHelper.shared.localized("task_days_before")) \(relativeDays)")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
+                        }
+
+                        // 📌 Sección Cultivo Asociado
+                        if let crop = liveTask?.crop {
+                            GlassCard {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(LocalizationHelper.shared.localized("task_associated_crop"))
+                                        .font(.headline)
                                         .foregroundColor(.white)
+                                    Text(LocalizationHelper.shared.localized(crop.name ?? "crop_default"))
+                                        .foregroundColor(.secondary)
                                 }
                             }
                         }
                     }
-
-                    if let crop = liveTask?.crop {
-                        GlassCard {
-                            Text("\(NSLocalizedString("task_associated_crop", comment: "")): \(crop.name ?? "—")")
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                    .padding()
                 }
-                .padding()
             }
-            .navigationTitle("edit_task")
+            .navigationTitle(LocalizationHelper.shared.localized("edit_task"))
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("cancel") { dismiss() }
+                    Button(LocalizationHelper.shared.localized("cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("save") {
+                    Button(LocalizationHelper.shared.localized("save")) {
                         saveChanges()
                         dismiss()
                     }
                 }
             }
             .onAppear(perform: loadLiveTask)
-            .alert("task_not_found", isPresented: $showMissingAlert) {
-                Button("ok", role: .cancel) { dismiss() }
+            .alert(LocalizationHelper.shared.localized("task_not_found"), isPresented: $showMissingAlert) {
+                Button(LocalizationHelper.shared.localized("ok"), role: .cancel) { dismiss() }
             } message: {
-                Text("task_not_found_message")
+                Text(LocalizationHelper.shared.localized("task_not_found_message"))
             }
         }
     }
@@ -127,7 +147,7 @@ struct EditTaskView: View {
             t.updatedAt = Date()
 
             t.recurrenceRule = recurrence
-            t.relativeDays = Int16(useRelative ? relativeDays : 0)
+            t.relativeDays = Int16(useRelative ? Int16(relativeDays) : 0)
 
             if reminder {
                 NotificationHelper.reschedule(for: t)

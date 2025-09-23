@@ -32,23 +32,43 @@ struct CropDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                headerSection
-                Divider()
-                seasonsSection
-                Divider()
-                collectionButtons
-                Divider()
-                tasksSection
-                Divider()
-                stepsSection
-                Divider()
-                progressSection
-                Divider()
-                infoSection
+        ZStack {
+            // 🌿 Fondo inspirado en naturaleza digital
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.green.opacity(0.7),
+                    Color.blue.opacity(0.5),
+                    Color.green.opacity(0.6)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            .overlay(
+                Circle()
+                    .fill(Color.green.opacity(0.25))
+                    .blur(radius: 120)
+                    .offset(x: -120, y: -150)
+            )
+            .overlay(
+                Circle()
+                    .fill(Color.teal.opacity(0.2))
+                    .blur(radius: 100)
+                    .offset(x: 150, y: 250)
+            )
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    glassCard { headerSection }
+                    glassCard { seasonsSection }
+                    glassCard { collectionButtons }
+                    if !filteredTasks.isEmpty { glassCard { tasksSection } }
+                    if let steps = crop.steps as? Set<Step>, !steps.isEmpty { glassCard { stepsSection } }
+                    glassCard { progressSection }
+                    glassCard { infoSection }
+                }
+                .padding()
             }
-            .padding()
         }
         .navigationTitle(Text(localizedName()))
         .navigationBarTitleDisplayMode(.inline)
@@ -70,41 +90,56 @@ struct CropDetailView: View {
                 .onDisappear { loadProgressLogs() }
         }
     }
+
+    // MARK: - Glass wrapper
+    private func glassCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            content()
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.15))
+                .background(Color.white.opacity(0.05).blur(radius: 6))
+                .shadow(color: .green.opacity(0.3), radius: 8, x: 0, y: 4)
+        )
+    }
 }
 
 // MARK: - UI Sections
 extension CropDetailView {
     @ViewBuilder private var headerSection: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 16) {
             if let imageName = crop.imageName, !imageName.isEmpty, UIImage(named: imageName) != nil {
                 Image(imageName)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 120, height: 120)
                     .clipped()
-                    .cornerRadius(10)
-                    .shadow(radius: 2)
+                    .cornerRadius(12)
+                    .shadow(radius: 4)
             } else {
                 ZStack {
-                    Color(.systemGray5)
+                    Color.green.opacity(0.3)
                     Image(systemName: "leaf.fill")
                         .font(.system(size: 40))
                         .foregroundColor(.white)
                 }
                 .frame(width: 120, height: 120)
-                .cornerRadius(10)
-                .shadow(radius: 1)
+                .cornerRadius(12)
+                .shadow(radius: 2)
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(localizedName())
-                    .font(.largeTitle)
+                    .font(.title)
                     .bold()
+                    .foregroundColor(.white)
 
                 if let descKey = crop.cropDescription, !descKey.isEmpty {
                     Text(LocalizationHelper.shared.localized(descKey))
                         .font(.body)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white.opacity(0.85))
                 }
 
                 if let catKey = crop.category {
@@ -112,14 +147,15 @@ extension CropDetailView {
                         .font(.caption)
                         .padding(.vertical, 4)
                         .padding(.horizontal, 8)
-                        .background(Color(.systemGray6))
+                        .background(Color.green.opacity(0.25))
                         .cornerRadius(8)
+                        .foregroundColor(.white)
                 }
             }
 
             Spacer()
 
-            VStack {
+            VStack(spacing: 8) {
                 Text(localizedDifficultyKey(crop.difficulty ?? ""))
                     .font(.caption2)
                     .bold()
@@ -132,8 +168,9 @@ extension CropDetailView {
                     Text(LocalizationHelper.shared.localized("crop_recommended_now"))
                         .font(.caption2)
                         .padding(6)
-                        .background(Color.green.opacity(0.15))
+                        .background(Color.green.opacity(0.3))
                         .cornerRadius(8)
+                        .foregroundColor(.white)
                 }
             }
         }
@@ -143,6 +180,7 @@ extension CropDetailView {
         VStack(alignment: .leading, spacing: 8) {
             Text(LocalizationHelper.shared.localized("crop_seasons"))
                 .font(.headline)
+                .foregroundColor(.white)
 
             if let stored = crop.recommendedSeasons as? [String], !stored.isEmpty {
                 HStack(spacing: 12) {
@@ -153,13 +191,14 @@ extension CropDetailView {
                                 .font(.subheadline)
                         }
                         .padding(6)
-                        .background(Color(.systemGray6))
+                        .background(Color.white.opacity(0.15))
                         .cornerRadius(8)
+                        .foregroundColor(.white)
                     }
                 }
             } else {
                 Text(LocalizationHelper.shared.localized("crop_seasons_none"))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.7))
             }
         }
     }
@@ -176,9 +215,7 @@ extension CropDetailView {
         .tint(isInCollection ? .red : .green)
 
         if isInCollection {
-            Button {
-                showingTaskSheet = true
-            } label: {
+            Button { showingTaskSheet = true } label: {
                 Label(LocalizationHelper.shared.localized("crop_add_task"), systemImage: "calendar.badge.plus")
                     .frame(maxWidth: .infinity)
             }
@@ -188,96 +225,92 @@ extension CropDetailView {
     }
 
     @ViewBuilder private var tasksSection: some View {
-        let tasksForUser = filteredTasks
-        if !tasksForUser.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(LocalizationHelper.shared.localized("crop_tasks_title"))
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LocalizationHelper.shared.localized("crop_tasks_title"))
+                .font(.headline)
+                .foregroundColor(.white)
 
-                ForEach(tasksForUser) { task in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(task.title ?? LocalizationHelper.shared.localized("task_default"))
-                                .font(.subheadline)
-                                .strikethrough(task.status == "completed")
+            ForEach(filteredTasks) { task in
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(task.title ?? LocalizationHelper.shared.localized("task_default"))
+                            .font(.subheadline)
+                            .strikethrough(task.status == "completed")
+                            .foregroundColor(.white)
 
-                            if let date = task.dueDate {
-                                Text("⏰ \(date.formatted(date: .abbreviated, time: .shortened))")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-
-                        Spacer()
-
-                        if task.status == "pending" {
-                            Button {
-                                TaskHelper.completeTask(task, context: viewContext)
-                            } label: {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.green)
-                            }
-                        } else {
-                            Text("✔️").foregroundColor(.green)
+                        if let date = task.dueDate {
+                            Text("⏰ \(date.formatted(date: .abbreviated, time: .shortened))")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
                         }
                     }
-                    .padding(.vertical, 4)
+
+                    Spacer()
+
+                    if task.status == "pending" {
+                        Button {
+                            TaskHelper.completeTask(task, context: viewContext)
+                        } label: {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        }
+                    } else {
+                        Text("✔️").foregroundColor(.green)
+                    }
                 }
+                .padding(.vertical, 4)
             }
         }
     }
 
     @ViewBuilder private var stepsSection: some View {
-        if let stepsSet = crop.steps as? Set<Step>, !stepsSet.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(LocalizationHelper.shared.localized("crop_steps"))
-                    .font(.headline)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(LocalizationHelper.shared.localized("crop_steps"))
+                .font(.headline)
+                .foregroundColor(.white)
 
-                let sortedSteps: [Step] = stepsSet.sorted { $0.order < $1.order }
-                let total = sortedSteps.count
-                let completed = sortedSteps.filter { step in
-                    if let sid = step.stepID { return stepProgress[sid] ?? false }
-                    return false
-                }.count
+            let stepsSet = (crop.steps as? Set<Step>) ?? []
+            let sortedSteps: [Step] = stepsSet.sorted { $0.order < $1.order }
+            let total = sortedSteps.count
+            let completed = sortedSteps.filter { stepProgress[$0.stepID ?? UUID()] == true }.count
 
-                ProgressView(value: Double(completed), total: Double(total))
-                    .padding(.vertical, 4)
+            ProgressView(value: Double(completed), total: Double(total))
+                .tint(.green)
+                .padding(.vertical, 4)
 
-                ForEach(sortedSteps, id: \.self) { step in
-                    if let stepID = step.stepID {
-                        HStack {
-                            Button {
-                                toggleStep(step)
-                            } label: {
-                                Image(systemName: stepProgress[stepID] == true ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(stepProgress[stepID] == true ? .green : .gray)
+            ForEach(sortedSteps, id: \.self) { step in
+                if let stepID = step.stepID {
+                    HStack(alignment: .top, spacing: 8) {
+                        Button { toggleStep(step) } label: {
+                            Image(systemName: stepProgress[stepID] == true ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(stepProgress[stepID] == true ? .green : .white.opacity(0.7))
+                        }
+                        .buttonStyle(.plain)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            if let stepKey = step.title {
+                                Text(LocalizationHelper.shared.localized(stepKey))
+                                    .foregroundColor(.white)
+                                    .strikethrough(stepProgress[stepID] == true)
                             }
-                            .buttonStyle(.plain)
 
-                            VStack(alignment: .leading) {
-                                if let stepKey = step.title {
-                                    Text(LocalizationHelper.shared.localized(stepKey))
-                                        .strikethrough(stepProgress[stepID] == true)
-                                }
+                            if step.estimateDuration > 0 {
+                                Text("\(step.estimateDuration) " + LocalizationHelper.shared.localized("days_abbr"))
+                                    .font(.caption2)
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
 
-                                if step.estimateDuration > 0 {
-                                    Text("\(step.estimateDuration) " + LocalizationHelper.shared.localized("days_abbr"))
+                            if let sd = step.stepDescription, !sd.isEmpty {
+                                let resolved = LocalizationHelper.shared.localized(sd)
+                                if resolved.contains("%@") {
+                                    let stepTitleLocalized = LocalizationHelper.shared.localized(step.title ?? "")
+                                    Text(String(format: resolved, stepTitleLocalized))
                                         .font(.caption2)
-                                        .foregroundColor(.secondary)
-                                }
-
-                                if let sd = step.stepDescription, !sd.isEmpty {
-                                    let resolved = LocalizationHelper.shared.localized(sd)
-                                    if resolved.contains("%@") {
-                                        let stepTitleLocalized = LocalizationHelper.shared.localized(step.title ?? "")
-                                        Text(String(format: resolved, stepTitleLocalized))
-                                            .font(.caption2)
-                                            .foregroundColor(.secondary)
-                                    } else {
-                                        Text(resolved)
-                                            .font(.caption2)
-                                            .foregroundColor(.secondary)
-                                    }
+                                        .foregroundColor(.white.opacity(0.7))
+                                } else {
+                                    Text(resolved)
+                                        .font(.caption2)
+                                        .foregroundColor(.white.opacity(0.7))
                                 }
                             }
                         }
@@ -291,30 +324,33 @@ extension CropDetailView {
         VStack(alignment: .leading, spacing: 8) {
             Text(LocalizationHelper.shared.localized("crop_progress_title"))
                 .font(.headline)
+                .foregroundColor(.white)
 
             if progressLogs.isEmpty {
                 Text(LocalizationHelper.shared.localized("crop_progress_empty"))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.7))
             } else {
-                ForEach(progressLogs as [ProgressLog], id: \.progressID) { log in
+                ForEach(progressLogs, id: \.progressID) { log in
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text(log.date ?? Date(), style: .date)
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.white.opacity(0.7))
 
                             if let categoryKey = log.category {
                                 Text(LocalizationHelper.shared.localized(categoryKey))
                                     .font(.caption2)
                                     .padding(4)
-                                    .background(Color.blue.opacity(0.2))
+                                    .background(Color.blue.opacity(0.25))
                                     .cornerRadius(6)
+                                    .foregroundColor(.white)
                             }
 
                             Spacer()
 
                             Button { selectedLog = log } label: {
                                 Image(systemName: "pencil")
+                                    .foregroundColor(.white.opacity(0.8))
                             }
 
                             Button(role: .destructive) {
@@ -322,11 +358,13 @@ extension CropDetailView {
                                 loadProgressLogs()
                             } label: {
                                 Image(systemName: "trash")
+                                    .foregroundColor(.red)
                             }
                         }
 
                         if let note = log.note {
                             Text(note)
+                                .foregroundColor(.white)
                         }
 
                         if let data = log.imageData, let img = UIImage(data: data) {
@@ -341,11 +379,10 @@ extension CropDetailView {
                 }
             }
 
-            Button {
-                showingAddProgress = true
-            } label: {
+            Button { showingAddProgress = true } label: {
                 Label(LocalizationHelper.shared.localized("crop_add_progress"), systemImage: "plus.circle")
             }
+            .foregroundColor(.green)
         }
     }
 
@@ -353,12 +390,13 @@ extension CropDetailView {
         VStack(alignment: .leading, spacing: 8) {
             Text(LocalizationHelper.shared.localized("crop_recommendations"))
                 .font(.headline)
+                .foregroundColor(.white)
 
             if let stepsSet = crop.steps as? Set<Step>, !stepsSet.isEmpty {
                 let totalDays = stepsSet.reduce(0) { $0 + Int($1.estimateDuration) }
                 Text("⏳ " + String(format: LocalizationHelper.shared.localized("crop_estimated_duration"), totalDays))
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.7))
             }
 
             if let info = crop.info {
@@ -379,9 +417,11 @@ extension CropDetailView {
                         Text("🌾 \(LocalizationHelper.shared.localized("crop_harvest_months")): \(mapped)")
                     }
                 }
+                .foregroundColor(.white.opacity(0.9))
+                .font(.subheadline)
             } else {
                 Text(LocalizationHelper.shared.localized("crop_info_unavailable"))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white.opacity(0.7))
             }
         }
     }

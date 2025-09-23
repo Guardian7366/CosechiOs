@@ -19,65 +19,85 @@ struct AddTaskView: View {
     @State private var relativeDays: Int = 0
 
     var body: some View {
-        FrutigerAeroBackground {
-            ScrollView {
-                VStack(spacing: 16) {
-                    GlassCard {
-                        VStack(spacing: 12) {
-                            TextField("task_title", text: $title)
-                                .aeroTextField()
-                            TextField("task_details", text: $details)
-                                .aeroTextField()
-                        }
-                    }
-
-                    GlassCard {
-                        VStack(spacing: 12) {
-                            DatePicker("task_due_date", selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
-                                .foregroundColor(.white)
-                            Toggle("task_reminder", isOn: $reminder)
-                                .foregroundColor(.white)
-                        }
-                    }
-
-                    GlassCard {
-                        VStack(spacing: 12) {
-                            Picker("task_repeat", selection: $recurrence) {
-                                Text("repeat_none").tag("none")
-                                Text("repeat_daily").tag("daily")
-                                Text("repeat_weekly").tag("weekly")
-                                Text("repeat_monthly").tag("monthly")
+        NavigationStack {
+            FrutigerAeroBackground {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // 📌 Sección Título y Detalles
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(LocalizationHelper.shared.localized("task_info_section"))
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                TextField(LocalizationHelper.shared.localized("task_title"), text: $title)
+                                    .aeroTextField()
+                                TextField(LocalizationHelper.shared.localized("task_details"), text: $details)
+                                    .aeroTextField()
                             }
-                            .pickerStyle(.segmented)
+                        }
 
-                            Toggle("task_remember_days_before", isOn: $useRelative)
-                                .foregroundColor(.white)
+                        // 📌 Sección Fecha y Recordatorio
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(LocalizationHelper.shared.localized("task_schedule_section"))
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                DatePicker(LocalizationHelper.shared.localized("task_due_date"), selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                                    .foregroundColor(.white)
+                                Toggle(LocalizationHelper.shared.localized("task_reminder"), isOn: $reminder)
+                                    .foregroundColor(.white)
+                            }
+                        }
 
-                            if useRelative {
-                                Stepper(value: $relativeDays, in: 0...30) {
-                                    Text("task_days_before \(relativeDays)")
+                        // 📌 Sección Repetición
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(LocalizationHelper.shared.localized("task_repeat_section"))
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Picker(LocalizationHelper.shared.localized("task_repeat"), selection: $recurrence) {
+                                    Text(LocalizationHelper.shared.localized("repeat_none")).tag("none")
+                                    Text(LocalizationHelper.shared.localized("repeat_daily")).tag("daily")
+                                    Text(LocalizationHelper.shared.localized("repeat_weekly")).tag("weekly")
+                                    Text(LocalizationHelper.shared.localized("repeat_monthly")).tag("monthly")
+                                }
+                                .pickerStyle(.segmented)
+
+                                Toggle(LocalizationHelper.shared.localized("task_remember_days_before"), isOn: $useRelative)
+                                    .foregroundColor(.white)
+
+                                if useRelative {
+                                    Stepper(value: $relativeDays, in: 0...30) {
+                                        Text("\(LocalizationHelper.shared.localized("task_days_before")) \(relativeDays)")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
+                        }
+
+                        // 📌 Sección Cultivo Asociado
+                        if let crop = crop {
+                            GlassCard {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(LocalizationHelper.shared.localized("task_associated_crop"))
+                                        .font(.headline)
                                         .foregroundColor(.white)
+                                    Text(LocalizationHelper.shared.localized(crop.name ?? "crop_default"))
+                                        .foregroundColor(.secondary)
                                 }
                             }
                         }
                     }
-
-                    if let crop = crop {
-                        GlassCard {
-                            Text("\(NSLocalizedString("task_associated_crop", comment: "")): \(crop.name ?? "—")")
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                    .padding()
                 }
-                .padding()
             }
-            .navigationTitle("task_new")
+            .navigationTitle(LocalizationHelper.shared.localized("task_new"))
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("cancel") { dismiss() }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(LocalizationHelper.shared.localized("cancel")) { dismiss() }
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("save") { saveTask() }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(LocalizationHelper.shared.localized("save")) { saveTask() }
                         .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
