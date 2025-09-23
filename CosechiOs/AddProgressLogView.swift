@@ -1,4 +1,3 @@
-// AddProgressLogView.swift
 import SwiftUI
 import CoreData
 import UIKit
@@ -19,41 +18,77 @@ struct AddProgressLogView: View {
     let categories = ["General", "Riego", "Fertilización", "Plaga", "Cosecha"]
 
     var body: some View {
-        FrutigerAeroBackground {
-            ScrollView {
-                VStack(spacing: 16) {
-                    GlassCard {
-                        TextEditor(text: $note)
-                            .frame(minHeight: 100)
-                            .foregroundColor(.white)
-                    }
+        NavigationStack {
+            FrutigerAeroBackground {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // 📝 Nota
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("progress_note")
+                                    .font(.headline)
+                                    .foregroundColor(.white.opacity(0.9))
 
-                    GlassCard {
-                        Picker("progress_category", selection: $category) {
-                            ForEach(categories, id: \.self) { cat in
-                                Text(cat).tag(cat)
+                                ZStack(alignment: .topLeading) {
+                                    if note.isEmpty {
+                                        Text("Escribe aquí tu nota...")
+                                            .foregroundColor(.white.opacity(0.4))
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 14)
+                                    }
+                                    TextEditor(text: $note)
+                                        .scrollContentBackground(.hidden) // quita el fondo blanco nativo
+                                        .frame(minHeight: 120)
+                                        .padding(8)
+                                        .background(Color.black.opacity(0.25))
+                                        .cornerRadius(10)
+                                        .foregroundColor(.white)
+                                }
                             }
                         }
-                        .pickerStyle(.menu)
-                        .foregroundColor(.white)
-                    }
 
-                    GlassCard {
-                        if let img = image {
-                            VStack {
-                                Image(uiImage: img)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 200)
-                                Button("remove_photo") { image = nil }
-                                    .foregroundColor(.red)
+                        // 📂 Categoría
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("progress_category")
+                                    .font(.headline)
+                                    .foregroundColor(.white.opacity(0.9))
+
+                                Picker("progress_category", selection: $category) {
+                                    ForEach(categories, id: \.self) { cat in
+                                        Text(cat).tag(cat)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .foregroundColor(.white)
                             }
-                        } else {
-                            Button("add_photo") { showImagePicker = true }
+                        }
+
+                        // 📸 Foto
+                        GlassCard {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("progress_photo")
+                                    .font(.headline)
+                                    .foregroundColor(.white.opacity(0.9))
+
+                                if let img = image {
+                                    VStack {
+                                        Image(uiImage: img)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 200)
+                                        Button("remove_photo") { image = nil }
+                                            .foregroundColor(.red)
+                                    }
+                                } else {
+                                    Button("add_photo") { showImagePicker = true }
+                                        .buttonStyle(AeroButtonStyle(filled: false))
+                                }
+                            }
                         }
                     }
+                    .padding()
                 }
-                .padding()
             }
             .navigationTitle("new_progress")
             .toolbar {
@@ -79,7 +114,14 @@ struct AddProgressLogView: View {
         let fr: NSFetchRequest<User> = User.fetchRequest()
         fr.predicate = NSPredicate(format: "userID == %@", userID as CVarArg)
         if let user = try? viewContext.fetch(fr).first {
-            ProgressLogHelper.addLog(for: crop, user: user, note: note.isEmpty ? nil : note, image: image, category: category, context: viewContext)
+            ProgressLogHelper.addLog(
+                for: crop,
+                user: user,
+                note: note.isEmpty ? nil : note,
+                image: image,
+                category: category,
+                context: viewContext
+            )
             AchievementManager.award(action: .addProgressLog, to: user.userID ?? UUID(), context: viewContext)
         }
     }
