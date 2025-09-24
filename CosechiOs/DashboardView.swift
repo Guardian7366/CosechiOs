@@ -86,9 +86,13 @@ struct DashboardView: View {
                             Button { showAddTask = true } label: {
                                 Image(systemName: "plus")
                             }
+                            // Etiqueta accesible (usa clave que ya tienes para consistencia)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("dashboard_action_add_task")))
+                            
                             NavigationLink(destination: UserProfileView()) {
                                 Image(systemName: "person.crop.circle")
                             }
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("dashboard_action_profile")))
                         }
                     }
                 }
@@ -144,24 +148,33 @@ struct DashboardView: View {
 
     // MARK: - Header
     private var headerView: some View {
-        HStack {
+        // Construimos textos reutilizables para accesibilidad
+        let greetingText: String = {
+            if let user = currentUser {
+                return "\(LocalizationHelper.shared.localized("dashboard_greeting")) \(user.username ?? "")"
+            } else {
+                return LocalizationHelper.shared.localized("dashboard_greeting")
+            }
+        }()
+
+        let subtitleText = LocalizationHelper.shared.localized("dashboard_subtitle")
+
+        return HStack {
             VStack(alignment: .leading, spacing: 4) {
-                if let user = currentUser {
-                    Text("\(LocalizationHelper.shared.localized("dashboard_greeting")) \(user.username ?? "")")
-                        .font(.title2).bold()
-                        .minimumScaleFactor(0.9)
-                        .lineLimit(1)
-                } else {
-                    Text(LocalizationHelper.shared.localized("dashboard_greeting"))
-                        .font(.title2).bold()
-                }
-                Text(LocalizationHelper.shared.localized("dashboard_subtitle"))
+                Text(greetingText)
+                    .font(.title2).bold()
+                    .minimumScaleFactor(0.9)
+                    .lineLimit(1)
+                Text(subtitleText)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
             Spacer()
         }
         .padding(.horizontal)
+        // Agrupamos para que VoiceOver lea el saludo y subtítulo como un bloque
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(greetingText). \(subtitleText)"))
     }
 
     // MARK: - Summary
@@ -327,6 +340,15 @@ struct DashboardView: View {
                                         .fill(Color.green.opacity(0.06))
                                     )
                             }
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(
+                                Text(
+                                    "\(LocalizationHelper.shared.localized(rec.crop.name ?? "crop_default")), " +
+                                    "\(LocalizationHelper.shared.localized(rec.crop.category ?? "")), " +
+                                    "\(Int(rec.score))"
+                                )
+                            )
+
                             .frame(minWidth: 140, maxWidth: 160)
                         }
 
@@ -436,11 +458,28 @@ struct DashboardView: View {
 
     // Compact task row
     private func TaskRowCompact(task: TaskEntity, onComplete: @escaping () -> Void) -> some View {
-        HStack {
+        // Preparamos textos para accesibilidad
+        let title = task.title ?? LocalizationHelper.shared.localized("task_default")
+        let dateString: String = {
+            if let d = task.dueDate {
+                return d.formatted(date: .abbreviated, time: .omitted)
+            }
+            return ""
+        }()
+        let cropName = task.crop != nil ? LocalizationHelper.shared.localized(task.crop!.name ?? "") : ""
+        let statusLabel = (task.status == "completed")
+            ? LocalizationHelper.shared.localized("dashboard_completed")
+            : LocalizationHelper.shared.localized("dashboard_metrics_pending")
+
+        return HStack {
             Button(action: onComplete) {
                 Image(systemName: task.status == "completed" ? "checkmark.circle.fill" : "circle")
                     .foregroundColor(task.status == "completed" ? .green : .gray)
             }
+            .accessibilityLabel(Text(task.status == "completed"
+                                     ? "\(LocalizationHelper.shared.localized("task_mark_completed") )"
+                                     : "\(LocalizationHelper.shared.localized("task_mark_pending") )"))
+            // Note: if those keys do not exist, puedes usar un texto simple aquí.
 
             VStack(alignment: .leading) {
                 Text(task.title ?? "")
@@ -465,6 +504,10 @@ struct DashboardView: View {
         .background(Color(.systemBackground))
         .cornerRadius(8)
         .shadow(color: Color.black.opacity(0.02), radius: 1, x: 0, y: 1)
+        // Agrupamos info importante para VoiceOver
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(title), \(statusLabel)"))
+        .accessibilityValue(Text("\(dateString)\(cropName.isEmpty ? "" : ", \(cropName)")"))
     }
 
     private func CropCardView(crop: Crop) -> some View {
@@ -513,10 +556,21 @@ struct DashboardView: View {
                 )
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.03), radius: 2, x: 0, y: 1)
+        // Marca la card como elemento accesible y como botón (porque es navegable)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+                Text("\(LocalizationHelper.shared.localized(crop.name ?? "")), \(LocalizationHelper.shared.localized(crop.category ?? ""))")
+            )
+            .accessibilityAddTraits(.isButton)
     }
 
     private func ProgressLogRow(log: ProgressLog) -> some View {
-        HStack(alignment: .top, spacing: 12) {
+        let cropName = LocalizationHelper.shared.localized(log.crop?.name ?? "dashboard_progress_log_no_crop")
+        let dateText = (log.date ?? Date()).formatted(date: .abbreviated, time: .omitted)
+        let hasNote = (log.note ?? "").isEmpty == false
+        let noteSummary = hasNote ? LocalizationHelper.shared.localized("crop_progress_has_note") : ""
+
+        return HStack(alignment: .top, spacing: 12) {
             if let data = log.imageData, let ui = UIImage(data: data) {
                 Image(uiImage: ui)
                     .resizable()
@@ -524,16 +578,18 @@ struct DashboardView: View {
                     .frame(width: 60, height: 60)
                     .clipped()
                     .cornerRadius(8)
+                    .accessibilityHidden(true) // la imagen la lee como parte del log textual
             } else {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color(.systemGray5))
                     .frame(width: 60, height: 60)
                     .overlay(Image(systemName: "photo.on.rectangle.angled").foregroundColor(.white))
+                    .accessibilityHidden(true)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Text(LocalizationHelper.shared.localized(log.crop?.name ?? "dashboard_progress_log_no_crop"))
+                    Text(cropName)
                         .font(.subheadline).bold()
                     Spacer()
                     Text(log.date ?? Date(), style: .time)
@@ -541,7 +597,7 @@ struct DashboardView: View {
                         .foregroundColor(.secondary)
                 }
 
-                if let note = log.note {
+                if let note = log.note, !note.isEmpty {
                     Text(note).font(.caption)
                 } else {
                     Text(LocalizedStringKey("dashboard_progress_no_note"))
@@ -553,6 +609,9 @@ struct DashboardView: View {
         .padding(10)
         .background(Color(.systemGray6))
         .cornerRadius(10)
+        // Agrupamos la card de log para VoiceOver
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(cropName), \(dateText)\(hasNote ? ", \(noteSummary)" : "")"))
     }
 
     // MARK: - Recomendaciones: funciones (lógica intacta)
@@ -614,6 +673,9 @@ struct DashboardView: View {
                         .font(.caption2).lineLimit(1).minimumScaleFactor(0.85)
                 }
                 .frame(width: 70)
+                // Agrupación y label para VoiceOver (usa la misma clave que el texto visual)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(Text(LocalizationHelper.shared.localized(titleKey)))
             }
         }
     }

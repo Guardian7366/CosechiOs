@@ -19,14 +19,18 @@ struct RecommendedCropsView: View {
                         LocalizationHelper.shared.localized("recommendations_title"),
                         subtitle: LocalizationHelper.shared.localized("recommendations_subtitle")
                     )
+                    // Ocultamos de VoiceOver porque es decorativo
+                    .accessibilityHidden(true)
 
                     if isLoading {
                         ProgressView()
                             .padding()
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("loading")))
                     } else if recommendations.isEmpty {
                         Text(LocalizationHelper.shared.localized("recommendations_no_results"))
                             .foregroundColor(.secondary)
                             .padding()
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("recommendations_no_results")))
                     } else {
                         // ✅ Cards en stack vertical
                         LazyVStack(spacing: 14) {
@@ -93,7 +97,7 @@ struct RecommendedCropsView: View {
     }
 }
 
-// MARK: - Recommendation Card (Frutiger Aero estilo)
+// MARK: - Recommendation Card (Frutiger Aero estilo + accesibilidad)
 private struct RecommendationCard: View {
     let rec: CropRecommendation
     let onAdd: () -> Void
@@ -109,6 +113,7 @@ private struct RecommendationCard: View {
                         .frame(width: 72, height: 72)
                         .clipped()
                         .cornerRadius(10)
+                        .accessibilityLabel(Text(LocalizationHelper.shared.localized(rec.crop.name ?? "crop_default")))
                 } else if let imgName = rec.crop.imageName, !imgName.isEmpty, UIImage(named: imgName) != nil {
                     Image(imgName)
                         .resizable()
@@ -116,6 +121,7 @@ private struct RecommendationCard: View {
                         .frame(width: 72, height: 72)
                         .clipped()
                         .cornerRadius(10)
+                        .accessibilityLabel(Text(LocalizationHelper.shared.localized(rec.crop.name ?? "crop_default")))
                 } else {
                     ZStack {
                         Color.green.opacity(0.25)
@@ -125,6 +131,7 @@ private struct RecommendationCard: View {
                     }
                     .frame(width: 72, height: 72)
                     .cornerRadius(10)
+                    .accessibilityHidden(true) // decorativo
                 }
 
                 // Texto descriptivo
@@ -134,26 +141,33 @@ private struct RecommendationCard: View {
                             .font(.headline)
                             .lineLimit(1)
                             .minimumScaleFactor(0.9)
+
                         Spacer()
+
                         Text(String(format: "%.0f", rec.score))
                             .font(.caption2)
                             .padding(6)
                             .background(Color.white.opacity(0.18))
                             .cornerRadius(8)
+                            .accessibilityLabel(Text("\(Int(rec.score))"))
+                            .accessibilityHint(Text(LocalizationHelper.shared.localized("recommendations_score_hint")))
                     }
 
                     if let cat = rec.crop.category, !cat.isEmpty {
                         Text(LocalizationHelper.shared.localized(cat))
                             .font(.caption2)
                             .foregroundColor(.secondary)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized(cat)))
                     }
 
                     ForEach(rec.reasons.prefix(3), id: \.self) { reason in
                         Text(LocalizationHelper.shared.localized(reason))
                             .font(.caption2)
                             .foregroundColor(.secondary)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized(reason)))
                     }
                 }
+                .accessibilityElement(children: .combine)
 
                 Spacer()
 
@@ -163,8 +177,12 @@ private struct RecommendationCard: View {
                         .font(.caption)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityHint(Text(LocalizationHelper.shared.localized("recommendations_add_hint")))
             }
         }
+        // Agrupamos toda la card para que VoiceOver lea de forma natural
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(Text("\(LocalizationHelper.shared.localized(rec.crop.name ?? "crop_default")), \(LocalizationHelper.shared.localized(rec.crop.category ?? ""))"))
     }
 }
 

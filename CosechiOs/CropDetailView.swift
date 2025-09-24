@@ -59,6 +59,7 @@ struct CropDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    imageHeaderSection
                     glassCard { headerSection }
                     glassCard { seasonsSection }
                     glassCard { collectionButtons }
@@ -109,73 +110,75 @@ struct CropDetailView: View {
 // MARK: - UI Sections
 extension CropDetailView {
     @ViewBuilder private var headerSection: some View {
-        HStack(alignment: .top, spacing: 16) {
-            if let imageName = crop.imageName, !imageName.isEmpty, UIImage(named: imageName) != nil {
-                Image(imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 120, height: 120)
-                    .clipped()
-                    .cornerRadius(12)
-                    .shadow(radius: 4)
-            } else {
-                ZStack {
-                    Color.green.opacity(0.3)
-                    Image(systemName: "leaf.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.white)
-                }
-                .frame(width: 120, height: 120)
-                .cornerRadius(12)
-                .shadow(radius: 2)
-            }
+        VStack(alignment: .leading, spacing: 12) {
+               HStack(alignment: .center) {
+                   Text(localizedName())
+                       .font(.title)
+                       .bold()
+                       .foregroundColor(.white)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(localizedName())
-                    .font(.title)
-                    .bold()
+                   Spacer()
+
+                   Text(localizedDifficultyKey(crop.difficulty ?? ""))
+                       .font(.caption2)
+                       .bold()
+                       .padding(8)
+                       .background(difficultyColor(crop.difficulty ?? ""))
+                       .cornerRadius(10)
+                       .foregroundColor(.white)
+               }
+
+               if let descKey = crop.cropDescription, !descKey.isEmpty {
+                   Text(LocalizationHelper.shared.localized(descKey))
+                       .font(.body)
+                       .foregroundColor(.white.opacity(0.85))
+               }
+
+               if let catKey = crop.category {
+                   Text(LocalizationHelper.shared.localized(catKey))
+                       .font(.caption)
+                       .padding(.vertical, 4)
+                       .padding(.horizontal, 8)
+                       .background(Color.green.opacity(0.25))
+                       .cornerRadius(8)
+                       .foregroundColor(.white)
+               }
+
+               if isRecommendedNow() {
+                   Text(LocalizationHelper.shared.localized("crop_recommended_now"))
+                       .font(.caption2)
+                       .padding(6)
+                       .background(Color.green.opacity(0.3))
+                       .cornerRadius(8)
+                       .foregroundColor(.white)
+               }
+           }
+    }
+    
+    @ViewBuilder private var imageHeaderSection: some View {
+        if let imageName = crop.imageName, !imageName.isEmpty, UIImage(named: imageName) != nil {
+            Image(imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 220) // altura grande
+                .clipped()
+                .cornerRadius(16)
+                .shadow(radius: 6)
+                .padding(.bottom, 4)
+        } else {
+            ZStack {
+                Color.green.opacity(0.3)
+                Image(systemName: "leaf.fill")
+                    .font(.system(size: 60))
                     .foregroundColor(.white)
-
-                if let descKey = crop.cropDescription, !descKey.isEmpty {
-                    Text(LocalizationHelper.shared.localized(descKey))
-                        .font(.body)
-                        .foregroundColor(.white.opacity(0.85))
-                }
-
-                if let catKey = crop.category {
-                    Text(LocalizationHelper.shared.localized(catKey))
-                        .font(.caption)
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 8)
-                        .background(Color.green.opacity(0.25))
-                        .cornerRadius(8)
-                        .foregroundColor(.white)
-                }
             }
-
-            Spacer()
-
-            VStack(spacing: 8) {
-                Text(localizedDifficultyKey(crop.difficulty ?? ""))
-                    .font(.caption2)
-                    .bold()
-                    .padding(8)
-                    .background(difficultyColor(crop.difficulty ?? ""))
-                    .cornerRadius(10)
-                    .foregroundColor(.white)
-
-                if isRecommendedNow() {
-                    Text(LocalizationHelper.shared.localized("crop_recommended_now"))
-                        .font(.caption2)
-                        .padding(6)
-                        .background(Color.green.opacity(0.3))
-                        .cornerRadius(8)
-                        .foregroundColor(.white)
-                }
-            }
+            .frame(height: 220)
+            .cornerRadius(16)
+            .shadow(radius: 4)
+            .padding(.bottom, 4)
         }
     }
-
+    
     @ViewBuilder private var seasonsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(LocalizationHelper.shared.localized("crop_seasons"))
