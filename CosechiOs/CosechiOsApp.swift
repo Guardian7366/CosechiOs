@@ -69,5 +69,8 @@ struct AppRootView: View {
         }
         // Aplico el background AQUÍ dentro del body: theme ya está disponible en este punto.
         .frutigerAeroBackground()
+        
+        // 👇 Overlay de logros y confetti
+        AchievementOverlayView()
     }
 }

@@ -165,12 +165,14 @@ extension CropDetailView {
                 .cornerRadius(16)
                 .shadow(radius: 6)
                 .padding(.bottom, 4)
+                .accessibilityLabel(Text(localizedName())) // 👈 describe la imagen
         } else {
             ZStack {
                 Color.green.opacity(0.3)
                 Image(systemName: "leaf.fill")
                     .font(.system(size: 60))
                     .foregroundColor(.white)
+                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_image_placeholder")))
             }
             .frame(height: 220)
             .cornerRadius(16)
@@ -224,6 +226,12 @@ extension CropDetailView {
             }
             .buttonStyle(.borderedProminent)
             .tint(.blue)
+            .accessibilityLabel(
+                Text(isInCollection
+                     ? LocalizationHelper.shared.localized("crop_remove_my")
+                     : LocalizationHelper.shared.localized("crop_add_my"))
+            )
+            .accessibilityHint(Text(LocalizationHelper.shared.localized("crop_collection_hint")))
         }
     }
 
@@ -247,7 +255,13 @@ extension CropDetailView {
                                 .foregroundColor(.white.opacity(0.7))
                         }
                     }
-
+                    .accessibilityElement(children: .combine) // 👈 une toda la fila como 1 elemento
+                    .accessibilityLabel(Text(task.title ?? LocalizationHelper.shared.localized("task_default")))
+                    .accessibilityValue(Text(task.status == "completed"
+                                             ? LocalizationHelper.shared.localized("task_completed")
+                                             : LocalizationHelper.shared.localized("task_pending")))
+                    .accessibilityHint(Text(LocalizationHelper.shared.localized("task_toggle_hint")))
+                    
                     Spacer()
 
                     if task.status == "pending" {
@@ -289,7 +303,12 @@ extension CropDetailView {
                                 .foregroundColor(stepProgress[stepID] == true ? .green : .white.opacity(0.7))
                         }
                         .buttonStyle(.plain)
-
+                        .accessibilityLabel(Text(LocalizationHelper.shared.localized(step.title ?? "")))
+                        .accessibilityValue(Text(stepProgress[stepID] == true
+                                                 ? LocalizationHelper.shared.localized("step_completed")
+                                                 : LocalizationHelper.shared.localized("step_pending")))
+                        .accessibilityHint(Text(LocalizationHelper.shared.localized("step_toggle_hint")))
+                        
                         VStack(alignment: .leading, spacing: 4) {
                             if let stepKey = step.title {
                                 Text(LocalizationHelper.shared.localized(stepKey))
@@ -364,7 +383,10 @@ extension CropDetailView {
                                     .foregroundColor(.red)
                             }
                         }
-
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(Text(LocalizationHelper.shared.localized("progress_log_entry")))
+                        .accessibilityValue(Text(log.note ?? ""))
+                        
                         if let note = log.note {
                             Text(note)
                                 .foregroundColor(.white)
@@ -404,16 +426,54 @@ extension CropDetailView {
 
             if let info = crop.info {
                 Group {
-                    if let soilKey = info.soilType { Text("🌱 \(LocalizationHelper.shared.localized("crop_soil")): \(LocalizationHelper.shared.localized(soilKey))") }
-                    if let wateringKey = info.watering { Text("💧 \(LocalizationHelper.shared.localized("crop_watering")): \(LocalizationHelper.shared.localized(wateringKey))") }
-                    if let sunKey = info.sunlight { Text("☀️ \(LocalizationHelper.shared.localized("crop_sunlight")): \(LocalizationHelper.shared.localized(sunKey))") }
-                    if let tempKey = info.temperatureRange { Text("🌡 \(LocalizationHelper.shared.localized("crop_temperature")): \(LocalizationHelper.shared.localized(tempKey))") }
-                    if let fertKey = info.fertilizationTips { Text("🧪 \(LocalizationHelper.shared.localized("crop_fertilization")): \(LocalizationHelper.shared.localized(fertKey))") }
-                    if let climateKey = info.climate { Text("🌍 \(LocalizationHelper.shared.localized("crop_climate")): \(LocalizationHelper.shared.localized(climateKey))") }
-                    if let plKey = info.plagues { Text("🐛 \(LocalizationHelper.shared.localized("crop_plagues")): \(LocalizationHelper.shared.localized(plKey))") }
-                    if let companionsKey = info.companions { Text("🤝 \(LocalizationHelper.shared.localized("crop_companions")): \(LocalizationHelper.shared.localized(companionsKey))") }
-                    if info.germinationDays > 0 { Text("🌱 " + String(format: LocalizationHelper.shared.localized("crop_germination_days"), info.germinationDays)) }
-                    if let freqKey = info.wateringFrequency { Text("💧 \(LocalizationHelper.shared.localized("crop_watering_frequency")): \(LocalizationHelper.shared.localized(freqKey))") }
+                    if let soilKey = info.soilType { Text("🌱 \(LocalizationHelper.shared.localized("crop_soil")): \(LocalizationHelper.shared.localized(soilKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_soil")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(soilKey)))
+                    }
+                    if let wateringKey = info.watering { Text("💧 \(LocalizationHelper.shared.localized("crop_watering")): \(LocalizationHelper.shared.localized(wateringKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_watering")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(wateringKey)))
+                        
+                    }
+                    if let sunKey = info.sunlight { Text("☀️ \(LocalizationHelper.shared.localized("crop_sunlight")): \(LocalizationHelper.shared.localized(sunKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_sunlight")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(sunKey)))
+                    }
+                    if let tempKey = info.temperatureRange { Text("🌡 \(LocalizationHelper.shared.localized("crop_temperature")): \(LocalizationHelper.shared.localized(tempKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_temperature")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(tempKey)))
+                    }
+                    if let fertKey = info.fertilizationTips { Text("🧪 \(LocalizationHelper.shared.localized("crop_fertilization")): \(LocalizationHelper.shared.localized(fertKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_fertilization")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(fertKey)))
+                    }
+                    if let climateKey = info.climate { Text("🌍 \(LocalizationHelper.shared.localized("crop_climate")): \(LocalizationHelper.shared.localized(climateKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_climate")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(climateKey)))
+                    }
+                    if let plKey = info.plagues { Text("🐛 \(LocalizationHelper.shared.localized("crop_plagues")): \(LocalizationHelper.shared.localized(plKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_plagues")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(plKey)))
+                    }
+                    if let companionsKey = info.companions { Text("🤝 \(LocalizationHelper.shared.localized("crop_companions")): \(LocalizationHelper.shared.localized(companionsKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_companions")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(companionsKey)))
+                    }
+                    if info.germinationDays > 0 { Text("🌱 " + String(format: LocalizationHelper.shared.localized("crop_germination_days"), info.germinationDays))
+                    }
+                    if let freqKey = info.wateringFrequency { Text("💧 \(LocalizationHelper.shared.localized("crop_watering_frequency")): \(LocalizationHelper.shared.localized(freqKey))")
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_watering_frequency")))
+                            .accessibilityValue(Text(LocalizationHelper.shared.localized(freqKey)))
+                    }
 
                     if let months = info.harvestMonths as? [String], !months.isEmpty {
                         let mapped = months.map { LocalizationHelper.shared.localized($0) }.joined(separator: ", ")
