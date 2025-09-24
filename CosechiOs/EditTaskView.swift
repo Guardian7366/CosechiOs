@@ -1,4 +1,3 @@
-// EditTaskView.swift
 import SwiftUI
 import CoreData
 import UserNotifications
@@ -35,8 +34,10 @@ struct EditTaskView: View {
                                     .foregroundColor(.white)
                                 TextField(LocalizationHelper.shared.localized("task_title"), text: $title)
                                     .aeroTextField()
+                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_title")))
                                 TextField(LocalizationHelper.shared.localized("task_details"), text: $details)
                                     .aeroTextField()
+                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_details")))
                             }
                         }
 
@@ -46,10 +47,14 @@ struct EditTaskView: View {
                                 Text(LocalizationHelper.shared.localized("task_schedule_section"))
                                     .font(.headline)
                                     .foregroundColor(.white)
-                                DatePicker(LocalizationHelper.shared.localized("task_due_date"), selection: $dueDate, displayedComponents: [.date, .hourAndMinute])
+                                DatePicker(LocalizationHelper.shared.localized("task_due_date"),
+                                           selection: $dueDate,
+                                           displayedComponents: [.date, .hourAndMinute])
                                     .foregroundColor(.white)
+                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_due_date")))
                                 Toggle(LocalizationHelper.shared.localized("task_reminder"), isOn: $reminder)
                                     .foregroundColor(.white)
+                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_reminder")))
                             }
                         }
 
@@ -66,15 +71,18 @@ struct EditTaskView: View {
                                     Text(LocalizationHelper.shared.localized("repeat_monthly")).tag("monthly")
                                 }
                                 .pickerStyle(.segmented)
+                                .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_repeat")))
 
                                 Toggle(LocalizationHelper.shared.localized("task_remember_days_before"), isOn: $useRelative)
                                     .foregroundColor(.white)
+                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_remember_days_before")))
 
                                 if useRelative {
                                     Stepper(value: $relativeDays, in: 0...30) {
                                         Text("\(LocalizationHelper.shared.localized("task_days_before")) \(relativeDays)")
                                             .foregroundColor(.white)
                                     }
+                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_days_before")))
                                 }
                             }
                         }
@@ -88,6 +96,7 @@ struct EditTaskView: View {
                                         .foregroundColor(.white)
                                     Text(LocalizationHelper.shared.localized(crop.name ?? "crop_default"))
                                         .foregroundColor(.secondary)
+                                        .accessibilityLabel(Text(LocalizationHelper.shared.localized("task_associated_crop")))
                                 }
                             }
                         }
@@ -99,12 +108,16 @@ struct EditTaskView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(LocalizationHelper.shared.localized("cancel")) { dismiss() }
+                        .accessibilityLabel(Text(LocalizationHelper.shared.localized("cancel")))
+                        .accessibilityAddTraits(.isButton)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(LocalizationHelper.shared.localized("save")) {
                         saveChanges()
                         dismiss()
                     }
+                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("save")))
+                    .accessibilityAddTraits(.isButton)
                 }
             }
             .onAppear(perform: loadLiveTask)

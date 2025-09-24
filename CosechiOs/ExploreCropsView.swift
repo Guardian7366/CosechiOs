@@ -27,6 +27,13 @@ struct ExploreCropsView: View {
                 }
                 .padding(.horizontal)
                 .frame(maxWidth: 220, maxHeight: 50) // 🔹 más pequeño y rectangular
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(Text(LocalizationHelper.shared.localized("filter_category")))
+                .accessibilityValue(
+                    Text(selectedCategoryKey != nil
+                         ? LocalizationHelper.shared.localized(selectedCategoryKey!)
+                         : LocalizationHelper.shared.localized("filter_all"))
+                )
 
                 // 📌 Catálogo de cultivos
                 ScrollView {
@@ -34,6 +41,10 @@ struct ExploreCropsView: View {
                         ForEach(filteredCrops, id: \.self) { crop in
                             NavigationLink(destination: CropDetailView(crop: crop)) {
                                 CropCardView(crop: crop)
+                                    .accessibilityElement(children: .combine)
+                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized(crop.name ?? "crop_no_name")))
+                                    .accessibilityValue(Text(LocalizationHelper.shared.localized(crop.category ?? "filter_all")))
+                                    .accessibilityHint(Text(LocalizationHelper.shared.localized("crop_open_detail")))
                             }
                         }
                     }
@@ -52,12 +63,15 @@ struct ExploreCropsView: View {
                         .cornerRadius(6)
                         .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
                         .font(.headline)
+                        .accessibilityHidden(true) // 👈 ya está como título accesible
                 }
             }
             .searchable(
                 text: $searchText,
                 prompt: Text(LocalizationHelper.shared.localized("search_crops"))
             )
+            .accessibilityLabel(Text(LocalizationHelper.shared.localized("search_crops")))
+            .accessibilityHint(Text(LocalizationHelper.shared.localized("search_crops_hint")))
         }
     }
 
@@ -81,15 +95,22 @@ private struct FilterMenuView: View {
                 Button { selectedCategoryKey = nil } label: {
                     Text(LocalizationHelper.shared.localized("filter_all"))
                 }
+                .accessibilityLabel(Text(LocalizationHelper.shared.localized("filter_all")))
+
                 Button { selectedCategoryKey = "category_vegetable" } label: {
                     Text(LocalizationHelper.shared.localized("filter_vegetable"))
                 }
+                .accessibilityLabel(Text(LocalizationHelper.shared.localized("filter_vegetable")))
+
                 Button { selectedCategoryKey = "category_herb" } label: {
                     Text(LocalizationHelper.shared.localized("filter_herb"))
                 }
+                .accessibilityLabel(Text(LocalizationHelper.shared.localized("filter_herb")))
+
                 Button { selectedCategoryKey = "category_fruit" } label: {
                     Text(LocalizationHelper.shared.localized("filter_fruit"))
                 }
+                .accessibilityLabel(Text(LocalizationHelper.shared.localized("filter_fruit")))
             } label: {
                 Label {
                     if let key = selectedCategoryKey {
@@ -107,6 +128,8 @@ private struct FilterMenuView: View {
                 .cornerRadius(6)
                 .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
             }
+            .accessibilityLabel(Text(LocalizationHelper.shared.localized("filter_category")))
+            .accessibilityHint(Text(LocalizationHelper.shared.localized("filter_change_category")))
             Spacer()
         }
     }
@@ -127,6 +150,7 @@ private struct CropCardView: View {
                         .frame(height: 100)
                         .clipped()
                         .cornerRadius(10)
+                        .accessibilityHidden(true) // 👈 evitamos leer doble
                 } else {
                     ZStack {
                         Color.blue.opacity(0.25)
@@ -137,26 +161,30 @@ private struct CropCardView: View {
                     }
                     .frame(height: 100)
                     .cornerRadius(10)
+                    .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_image_placeholder")))
                 }
 
-                // Nombre y categoría con fondo para legibilidad
+                // Nombre
                 Text(LocalizationHelper.shared.localized(crop.name ?? "crop_no_name"))
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(Color.green.opacity(0.4)) // 🔹 fondo semitransparente
+                    .background(Color.green.opacity(0.4))
                     .cornerRadius(4)
                     .lineLimit(1)
+                    .accessibilityHidden(true) // 👈 lo maneja la tarjeta completa
 
+                // Categoría
                 if let category = crop.category {
                     Text(LocalizationHelper.shared.localized(category))
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.95))
                         .padding(.horizontal, 4)
                         .padding(.vertical, 1)
-                        .background(Color.green.opacity(0.35)) // 🔹 contraste en subtítulo
+                        .background(Color.green.opacity(0.35))
                         .cornerRadius(3)
+                        .accessibilityHidden(true)
                 }
             }
             .padding(8)

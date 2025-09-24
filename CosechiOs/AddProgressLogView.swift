@@ -35,14 +35,17 @@ struct AddProgressLogView: View {
                                             .foregroundColor(.white.opacity(0.4))
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 14)
+                                            .accessibilityHidden(true)
                                     }
                                     TextEditor(text: $note)
-                                        .scrollContentBackground(.hidden) // quita el fondo blanco nativo
+                                        .scrollContentBackground(.hidden)
                                         .frame(minHeight: 120)
                                         .padding(8)
                                         .background(Color.black.opacity(0.25))
                                         .cornerRadius(10)
                                         .foregroundColor(.white)
+                                        .accessibilityLabel("progress_note")
+                                        .accessibilityHint("Ingresa una nota de progreso para tu cultivo")
                                 }
                             }
                         }
@@ -61,6 +64,8 @@ struct AddProgressLogView: View {
                                 }
                                 .pickerStyle(.menu)
                                 .foregroundColor(.white)
+                                .accessibilityLabel("progress_category")
+                                .accessibilityHint("Selecciona la categoría correspondiente al progreso")
                             }
                         }
 
@@ -77,12 +82,18 @@ struct AddProgressLogView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(height: 200)
+                                            .accessibilityLabel("Foto seleccionada para el progreso")
+
                                         Button("remove_photo") { image = nil }
                                             .foregroundColor(.red)
+                                            .accessibilityLabel("remove_photo")
+                                            .accessibilityHint("Elimina la foto seleccionada")
                                     }
                                 } else {
                                     Button("add_photo") { showImagePicker = true }
                                         .buttonStyle(AeroButtonStyle(filled: false))
+                                        .accessibilityLabel("add_photo")
+                                        .accessibilityHint("Agrega una foto a tu progreso")
                                 }
                             }
                         }
@@ -94,6 +105,8 @@ struct AddProgressLogView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("cancel") { dismiss() }
+                        .accessibilityLabel("cancel")
+                        .accessibilityHint("Cancela y cierra el formulario sin guardar")
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("save") {
@@ -101,10 +114,14 @@ struct AddProgressLogView: View {
                         dismiss()
                     }
                     .disabled(note.isEmpty && image == nil)
+                    .accessibilityLabel("save")
+                    .accessibilityHint("Guarda este progreso en tu historial")
                 }
             }
             .sheet(isPresented: $showImagePicker) {
                 ImagePicker(image: $image, sourceType: .photoLibrary)
+                    .accessibilityLabel("image_picker")
+                    .accessibilityHint("Selecciona una foto de tu biblioteca")
             }
         }
     }

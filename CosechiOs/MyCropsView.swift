@@ -24,7 +24,6 @@ struct MyCropsView: View {
             )
             .ignoresSafeArea()
             .overlay(
-                // Pequeñas luces difusas
                 Circle()
                     .fill(Color.green.opacity(0.25))
                     .blur(radius: 120)
@@ -45,12 +44,14 @@ struct MyCropsView: View {
                             .font(.system(size: 48))
                             .foregroundStyle(.green, .white)
                             .shadow(color: .green.opacity(0.5), radius: 6, x: 0, y: 4)
+                            .accessibilityHidden(true) // 👈 evita lectura doble
 
                         Text(LocalizationHelper.shared.localized("mycrops_empty"))
                             .foregroundColor(.secondary)
                             .font(.headline)
                             .multilineTextAlignment(.center)
                             .padding()
+                            .accessibilityLabel(Text(LocalizationHelper.shared.localized("mycrops_empty")))
                     }
                 } else {
                     ScrollView {
@@ -59,13 +60,14 @@ struct MyCropsView: View {
                                 if let crop = uc.crop {
                                     NavigationLink(destination: CropDetailView(crop: crop)) {
                                         HStack(spacing: 16) {
-                                            // 🌱 Icono dinámico (imagen del cultivo si existe)
+                                            // 🌱 Icono dinámico
                                             Image(crop.imageName ?? "leaf.fill")
                                                 .resizable()
                                                 .scaledToFit()
                                                 .frame(width: 60, height: 60)
                                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                                                 .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                                                .accessibilityHidden(true)
 
                                             VStack(alignment: .leading, spacing: 6) {
                                                 Text(
@@ -75,21 +77,23 @@ struct MyCropsView: View {
                                                 )
                                                 .font(.headline)
                                                 .foregroundColor(.white)
+                                                .accessibilityHidden(true)
 
                                                 if let categoryKey = crop.category {
                                                     Text(LocalizationHelper.shared.localized(categoryKey))
                                                         .font(.subheadline)
                                                         .foregroundColor(.white.opacity(0.8))
+                                                        .accessibilityHidden(true)
                                                 }
                                             }
 
                                             Spacer()
                                             Image(systemName: "chevron.right")
                                                 .foregroundColor(.white.opacity(0.7))
+                                                .accessibilityHidden(true)
                                         }
                                         .padding()
                                         .background(
-                                            // Glassmorphism card
                                             RoundedRectangle(cornerRadius: 20)
                                                 .fill(Color.white.opacity(0.15))
                                                 .background(
@@ -97,6 +101,17 @@ struct MyCropsView: View {
                                                         .blur(radius: 6)
                                                 )
                                                 .shadow(color: .green.opacity(0.3), radius: 8, x: 0, y: 4)
+                                        )
+                                        // ♿ VoiceOver: Tarjeta como un solo elemento
+                                        .accessibilityElement(children: .combine)
+                                        .accessibilityLabel(
+                                            Text(LocalizationHelper.shared.localized(crop.name ?? "crop_default"))
+                                        )
+                                        .accessibilityValue(
+                                            Text(LocalizationHelper.shared.localized(crop.category ?? ""))
+                                        )
+                                        .accessibilityHint(
+                                            Text(LocalizationHelper.shared.localized("crop_open_detail"))
                                         )
                                     }
                                 }
@@ -113,7 +128,6 @@ struct MyCropsView: View {
         )
         .onAppear {
             loadUserCollections()
-            // guardar el token del observer para removerlo después
             observer = notificationCenter.addObserver(forName: .userCollectionsChanged, object: nil, queue: .main) { _ in
                 loadUserCollections()
             }

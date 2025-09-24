@@ -37,26 +37,38 @@ struct MainMenuView: View {
                         NavigationLink(destination: DashboardView()) {
                             MenuCardView(icon: "speedometer", title: "dashboard_title")
                         }
+                        .accessibilityLabel(Text("dashboard_title"))
+                        .accessibilityAddTraits(.isButton)
 
                         NavigationLink(destination: MyCropsView()) {
                             MenuCardView(icon: "leaf.fill", title: "menu_my_crops")
                         }
+                        .accessibilityLabel(Text("menu_my_crops"))
+                        .accessibilityAddTraits(.isButton)
 
                         NavigationLink(destination: ExploreCropsView()) {
                             MenuCardView(icon: "book.fill", title: "menu_explore")
                         }
+                        .accessibilityLabel(Text("menu_explore"))
+                        .accessibilityAddTraits(.isButton)
 
                         NavigationLink(destination: TaskCalendarView()) {
                             MenuCardView(icon: "calendar", title: "menu_tasks")
                         }
+                        .accessibilityLabel(Text("menu_tasks"))
+                        .accessibilityAddTraits(.isButton)
 
                         NavigationLink(destination: TaskListView()) {
                             MenuCardView(icon: "checklist", title: "menu_all_tasks")
                         }
+                        .accessibilityLabel(Text("menu_all_tasks"))
+                        .accessibilityAddTraits(.isButton)
 
                         NavigationLink(destination: UserProfileView()) {
                             MenuCardView(icon: "person.circle", title: "menu_profile")
                         }
+                        .accessibilityLabel(Text("menu_profile"))
+                        .accessibilityAddTraits(.isButton)
 
                         Button(role: .destructive) {
                             appState.isAuthenticated = false
@@ -74,6 +86,8 @@ struct MainMenuView: View {
                                 }
                             }
                         }
+                        .accessibilityLabel(Text("logout"))
+                        .accessibilityAddTraits(.isButton)
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 24)
@@ -110,6 +124,7 @@ struct MenuCardView: View {
                     Image(systemName: icon)
                         .foregroundColor(.white)
                         .font(.title3)
+                        .accessibilityHidden(true) // 👈 evita que VoiceOver lea el ícono decorativo
                 }
 
                 Text(title)
@@ -121,8 +136,10 @@ struct MenuCardView: View {
 
                 Image(systemName: "chevron.right")
                     .foregroundColor(.gray)
+                    .accessibilityHidden(true) // 👈 decorativo, no leer
             }
             .padding(.vertical, 6)
         }
+        // El rol de botón ya lo maneja el NavigationLink
     }
 }
