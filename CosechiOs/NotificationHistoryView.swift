@@ -19,6 +19,7 @@ struct NotificationHistoryView: View {
                     Text("history_no_notifications")
                         .foregroundColor(.secondary)
                         .listRowBackground(Color.clear)
+                        .accessibilityLabel(Text("No hay notificaciones registradas"))
                 } else {
                     ForEach(logs, id: \.id) { log in
                         GlassCard {
@@ -32,6 +33,8 @@ struct NotificationHistoryView: View {
                                         Text(d, style: .time)
                                             .font(.caption2)
                                             .foregroundColor(.secondary)
+                                            .accessibilityLabel(Text("Hora de notificación"))
+                                            .accessibilityValue(Text(d.formatted(date: .abbreviated, time: .shortened)))
                                     }
                                 }
                                 Text(log.body ?? "")
@@ -46,6 +49,10 @@ struct NotificationHistoryView: View {
                             }
                         }
                         .listRowBackground(Color.clear)
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(Text(log.title ?? ""))
+                        .accessibilityValue(Text(log.body ?? ""))
+                        .accessibilityHint(Text("Tipo: \(log.type ?? "—")"))
                     }
                 }
             }

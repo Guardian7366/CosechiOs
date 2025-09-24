@@ -1,4 +1,3 @@
-// AchievementsSummaryView.swift
 import SwiftUI
 import CoreData
 
@@ -34,16 +33,19 @@ struct AchievementsSummaryView: View {
                     Text("\(level)")
                         .font(.headline)
                         .foregroundColor(.white)
+                        .accessibilityLabel(Text("Level \(level)"))
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("\(xp) XP")
                         .font(.subheadline)
                         .foregroundColor(theme.accent)
+                        .accessibilityLabel(Text("\(xp) experience points"))
 
                     Text(String(format: NSLocalizedString("achievements_badges_count", comment: ""), badgesCount))
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .accessibilityLabel(Text("\(badgesCount) badges earned"))
                 }
                 Spacer()
             }

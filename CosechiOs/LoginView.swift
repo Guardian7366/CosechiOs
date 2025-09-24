@@ -12,19 +12,19 @@ struct LoginView: View {
 
     var body: some View {
         ZStack {
-            // 🌈 Fondo Frutiger Aero degradante (paleta cálida)
+            // 🌈 Fondo Frutiger Aero degradante
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color(hex: "FF9A9E"), // rosa cálido
-                    Color(hex: "FAD0C4"), // durazno suave
-                    Color(hex: "FBC2EB")  // violeta-rosado claro
+                    Color(hex: "FF9A9E"),
+                    Color(hex: "FAD0C4"),
+                    Color(hex: "FBC2EB")
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
-            // ✨ Círculos difusos estilo "aero bubbles"
+            // ✨ Círculos difusos
             ZStack {
                 Circle()
                     .fill(Color.white.opacity(0.08))
@@ -46,10 +46,10 @@ struct LoginView: View {
             }
             .ignoresSafeArea()
 
-            // 📋 Contenido principal centrado
+            // 📋 Contenido
             VStack(spacing: 22) {
-                Spacer().frame(height: 80) // 👈 en vez de usar un Spacer "libre"
-                
+                Spacer().frame(height: 80)
+
                 Text("login_title")
                     .font(.largeTitle).bold()
                     .foregroundColor(.white)
@@ -61,16 +61,22 @@ struct LoginView: View {
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .aeroTextField()
+                    .accessibilityLabel("login_email")
+                    .accessibilityHint("Introduce tu correo electrónico")
 
                 // Password
                 SecureField("login_password", text: $password)
                     .aeroTextField()
+                    .accessibilityLabel("login_password")
+                    .accessibilityHint("Introduce tu contraseña")
 
                 // Errores
                 if let error = errorMessage {
                     Text(error)
                         .foregroundColor(.red)
                         .font(.caption)
+                        .accessibilityLabel("error_message")
+                        .accessibilityHint(error)
                 }
 
                 // Botón Login
@@ -80,6 +86,8 @@ struct LoginView: View {
                     if isLoading {
                         ProgressView()
                             .tint(.white)
+                            .accessibilityLabel("loading")
+                            .accessibilityHint("Procesando inicio de sesión")
                     } else {
                         Text("login_button")
                             .frame(maxWidth: .infinity)
@@ -87,8 +95,8 @@ struct LoginView: View {
                             .background(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color(hex: "F7971E"), // naranja
-                                        Color(hex: "FFD200")  // amarillo brillante
+                                        Color(hex: "F7971E"),
+                                        Color(hex: "FFD200")
                                     ]),
                                     startPoint: .leading,
                                     endPoint: .trailing
@@ -100,6 +108,8 @@ struct LoginView: View {
                     }
                 }
                 .disabled(isLoading)
+                .accessibilityLabel("login_button")
+                .accessibilityHint("Inicia sesión con los datos ingresados")
 
                 Spacer()
             }
@@ -126,4 +136,3 @@ struct LoginView: View {
         isLoading = false
     }
 }
-

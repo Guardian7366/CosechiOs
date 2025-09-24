@@ -1,5 +1,5 @@
 // UserProfileView.swift
-// Vista de perfil con estética Frutiger Aero - versión completa lista para pegar
+// Vista de perfil con estética Frutiger Aero - con VoiceOver accesibilidad
 
 import SwiftUI
 import CoreData
@@ -39,11 +39,11 @@ struct UserProfileView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Fondo Frutiger Aero (nuevo y cálido)
+                // Fondo Frutiger Aero
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        Color(hex: "D9F6E2"), // verde muy suave
-                        Color(hex: "BEEAF0"), // celeste suave
+                        Color(hex: "D9F6E2"),
+                        Color(hex: "BEEAF0"),
                         Color(hex: "FFFFFF").opacity(0.9)
                     ]),
                     startPoint: .topLeading,
@@ -89,7 +89,7 @@ struct UserProfileView: View {
                             }
                         }
 
-                        // Sección: Username edit
+                        // Username edit
                         GlassCard {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(LocalizedStringKey("profile_username"))
@@ -102,10 +102,12 @@ struct UserProfileView: View {
                                     .padding(12)
                                     .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.06)))
                                     .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.06)))
+                                    .accessibilityLabel(Text(LocalizedStringKey("profile_username")))
+                                    .accessibilityHint(Text("Introduce tu nombre de usuario"))
                             }
                         }
 
-                        // Sección: Logros (Resumen + botón ver todo)
+                        // Logros
                         GlassCard {
                             VStack(alignment: .leading, spacing: 10) {
                                 Text(LocalizedStringKey("profile_achievements_section"))
@@ -119,6 +121,7 @@ struct UserProfileView: View {
                                         NavigationLink(destination: AchievementsView(userID: uid).environment(\.managedObjectContext, viewContext)) {
                                             Text(LocalizedStringKey("profile_achievements_view_all"))
                                         }
+                                        .accessibilityHint(Text("Ver todos los logros"))
                                     }
                                 } else {
                                     Text("—").foregroundColor(.secondary)
@@ -126,7 +129,7 @@ struct UserProfileView: View {
                             }
                         }
 
-                        // Sección: Idioma
+                        // Idioma
                         GlassCard {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(LocalizedStringKey("profile_language"))
@@ -134,18 +137,18 @@ struct UserProfileView: View {
 
                                 Picker(selection: Binding(
                                     get: { config?.language ?? appState.appLanguage },
-                                    set: { newValue in
-                                        changeLanguage(to: newValue)
-                                    }
+                                    set: { newValue in changeLanguage(to: newValue) }
                                 ), label: Text(LocalizedStringKey("profile_language"))) {
                                     Text("English").tag("en")
                                     Text("Español").tag("es")
                                 }
                                 .pickerStyle(.segmented)
+                                .accessibilityLabel(Text(LocalizedStringKey("profile_language")))
+                                .accessibilityHint(Text("Selecciona el idioma de la aplicación"))
                             }
                         }
 
-                        // Sección: Notificaciones
+                        // Notificaciones
                         GlassCard {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(LocalizedStringKey("profile_notifications_settings"))
@@ -157,6 +160,7 @@ struct UserProfileView: View {
                                 )) {
                                     Text(LocalizedStringKey("profile_notifications"))
                                 }
+                                .accessibilityHint(Text("Activa o desactiva todas las notificaciones"))
 
                                 if config?.notificationsEnabled ?? true {
                                     Toggle(isOn: Binding(
@@ -165,6 +169,7 @@ struct UserProfileView: View {
                                     )) {
                                         Text(LocalizedStringKey("profile_notify_tasks"))
                                     }
+                                    .accessibilityHint(Text("Notificar recordatorios de tareas"))
 
                                     Toggle(isOn: Binding(
                                         get: { config?.notifyCrops ?? true },
@@ -172,6 +177,7 @@ struct UserProfileView: View {
                                     )) {
                                         Text(LocalizedStringKey("profile_notify_crops"))
                                     }
+                                    .accessibilityHint(Text("Notificar sobre cultivos"))
 
                                     Toggle(isOn: Binding(
                                         get: { config?.notifyTips ?? false },
@@ -179,15 +185,17 @@ struct UserProfileView: View {
                                     )) {
                                         Text(LocalizedStringKey("profile_notify_tips"))
                                     }
+                                    .accessibilityHint(Text("Recibir consejos y tips"))
 
                                     NavigationLink(destination: NotificationHistoryView().environment(\.managedObjectContext, viewContext)) {
                                         Text(LocalizedStringKey("profile_notifications_history"))
                                     }
+                                    .accessibilityHint(Text("Ver historial de notificaciones"))
                                 }
                             }
                         }
 
-                        // Sección: Apariencia (tema)
+                        // Apariencia
                         GlassCard {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(LocalizedStringKey("profile_theme"))
@@ -196,7 +204,11 @@ struct UserProfileView: View {
                                 Picker(selection: Binding(
                                     get: { config?.theme ?? "Auto" },
                                     set: { newVal in
-                                        if let cfg = config { cfg.theme = newVal; try? ConfigHelper.save(cfg, context: viewContext); self.config = cfg }
+                                        if let cfg = config {
+                                            cfg.theme = newVal
+                                            try? ConfigHelper.save(cfg, context: viewContext)
+                                            self.config = cfg
+                                        }
                                     }
                                 ), label: Text(LocalizedStringKey("profile_theme"))) {
                                     Text(LocalizedStringKey("theme_auto")).tag("Auto")
@@ -204,10 +216,11 @@ struct UserProfileView: View {
                                     Text(LocalizedStringKey("theme_dark")).tag("Dark")
                                 }
                                 .pickerStyle(.segmented)
+                                .accessibilityHint(Text("Selecciona el tema de apariencia"))
                             }
                         }
 
-                        // Sección: Extras (export / delete photo)
+                        // Extras
                         GlassCard {
                             VStack(alignment: .leading, spacing: 10) {
                                 Button(role: .destructive) {
@@ -219,6 +232,8 @@ struct UserProfileView: View {
                                         Spacer()
                                     }
                                 }
+                                .accessibilityLabel(Text(LocalizedStringKey("profile_delete_photo")))
+                                .accessibilityHint(Text("Elimina tu foto de perfil"))
 
                                 Button {
                                     alertMessage = NSLocalizedString("profile_export", comment: "")
@@ -230,14 +245,16 @@ struct UserProfileView: View {
                                         Spacer()
                                     }
                                 }
+                                .accessibilityLabel(Text(LocalizedStringKey("profile_export")))
+                                .accessibilityHint(Text("Exporta tus datos"))
                             }
                         }
 
                         Spacer(minLength: 32)
                     }
                     .padding()
-                } // ScrollView
-            } // ZStack
+                }
+            }
             .navigationTitle(LocalizedStringKey("profile_title"))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -248,9 +265,10 @@ struct UserProfileView: View {
                             Text(LocalizedStringKey("save"))
                         }
                     }
+                    .accessibilityHint(Text("Guarda los cambios del perfil"))
                 }
             }
-            // Image picker + editor + alerts + confirmation (misma lógica)
+            // Image picker + editor + alerts + confirmación
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(image: $pickedUIImage, sourceType: imageSource)
             }
@@ -286,10 +304,10 @@ struct UserProfileView: View {
                 Button(LocalizedStringKey("cancel"), role: .cancel) {}
             }
             .onAppear(perform: loadUserAndConfig)
-        } // NavigationStack
+        }
     }
 
-    // MARK: - Avatar subview (icon + edit button)
+    // MARK: - Avatar
     private var profileAvatar: some View {
         VStack {
             ZStack(alignment: .bottomTrailing) {
@@ -298,12 +316,14 @@ struct UserProfileView: View {
                         Image(uiImage: ui)
                             .resizable()
                             .scaledToFill()
+                            .accessibilityLabel(Text("Foto de perfil"))
                     } else {
                         Image(systemName: "person.crop.circle.fill")
                             .resizable()
                             .scaledToFit()
                             .foregroundColor(.white.opacity(0.85))
                             .background(Circle().fill(theme.primaryStart).opacity(0.12))
+                            .accessibilityLabel(Text("Avatar de perfil predeterminado"))
                     }
                 }
                 .frame(width: 120, height: 120)
@@ -323,6 +343,8 @@ struct UserProfileView: View {
                         .shadow(radius: 3)
                 }
                 .offset(x: -6, y: -6)
+                .accessibilityLabel(Text("Editar foto de perfil"))
+                .accessibilityHint(Text("Toca para cambiar tu foto de perfil"))
                 .confirmationDialog(LocalizedStringKey("profile_choose_image"),
                                     isPresented: $showImageSourceOptions,
                                     titleVisibility: .visible) {
@@ -337,7 +359,6 @@ struct UserProfileView: View {
             }
         }
     }
-
     // MARK: - Lógica / Helpers (idéntica a la tuya; solo envuelta)
     private func loadUserAndConfig() {
         guard let uid = appState.currentUserID else { return }
@@ -447,7 +468,7 @@ struct UserProfileView: View {
     }
 }
 
-// MARK: - Avatar Editor (simple y funcional)
+// MARK: - Avatar Editor
 struct AvatarEditorView: View {
     let image: UIImage
     var onSave: (UIImage) -> Void
@@ -461,14 +482,17 @@ struct AvatarEditorView: View {
                 .scaledToFit()
                 .clipShape(Circle())
                 .padding()
+                .accessibilityLabel(Text("Vista previa de la imagen seleccionada"))
             Spacer()
             HStack {
                 Button(LocalizedStringKey("cancel")) { dismiss() }
+                    .accessibilityHint(Text("Cancelar edición de imagen"))
                 Spacer()
                 Button(LocalizedStringKey("save")) {
                     onSave(image)
                     dismiss()
                 }
+                .accessibilityHint(Text("Guardar imagen como foto de perfil"))
             }
             .padding()
         }

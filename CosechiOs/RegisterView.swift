@@ -21,9 +21,9 @@ struct RegisterView: View {
             // 🌈 Fondo Frutiger Aero degradante
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color(hex: "89F7FE"), // azul celeste
-                    Color(hex: "66A6FF"), // azul intenso
-                    Color(hex: "D16BA5")  // violeta-rosado
+                    Color(hex: "89F7FE"),
+                    Color(hex: "66A6FF"),
+                    Color(hex: "D16BA5")
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -52,9 +52,9 @@ struct RegisterView: View {
             }
             .ignoresSafeArea()
 
-            // 📋 Contenido principal centrado
+            // 📋 Contenido principal
             VStack(spacing: 20) {
-                Spacer().frame(height: 95) // 👈 en vez de usar un Spacer "libre"
+                Spacer().frame(height: 95)
 
                 Text("register_title")
                     .font(.largeTitle).bold()
@@ -64,6 +64,8 @@ struct RegisterView: View {
                 // Nombre de usuario
                 TextField("register_username", text: $username)
                     .aeroTextField()
+                    .accessibilityLabel("register_username")
+                    .accessibilityHint("Introduce tu nombre de usuario")
 
                 // Email
                 TextField("register_email", text: $email)
@@ -71,6 +73,8 @@ struct RegisterView: View {
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .aeroTextField()
+                    .accessibilityLabel("register_email")
+                    .accessibilityHint("Introduce tu correo electrónico")
 
                 // Contraseña
                 HStack {
@@ -80,16 +84,22 @@ struct RegisterView: View {
                             .autocapitalization(.none)
                             .disableAutocorrection(true)
                             .aeroTextField()
+                            .accessibilityLabel("register_password")
+                            .accessibilityHint("Introduce tu contraseña")
                     } else {
                         SecureField("register_password", text: $password)
                             .textContentType(.oneTimeCode)
                             .aeroTextField()
+                            .accessibilityLabel("register_password")
+                            .accessibilityHint("Introduce tu contraseña")
                     }
 
                     Button { showPassword.toggle() } label: {
                         Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.white.opacity(0.7))
                     }
+                    .accessibilityLabel("toggle_password_visibility")
+                    .accessibilityHint("Muestra u oculta la contraseña")
                 }
 
                 // Confirmar contraseña
@@ -100,16 +110,22 @@ struct RegisterView: View {
                             .autocapitalization(.none)
                             .disableAutocorrection(true)
                             .aeroTextField()
+                            .accessibilityLabel("register_confirm_password")
+                            .accessibilityHint("Vuelve a escribir tu contraseña")
                     } else {
                         SecureField("register_confirm_password", text: $confirmPassword)
                             .textContentType(.oneTimeCode)
                             .aeroTextField()
+                            .accessibilityLabel("register_confirm_password")
+                            .accessibilityHint("Vuelve a escribir tu contraseña")
                     }
 
                     Button { showConfirmPassword.toggle() } label: {
                         Image(systemName: showConfirmPassword ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.white.opacity(0.7))
                     }
+                    .accessibilityLabel("toggle_confirm_password_visibility")
+                    .accessibilityHint("Muestra u oculta la confirmación de la contraseña")
                 }
 
                 // Errores
@@ -117,6 +133,8 @@ struct RegisterView: View {
                     Text(error)
                         .foregroundColor(.red)
                         .font(.caption)
+                        .accessibilityLabel("error_message")
+                        .accessibilityHint(error)
                 }
 
                 // Botón Registrar
@@ -126,6 +144,8 @@ struct RegisterView: View {
                     if isLoading {
                         ProgressView()
                             .tint(.white)
+                            .accessibilityLabel("loading")
+                            .accessibilityHint("Procesando tu registro")
                     } else {
                         Text("register_button")
                             .frame(maxWidth: .infinity)
@@ -146,6 +166,8 @@ struct RegisterView: View {
                     }
                 }
                 .disabled(isLoading)
+                .accessibilityLabel("register_button")
+                .accessibilityHint("Crea una nueva cuenta con los datos ingresados")
 
                 Spacer()
             }

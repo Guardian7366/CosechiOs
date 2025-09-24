@@ -30,13 +30,14 @@ struct IntroView: View {
                             .multilineTextAlignment(.center)
                             .foregroundColor(.white)
                             .shadow(radius: 3)
-                        
+                            .accessibilityAddTraits(.isHeader)
+
                         Text(LocalizedStringKey("intro_subtitle"))
                             .font(.subheadline)
                             .foregroundColor(.white.opacity(0.9))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
-                        
+
                         Spacer()
                         
                         // Botón de registro
@@ -59,7 +60,8 @@ struct IntroView: View {
                                 .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 3)
                         }
                         .padding(.horizontal)
-                        
+                        .accessibilityLabel(Text("register"))
+
                         // Botón de login
                         NavigationLink(destination: LoginView()) {
                             Text(LocalizedStringKey("login"))
@@ -71,6 +73,7 @@ struct IntroView: View {
                                 .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
                         }
                         .padding(.horizontal)
+                        .accessibilityLabel(Text("login"))
                         
                         Spacer()
                     }

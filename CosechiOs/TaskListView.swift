@@ -35,6 +35,8 @@ struct TaskListView: View {
                         .fill(Color.white.opacity(0.12))
                 )
                 .padding(.top, 12)
+                .accessibilityLabel(Text("task_filter"))
+                .accessibilityHint(Text("Selecciona un filtro de tareas"))
 
                 // 🔹 Lista de tareas
                 List {
@@ -49,6 +51,7 @@ struct TaskListView: View {
                             }
                             .listRowBackground(Color.clear)
                         }
+                        .accessibilityLabel(Text("task_today"))
                     }
 
                     // PRÓXIMAS
@@ -62,6 +65,7 @@ struct TaskListView: View {
                             }
                             .listRowBackground(Color.clear)
                         }
+                        .accessibilityLabel(Text("task_upcoming"))
                     }
 
                     // COMPLETADAS
@@ -73,6 +77,7 @@ struct TaskListView: View {
                             }
                             .listRowBackground(Color.clear)
                         }
+                        .accessibilityLabel(Text("task_completed"))
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -146,10 +151,13 @@ struct TaskListView: View {
                             .aeroIcon(size: 22)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Marcar como completada"))
+                    .accessibilityHint(Text("Completa esta tarea"))
                 } else {
                     Image(systemName: "checkmark.circle")
                         .foregroundColor(.gray)
                         .aeroIcon(size: 22)
+                        .accessibilityLabel(Text("Tarea completada"))
                 }
 
                 Button {
@@ -159,6 +167,7 @@ struct TaskListView: View {
                         .aeroIcon(size: 20)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(Text("Editar tarea"))
 
                 Button(role: .destructive) {
                     showDeleteAlertFor = ManagedObjectIDWrapper(id: task.objectID)
@@ -168,9 +177,14 @@ struct TaskListView: View {
                         .aeroIcon(size: 20)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(Text("Eliminar tarea"))
+                .accessibilityHint(Text("Muestra una alerta para confirmar eliminación"))
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(task.title ?? NSLocalizedString("task_no_title", comment: "")))
+        .accessibilityValue(Text(task.status == "completed" ? "Completada" : "Pendiente"))
     }
 
     private func completeTask(_ task: TaskEntity) {

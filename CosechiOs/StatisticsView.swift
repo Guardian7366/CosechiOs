@@ -84,6 +84,7 @@ struct StatisticsView: View {
                         subtitle: LocalizationHelper.shared.localized("statistics_subtitle")
                     )
                     .padding(.horizontal)
+                    .accessibilityElement(children: .combine)
 
                     // 📌 Filtros + Export
                     GlassCard {
@@ -94,6 +95,7 @@ struct StatisticsView: View {
                                 }
                             }
                             .pickerStyle(.segmented)
+                            .accessibilityLabel(LocalizationHelper.shared.localized("statistics_range_all"))
 
                             Spacer()
 
@@ -104,6 +106,8 @@ struct StatisticsView: View {
                                 Text(LocalizationHelper.shared.localized("statistics_export_csv"))
                             }
                             .font(.caption)
+                            .accessibilityLabel(LocalizationHelper.shared.localized("statistics_export_csv"))
+                            .accessibilityHint("Exportar estadísticas en formato CSV")
                         }
                     }
                     .padding(.horizontal)
@@ -124,6 +128,9 @@ struct StatisticsView: View {
                             HStack {
                                 PieChartView(completed: completedCount, pending: pendingCount, overdue: overdueCount)
                                     .frame(width: 180, height: 180)
+                                    .accessibilityElement(children: .ignore)
+                                    .accessibilityLabel("Gráfico de tareas")
+                                    .accessibilityValue("Completadas \(completedCount), Pendientes \(pendingCount), Atrasadas \(overdueCount)")
 
                                 VStack(alignment: .leading, spacing: 8) {
                                     metricRow(color: .green, value: completedCount, key: "statistics_metrics_completed")
@@ -143,6 +150,9 @@ struct StatisticsView: View {
                         } else {
                             LogsLineChart(logs: logsInRange, days: selectedRange == .all ? 30 : selectedRange.rawValue)
                                 .frame(height: 240)
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel("Gráfico de progreso")
+                                .accessibilityValue("Mostrando \(logsInRange.count) registros de progreso en los últimos \(selectedRange.rawValue == 0 ? "todos" : "\(selectedRange.rawValue)") días")
                         }
                     }
 
@@ -173,16 +183,11 @@ struct StatisticsView: View {
                                             }
                                         }
                                     }
-                                    .chartForegroundStyleScale([
-                                        top.first?.name ?? "": .teal,
-                                        top.dropFirst().first?.name ?? "": .indigo,
-                                        top.dropFirst(2).first?.name ?? "": .cyan,
-                                        top.dropFirst(3).first?.name ?? "": .purple,
-                                        top.dropFirst(4).first?.name ?? "": .mint,
-                                        top.dropFirst(5).first?.name ?? "": .blue
-                                    ])
                                 }
                                 .frame(height: min(240, CGFloat(top.count * 40)))
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel("Cultivos más frecuentes")
+                                .accessibilityValue(top.map { "\($0.name): \($0.count)" }.joined(separator: ", "))
                             }
                         }
                     }
@@ -216,6 +221,9 @@ struct StatisticsView: View {
                                     }
                                 }
                                 .frame(height: 200)
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel("Acciones de notificaciones")
+                                .accessibilityValue(actionCounts.map { "\($0.key): \($0.value)" }.joined(separator: ", "))
                             }
                         }
                     }
@@ -245,12 +253,16 @@ struct StatisticsView: View {
             }
             .frame(maxWidth: .infinity)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(LocalizationHelper.shared.localized(titleKey))
+        .accessibilityValue(valueText)
     }
 
     private func placeholderText(_ key: String) -> some View {
         Text(LocalizationHelper.shared.localized(key))
             .foregroundColor(.secondary)
             .padding(.vertical, 8)
+            .accessibilityLabel(LocalizationHelper.shared.localized(key))
     }
 
     private func metricRow(color: Color, value: Int, key: String) -> some View {
@@ -263,6 +275,9 @@ struct StatisticsView: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(LocalizationHelper.shared.localized(key))
+        .accessibilityValue("\(value)")
     }
 
     // MARK: - Computed values
@@ -349,6 +364,7 @@ struct StatisticsView: View {
             Text(LocalizationHelper.shared.localized(key))
                 .font(.headline)
                 .padding(.horizontal)
+                .accessibilityLabel(LocalizationHelper.shared.localized(key))
             content()
         }
     }
@@ -384,6 +400,7 @@ private struct PieChartView: View {
                 }
             }
         }
+        .accessibilityHidden(true) // accesibilidad ya manejada en el padre
     }
 }
 
@@ -443,6 +460,7 @@ private struct LogsLineChart: View {
                 }
             }
         }
+        .accessibilityHidden(true) // accesibilidad ya manejada en el padre
     }
 }
 

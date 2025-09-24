@@ -28,7 +28,8 @@ struct TaskCalendarView: View {
                     ForEach(groupedDates, id: \.self) { date in
                         Section(header: Text(formattedDate(date))
                             .font(.headline)
-                            .foregroundColor(.white)) {
+                            .foregroundColor(.white)
+                            .accessibilityLabel(formattedDate(date))) {
 
                             let items = groupedTasks[date] ?? []
                             ForEach(items, id: \.objectID) { task in
@@ -56,6 +57,8 @@ struct TaskCalendarView: View {
                     Image(systemName: "plus")
                         .foregroundColor(.white)
                         .aeroIcon(size: 20)
+                        .accessibilityLabel(NSLocalizedString("task_add", comment: ""))
+                        .accessibilityHint(NSLocalizedString("task_add_hint", comment: ""))
                 }
             }
         }
@@ -101,15 +104,21 @@ struct TaskCalendarView: View {
                         .aeroIcon(size: 22)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(task.status == "completed"
+                                    ? NSLocalizedString("task_mark_incomplete", comment: "")
+                                    : NSLocalizedString("task_mark_complete", comment: ""))
+                .accessibilityHint(NSLocalizedString("task_toggle_hint", comment: ""))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(task.title ?? NSLocalizedString("task_no_title", comment: ""))
                         .strikethrough(task.status == "completed")
                         .foregroundColor(.primary)
+                        .accessibilityLabel(task.title ?? NSLocalizedString("task_no_title", comment: ""))
                     if let details = task.details, !details.isEmpty {
                         Text(details)
                             .font(.caption)
                             .foregroundColor(.secondary)
+                            .accessibilityLabel(details)
                     }
                 }
 
@@ -123,9 +132,15 @@ struct TaskCalendarView: View {
                         .aeroIcon(size: 18)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(NSLocalizedString("task_edit", comment: ""))
+                .accessibilityHint(NSLocalizedString("task_edit_hint", comment: ""))
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityValue(task.status == "completed"
+                            ? NSLocalizedString("task_status_completed", comment: "")
+                            : NSLocalizedString("task_status_pending", comment: ""))
     }
 
     // MARK: - Delete

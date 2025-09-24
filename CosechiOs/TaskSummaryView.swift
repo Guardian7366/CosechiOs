@@ -1,4 +1,3 @@
-
 // TaskSummaryView.swift
 import SwiftUI
 import CoreData
@@ -33,13 +32,16 @@ struct TaskSummaryView: View {
             Text("task_summary_title")
                 .font(.headline)
                 .foregroundColor(.white)
+                .accessibilityLabel(NSLocalizedString("task_summary_title", comment: ""))
 
             HStack {
                 Text("\(NSLocalizedString("task_pending", comment: "")): \(pendingTasks)")
                     .foregroundColor(theme.accent)
+                    .accessibilityLabel("\(NSLocalizedString("task_pending", comment: "")): \(pendingTasks)")
                 Spacer()
                 Text("\(NSLocalizedString("task_completed", comment: "")): \(completedTasks)")
                     .foregroundColor(theme.mint)
+                    .accessibilityLabel("\(NSLocalizedString("task_completed", comment: "")): \(completedTasks)")
             }
             .font(.subheadline).bold()
         }
@@ -53,5 +55,7 @@ struct TaskSummaryView: View {
                 )
         )
         .shadow(color: Color.black.opacity(0.15), radius: 5, x: 0, y: 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint(NSLocalizedString("task_summary_hint", comment: ""))
     }
 }
