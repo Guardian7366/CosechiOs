@@ -37,10 +37,11 @@ struct ExploreCropsView: View {
 
                 // 📌 Catálogo de cultivos
                 ScrollView {
-                    LazyVGrid(columns: gridColumns, spacing: 16) {
+                    LazyVGrid(columns: gridColumns, spacing: 20) {
                         ForEach(filteredCrops, id: \.self) { crop in
                             NavigationLink(destination: CropDetailView(crop: crop)) {
                                 CropCardView(crop: crop)
+                                    .padding(.horizontal, 4)
                                     .accessibilityElement(children: .combine)
                                     .accessibilityLabel(Text(LocalizationHelper.shared.localized(crop.name ?? "crop_no_name")))
                                     .accessibilityValue(Text(LocalizationHelper.shared.localized(crop.category ?? "filter_all")))
@@ -188,6 +189,7 @@ private struct CropCardView: View {
                 }
             }
             .padding(8)
+            .padding(.vertical, 4)
         }
     }
 }
