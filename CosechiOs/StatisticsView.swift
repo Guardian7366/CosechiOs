@@ -123,12 +123,12 @@ struct StatisticsView: View {
                         } else {
                             HStack {
                                 PieChartView(completed: completedCount, pending: pendingCount, overdue: overdueCount)
-                                    .frame(width: 160, height: 160)
+                                    .frame(width: 180, height: 180)
 
                                 VStack(alignment: .leading, spacing: 8) {
                                     metricRow(color: .green, value: completedCount, key: "statistics_metrics_completed")
-                                    metricRow(color: .blue, value: pendingCount, key: "statistics_metrics_pending")
-                                    metricRow(color: .red, value: overdueCount, key: "statistics_metrics_overdue")
+                                    metricRow(color: .cyan, value: pendingCount, key: "statistics_metrics_pending")
+                                    metricRow(color: .pink, value: overdueCount, key: "statistics_metrics_overdue")
                                 }
                                 .padding(.leading)
                                 Spacer()
@@ -142,7 +142,7 @@ struct StatisticsView: View {
                             placeholderText("statistics_no_progress_logs")
                         } else {
                             LogsLineChart(logs: logsInRange, days: selectedRange == .all ? 30 : selectedRange.rawValue)
-                                .frame(height: 220)
+                                .frame(height: 240)
                         }
                     }
 
@@ -153,16 +153,34 @@ struct StatisticsView: View {
                             placeholderText("statistics_no_top_crops")
                         } else {
                             GlassCard {
-                                Chart {
-                                    ForEach(Array(top.enumerated()), id: \.offset) { _, item in
-                                        BarMark(
-                                            x: .value("Count", item.count),
-                                            y: .value("Crop", item.name)
-                                        )
-                                        .annotation(position: .trailing) {
-                                            Text("\(item.count)").font(.caption2)
+                                ZStack {
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.green.opacity(0.15), Color.blue.opacity(0.15)]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                    .cornerRadius(12)
+
+                                    Chart {
+                                        ForEach(Array(top.enumerated()), id: \.offset) { _, item in
+                                            BarMark(
+                                                x: .value("Count", item.count),
+                                                y: .value("Crop", item.name)
+                                            )
+                                            .foregroundStyle(by: .value("Crop", item.name))
+                                            .annotation(position: .trailing) {
+                                                Text("\(item.count)").font(.caption2)
+                                            }
                                         }
                                     }
+                                    .chartForegroundStyleScale([
+                                        top.first?.name ?? "": .teal,
+                                        top.dropFirst().first?.name ?? "": .indigo,
+                                        top.dropFirst(2).first?.name ?? "": .cyan,
+                                        top.dropFirst(3).first?.name ?? "": .purple,
+                                        top.dropFirst(4).first?.name ?? "": .mint,
+                                        top.dropFirst(5).first?.name ?? "": .blue
+                                    ])
                                 }
                                 .frame(height: min(240, CGFloat(top.count * 40)))
                             }
@@ -175,12 +193,26 @@ struct StatisticsView: View {
                             placeholderText("statistics_no_notifications")
                         } else {
                             GlassCard {
-                                Chart {
-                                    ForEach(actionCounts.keys.sorted(), id: \.self) { action in
-                                        BarMark(
-                                            x: .value("Count", actionCounts[action] ?? 0),
-                                            y: .value("Action", action)
-                                        )
+                                ZStack {
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.green.opacity(0.15), Color.blue.opacity(0.15)]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                    .cornerRadius(12)
+
+                                    Chart {
+                                        ForEach(actionCounts.keys.sorted(), id: \.self) { action in
+                                            BarMark(
+                                                x: .value("Count", actionCounts[action] ?? 0),
+                                                y: .value("Action", action)
+                                            )
+                                            .foregroundStyle(.linearGradient(
+                                                colors: [.green, .blue],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            ))
+                                        }
                                     }
                                 }
                                 .frame(height: 200)
@@ -329,18 +361,27 @@ private struct PieChartView: View {
     let overdue: Int
 
     var body: some View {
-        Chart {
-            if completed > 0 {
-                SectorMark(angle: .value("Completed", completed), innerRadius: .ratio(0.5))
-                    .foregroundStyle(.green)
-            }
-            if pending > 0 {
-                SectorMark(angle: .value("Pending", pending), innerRadius: .ratio(0.5))
-                    .foregroundStyle(.blue)
-            }
-            if overdue > 0 {
-                SectorMark(angle: .value("Overdue", overdue), innerRadius: .ratio(0.5))
-                    .foregroundStyle(.red)
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [Color.green.opacity(0.12), Color.blue.opacity(0.12)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .cornerRadius(90)
+
+            Chart {
+                if completed > 0 {
+                    SectorMark(angle: .value("Completed", completed), innerRadius: .ratio(0.5))
+                        .foregroundStyle(.green.gradient)
+                }
+                if pending > 0 {
+                    SectorMark(angle: .value("Pending", pending), innerRadius: .ratio(0.5))
+                        .foregroundStyle(.cyan.gradient)
+                }
+                if overdue > 0 {
+                    SectorMark(angle: .value("Overdue", overdue), innerRadius: .ratio(0.5))
+                        .foregroundStyle(.pink.gradient)
+                }
             }
         }
     }
@@ -370,17 +411,36 @@ private struct LogsLineChart: View {
     }
 
     var body: some View {
-        Chart {
-            ForEach(dailyCounts, id: \.0) { item in
-                LineMark(x: .value("Date", item.0), y: .value("Count", item.1))
-                PointMark(x: .value("Date", item.0), y: .value("Count", item.1))
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [Color.green.opacity(0.1), Color.blue.opacity(0.1)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .cornerRadius(12)
+
+            Chart {
+                ForEach(dailyCounts, id: \.0) { item in
+                    LineMark(
+                        x: .value("Date", item.0),
+                        y: .value("Count", item.1)
+                    )
+                    .foregroundStyle(.linearGradient(
+                        colors: [.green, .blue],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ))
+
+                    PointMark(x: .value("Date", item.0), y: .value("Count", item.1))
+                        .foregroundStyle(.teal)
+                }
             }
-        }
-        .chartXAxis {
-            AxisMarks(values: .stride(by: .day, count: max(1, dailyCounts.count / 6))) { _ in
-                AxisGridLine()
-                AxisTick()
-                AxisValueLabel(format: .dateTime.day().month(.abbreviated))
+            .chartXAxis {
+                AxisMarks(values: .stride(by: .day, count: max(1, dailyCounts.count / 6))) { _ in
+                    AxisGridLine()
+                    AxisTick()
+                    AxisValueLabel(format: .dateTime.day().month(.abbreviated))
+                }
             }
         }
     }

@@ -279,6 +279,13 @@ struct DashboardView: View {
                                             .frame(width: 140, height: 80)
                                             .clipped()
                                             .cornerRadius(8)
+                                    } else if let imgName = rec.crop.imageName, !imgName.isEmpty, UIImage(named: imgName) != nil {
+                                        Image(imgName)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 140, height: 80)
+                                            .clipped()
+                                            .cornerRadius(8)
                                     } else {
                                         ZStack {
                                             Color.green.opacity(0.18)
@@ -464,6 +471,13 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 8) {
             if let data = crop.imageData, let ui = UIImage(data: data) {
                 Image(uiImage: ui)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 140, height: 90)
+                    .clipped()
+                    .cornerRadius(8)
+            } else if let imgName = crop.imageName, !imgName.isEmpty, UIImage(named: imgName) != nil {
+                Image(imgName)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 140, height: 90)

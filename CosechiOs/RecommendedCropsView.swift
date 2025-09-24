@@ -109,6 +109,13 @@ private struct RecommendationCard: View {
                         .frame(width: 72, height: 72)
                         .clipped()
                         .cornerRadius(10)
+                } else if let imgName = rec.crop.imageName, !imgName.isEmpty, UIImage(named: imgName) != nil {
+                    Image(imgName)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 72, height: 72)
+                        .clipped()
+                        .cornerRadius(10)
                 } else {
                     ZStack {
                         Color.green.opacity(0.25)
