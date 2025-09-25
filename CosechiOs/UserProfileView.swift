@@ -38,23 +38,7 @@ struct UserProfileView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                // Fondo Frutiger Aero
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(hex: "D9F6E2"),
-                        Color(hex: "BEEAF0"),
-                        Color(hex: "FFFFFF").opacity(0.9)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-
-                BubbleOverlay()
-                    .opacity(0.06)
-
-                // Contenido principal
+            FrutigerAeroBackground {
                 ScrollView {
                     VStack(spacing: 18) {
                         // Encabezado
@@ -209,6 +193,8 @@ struct UserProfileView: View {
                                             try? ConfigHelper.save(cfg, context: viewContext)
                                             self.config = cfg
                                         }
+                                        // 👇 Actualiza el theme global en tiempo real
+                                        theme.mode = newVal
                                     }
                                 ), label: Text(LocalizedStringKey("profile_theme"))) {
                                     Text(LocalizedStringKey("theme_auto")).tag("Auto")
@@ -359,7 +345,8 @@ struct UserProfileView: View {
             }
         }
     }
-    // MARK: - Lógica / Helpers (idéntica a la tuya; solo envuelta)
+
+    // MARK: - Lógica / Helpers
     private func loadUserAndConfig() {
         guard let uid = appState.currentUserID else { return }
         let fr: NSFetchRequest<User> = User.fetchRequest()

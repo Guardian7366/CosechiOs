@@ -9,34 +9,87 @@ public enum AeroVariant { case soft, neon }
 
 public final class AeroTheme: ObservableObject {
     @Published public var variant: AeroVariant = .soft
-    public init(variant: AeroVariant = .soft) { self.variant = variant }
+    @Published public var mode: String = "Auto" // "Auto", "Light", "Dark"
 
+    public init(variant: AeroVariant = .soft, mode: String = "Auto") {
+        self.variant = variant
+        self.mode = mode
+    }
+
+    // Detecta esquema actual (si está en Auto)
+    private var resolvedColorScheme: ColorScheme {
+        if mode == "Light" { return .light }
+        if mode == "Dark" { return .dark }
+        return UITraitCollection.current.userInterfaceStyle == .dark ? .dark : .light
+    }
+
+    // Colores principales adaptados
     public var primaryStart: Color {
-        variant == .soft ? Color(hex: "00A8FF") : Color(hex: "00D4FF")
+        if resolvedColorScheme == .dark {
+            return Color(hex: "005577") // azul profundo nocturno
+        } else {
+            return variant == .soft ? Color(hex: "00A8FF") : Color(hex: "00D4FF")
+        }
     }
+
     public var primaryEnd: Color {
-        variant == .soft ? Color(hex: "00D4FF") : Color(hex: "00F0FF")
+        if resolvedColorScheme == .dark {
+            return Color(hex: "001F33") // azul casi negro
+        } else {
+            return variant == .soft ? Color(hex: "00D4FF") : Color(hex: "00F0FF")
+        }
     }
+
     public var accent: Color {
-        variant == .soft ? Color(hex: "00C37A") : Color(hex: "00E08A")
+        if resolvedColorScheme == .dark {
+            return Color(hex: "00B86B") // verde tenue nocturno
+        } else {
+            return variant == .soft ? Color(hex: "00C37A") : Color(hex: "00E08A")
+        }
     }
+
     public var mint: Color { Color(hex: "00C37A") }
 
     // Fondo "fondo fondo" — agradable y no intrusivo
     public var bgGradient: LinearGradient {
+        if resolvedColorScheme == .dark {
+            return LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.black.opacity(0.95),           // base
+                    Color(hex: "0A2239").opacity(0.92), // azul noche
+                    Color(hex: "000814").opacity(0.95)  // casi negro
+                ]), startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        } else {
+            return LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(hex: "A1C4FD").opacity(0.95), // azul suave
+                    Color(hex: "C2E9FB").opacity(0.92), // celeste
+                    Color.white.opacity(0.92)
+                ]), startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        }
+    }
+
+    public var strongBgGradient: LinearGradient {
         LinearGradient(
-            gradient: Gradient(colors: [
-                Color(hex: "A1C4FD").opacity(0.95), // azul suave
-                Color(hex: "C2E9FB").opacity(0.92), // celeste
-                Color.white.opacity(0.92)
-            ]),
+            gradient: Gradient(colors: [primaryStart, primaryEnd]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
     }
 
-    public var strongBgGradient: LinearGradient {
-        LinearGradient(gradient: Gradient(colors: [primaryStart, primaryEnd]), startPoint: .topLeading, endPoint: .bottomTrailing)
+    // ✅ Colores dinámicos para texto
+    public var textPrimary: Color {
+        resolvedColorScheme == .dark ? Color.white : Color.black
+    }
+
+    public var textSecondary: Color {
+        resolvedColorScheme == .dark ? Color.white.opacity(0.7) : Color.black.opacity(0.7)
+    }
+
+    public var textInverse: Color {
+        resolvedColorScheme == .dark ? Color.black : Color.white
     }
 }
 
@@ -80,7 +133,10 @@ public struct FrutigerAeroBackground<Content: View>: View {
                 .ignoresSafeArea()
 
             LinearGradient(
-                gradient: Gradient(colors: [Color.white.opacity(0.0), Color.black.opacity(0.02)]),
+                gradient: Gradient(colors: [
+                    Color.white.opacity(0.0),
+                    Color.black.opacity(0.02)
+                ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -142,7 +198,13 @@ public struct AeroButtonStyle: ButtonStyle {
             .background {
                 if filled {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(LinearGradient(gradient: Gradient(colors: [theme.primaryStart, theme.primaryEnd]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [theme.primaryStart, theme.primaryEnd]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                 } else {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .fill(Color.white.opacity(0.06))
@@ -151,7 +213,8 @@ public struct AeroButtonStyle: ButtonStyle {
             }
             .foregroundColor(filled ? Color.white : theme.primaryStart)
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .shadow(color: filled ? theme.primaryStart.opacity(0.16) : Color.black.opacity(0.02), radius: configuration.isPressed ? 2 : 6, x: 0, y: 4)
+            .shadow(color: filled ? theme.primaryStart.opacity(0.16) : Color.black.opacity(0.02),
+                    radius: configuration.isPressed ? 2 : 6, x: 0, y: 4)
     }
 }
 
@@ -250,5 +313,20 @@ public struct AeroIcon: ViewModifier {
 public extension View {
     func aeroIcon(size: CGFloat = 28) -> some View {
         self.modifier(AeroIcon(size: size))
+    }
+}
+
+// ✅ Extensiones rápidas para textos adaptables
+public extension View {
+    func aeroTextPrimary(_ theme: AeroTheme) -> some View {
+        self.foregroundColor(theme.textPrimary)
+    }
+
+    func aeroTextSecondary(_ theme: AeroTheme) -> some View {
+        self.foregroundColor(theme.textSecondary)
+    }
+
+    func aeroTextInverse(_ theme: AeroTheme) -> some View {
+        self.foregroundColor(theme.textInverse)
     }
 }
