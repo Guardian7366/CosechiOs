@@ -1,3 +1,4 @@
+// AchievementsView.swift
 import SwiftUI
 import CoreData
 
@@ -23,7 +24,20 @@ struct AchievementsView: View {
                 .padding()
             }
         }
-        .navigationTitle(LocalizedStringKey("achievements_title"))
+        .navigationTitle(LocalizationHelper.shared.localized("achievements_title"))
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(LocalizationHelper.shared.localized("achievements_title"))
+                    .aeroTextPrimary(theme)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.35))
+                    .cornerRadius(6)
+                    .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
+                    .font(.headline)
+                    .accessibilityHidden(true) // evitamos duplicación en VoiceOver
+            }
+        }
         .onAppear(perform: load)
         .onReceive(NotificationCenter.default.publisher(for: .didUpdateAchievements)) { note in
             if let info = note.userInfo, let uid = info["userID"] as? UUID, uid == userID {
@@ -39,11 +53,11 @@ struct AchievementsView: View {
             VStack(spacing: 6) {
                 Text(LocalizedStringKey("achievements_your_level"))
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .aeroTextSecondary(theme)
 
                 Text("\(level)")
                     .font(.system(size: 46, weight: .bold))
-                    .foregroundColor(.white)
+                    .aeroTextPrimary(theme)
                     .shadow(color: .green.opacity(0.5), radius: 3, x: 0, y: 1)
                     .accessibilityLabel(Text("Level \(level)"))
 
@@ -61,7 +75,7 @@ struct AchievementsView: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text(LocalizedStringKey("achievements_progress"))
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .aeroTextPrimary(theme)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(Color.green.opacity(0.35))
@@ -77,11 +91,11 @@ struct AchievementsView: View {
                 HStack {
                     Text(String(format: NSLocalizedString("achievements_progress_pct", comment: ""), Int(progress * 100)))
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                     Spacer()
                     Text(String(format: NSLocalizedString("achievements_level_next", comment: ""), level + 1))
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                 }
             }
         }
@@ -92,7 +106,7 @@ struct AchievementsView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(LocalizedStringKey("achievements_badges"))
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .aeroTextPrimary(theme)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(Color.green.opacity(0.35))
@@ -101,7 +115,7 @@ struct AchievementsView: View {
 
                 if badges.isEmpty {
                     Text(LocalizedStringKey("achievements_no_badges"))
-                        .foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                         .accessibilityLabel(Text("No badges earned yet"))
                 } else {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 14) {
@@ -137,7 +151,7 @@ struct AchievementsView: View {
 
             Text(LocalizedStringKey(meta?.titleKey ?? id))
                 .font(.caption2)
-                .foregroundColor(.white)
+                .aeroTextPrimary(theme)
                 .padding(.horizontal, 4)
                 .padding(.vertical, 2)
                 .background(Color.green.opacity(0.45))

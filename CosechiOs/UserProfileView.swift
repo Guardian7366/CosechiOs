@@ -56,6 +56,20 @@ struct UserProfileView: View {
             }
             .navigationTitle(LocalizedStringKey("profile_title"))
             .toolbar {
+                // 🔹 Título principal con estilo Frutiger Aero
+                ToolbarItem(placement: .principal) {
+                    Text(LocalizationHelper.shared.localized("profile_title"))
+                        .aeroTextPrimary(theme)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.green.opacity(0.35))
+                        .cornerRadius(6)
+                        .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
+                        .font(.headline)
+                        .accessibilityHidden(true) // evita duplicación con el navigationTitle nativo
+                }
+
+                // 🔹 Botón de guardado
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: saveProfile) {
                         if isSaving {
@@ -68,6 +82,7 @@ struct UserProfileView: View {
                     .accessibilityHint(Text("Guarda los cambios del perfil"))
                 }
             }
+
             // MARK: Image picker + editor + alerts + confirmación
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(image: $pickedUIImage, sourceType: imageSource)

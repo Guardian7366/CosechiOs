@@ -5,6 +5,7 @@ import CoreData
 struct TaskListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var theme: AeroTheme
     
     @FetchRequest(
         entity: TaskEntity.entity(),
@@ -45,7 +46,7 @@ struct TaskListView: View {
                         $0.dueDate != nil && Calendar.current.isDateInToday($0.dueDate!)
                     }
                     if !todayTasks.isEmpty {
-                        Section(header: Text("task_today").font(.headline)) {
+                        Section(header: Text("task_today").font(.headline).aeroTextPrimary(theme)) {
                             ForEach(todayTasks, id: \.objectID) { task in
                                 taskRow(task)
                             }
@@ -59,7 +60,7 @@ struct TaskListView: View {
                         $0.dueDate != nil && $0.dueDate! > today
                     }
                     if !upcoming.isEmpty {
-                        Section(header: Text("task_upcoming").font(.headline)) {
+                        Section(header: Text("task_upcoming").font(.headline).aeroTextPrimary(theme)) {
                             ForEach(upcoming, id: \.objectID) { task in
                                 taskRow(task)
                             }
@@ -71,7 +72,7 @@ struct TaskListView: View {
                     // COMPLETADAS
                     let completed = filteredTasks.filter { $0.status == "completed" }
                     if !completed.isEmpty {
-                        Section(header: Text("task_completed").font(.headline)) {
+                        Section(header: Text("task_completed").font(.headline).aeroTextPrimary(theme)) {
                             ForEach(completed, id: \.objectID) { task in
                                 taskRow(task)
                             }
@@ -81,10 +82,25 @@ struct TaskListView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden) // 👈 elimina fondo gris por defecto
+                .scrollContentBackground(.hidden)
             }
         }
+        // ✅ dejamos el título nativo (aunque sea negro)
         .navigationTitle("menu_all_tasks")
+        // ✅ usamos toolbar para mostrar el título visible con estilo
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(LocalizationHelper.shared.localized("menu_all_tasks"))
+                    .aeroTextPrimary(theme)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.35))
+                    .cornerRadius(6)
+                    .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
+                    .font(.headline)
+                    .accessibilityHidden(true)
+            }
+        }
         .sheet(item: $selectedTaskID) { wrapper in
             EditTaskView(taskID: wrapper.id)
                 .environment(\.managedObjectContext, viewContext)
@@ -125,19 +141,19 @@ struct TaskListView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(task.title ?? NSLocalizedString("task_no_title", comment: ""))
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .aeroTextPrimary(theme)
                         .strikethrough(task.status == "completed")
 
                     if let due = task.dueDate {
                         Text("task_due_prefix \(due.formatted(date: .abbreviated, time: .shortened))")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .aeroTextSecondary(theme)
                     }
 
                     if let crop = task.crop {
                         Text("\(NSLocalizedString("task_crop_prefix", comment: "")) \(crop.name ?? "-")")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .aeroTextSecondary(theme)
                     }
                 }
                 Spacer()
