@@ -281,7 +281,7 @@ struct DashboardView: View {
                     .padding(.horizontal)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 20) {
+                    HStack(spacing: 50) {
                         ForEach(recommendations.prefix(4)) { rec in
                             GlassCard{
                                 VStack(alignment: .leading, spacing: 6) {

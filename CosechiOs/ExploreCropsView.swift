@@ -1,6 +1,7 @@
 // ExploreCropsView.swift
 import SwiftUI
 import CoreData
+import UIKit // usado para UIScreen.main.bounds.width (cálculo de ancho disponible)
 
 struct ExploreCropsView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -13,10 +14,10 @@ struct ExploreCropsView: View {
         animation: .default
     ) private var crops: FetchedResults<Crop>
 
-    private let gridColumns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
+    // Espaciado configurable
+    private let horizontalPadding: CGFloat = 16
+    private let interItemSpacing: CGFloat = 16
+    private let columnsCount: Int = 2
 
     var body: some View {
         FrutigerAeroBackground {
@@ -26,7 +27,7 @@ struct ExploreCropsView: View {
                     FilterMenuView(selectedCategoryKey: $selectedCategoryKey)
                 }
                 .padding(.horizontal)
-                .frame(maxWidth: 220, maxHeight: 50) // 🔹 más pequeño y rectangular
+                .frame(maxWidth: 220, maxHeight: 50)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(Text(LocalizationHelper.shared.localized("filter_category")))
                 .accessibilityValue(
@@ -37,34 +38,49 @@ struct ExploreCropsView: View {
 
                 // 📌 Catálogo de cultivos
                 ScrollView {
-                    LazyVGrid(columns: gridColumns, spacing: 20) {
-                        ForEach(filteredCrops, id: \.self) { crop in
-                            NavigationLink(destination: CropDetailView(crop: crop)) {
+                    // calculamos ancho por tarjeta usando el ancho de pantalla disponible
+                    let screenW = UIScreen.main.bounds.width
+                    // espacio total ocupado por los paddings horizontales de la grid
+                    let totalHorizontalPadding = horizontalPadding * 2
+                    // espacio total ocupado por los gaps entre columnas
+                    let totalGaps = CGFloat(columnsCount - 1) * interItemSpacing
+                    // ancho disponible para contenido
+                    let availableWidth = max(0, screenW - totalHorizontalPadding - totalGaps)
+                    // ancho por tarjeta (entero)
+                    let itemWidth = floor(availableWidth / CGFloat(columnsCount))
+
+                    // columnas fijas con ancho calculado: evita que una tarjeta "se salga"
+                    let gridColumns: [GridItem] = Array(repeating: GridItem(.fixed(itemWidth), spacing: interItemSpacing), count: columnsCount)
+
+                    LazyVGrid(columns: gridColumns, spacing: interItemSpacing) {
+                        ForEach(filteredCrops, id: \.objectID) { crop in
+                            NavigationLink(destination: CropDetailView(crop: crop)
+                                            .environment(\.managedObjectContext, viewContext)
+                            ) {
                                 CropCardView(crop: crop)
-                                    .padding(.horizontal, 4)
-                                    .accessibilityElement(children: .combine)
-                                    .accessibilityLabel(Text(LocalizationHelper.shared.localized(crop.name ?? "crop_no_name")))
-                                    .accessibilityValue(Text(LocalizationHelper.shared.localized(crop.category ?? "filter_all")))
-                                    .accessibilityHint(Text(LocalizationHelper.shared.localized("crop_open_detail")))
+                                    .frame(width: itemWidth)               // fijo al ancho calculado
+                                    .contentShape(Rectangle())            // área de toque completa
                             }
+                            .buttonStyle(.plain)
+                            .padding(.vertical, 6) // separación vertical consistente entre filas
                         }
                     }
-                    .padding(.horizontal)
+                    .padding(.horizontal, horizontalPadding)
                     .padding(.bottom, 16)
                 }
             }
-            .navigationTitle(LocalizationHelper.shared.localized("menu_explore")) // ✅ solo texto
+            .navigationTitle(LocalizationHelper.shared.localized("menu_explore"))
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(LocalizationHelper.shared.localized("menu_explore"))
                         .foregroundColor(.white)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.green.opacity(0.35)) // 🔹 contraste extra
+                        .background(Color.green.opacity(0.35))
                         .cornerRadius(6)
                         .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
                         .font(.headline)
-                        .accessibilityHidden(true) // 👈 ya está como título accesible
+                        .accessibilityHidden(true)
                 }
             }
             .searchable(
@@ -125,7 +141,7 @@ private struct FilterMenuView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 6)
                 .padding(.vertical, 4)
-                .background(Color.green.opacity(0.35)) // 🔹 mejor visibilidad
+                .background(Color.green.opacity(0.35))
                 .cornerRadius(6)
                 .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
             }
@@ -136,22 +152,20 @@ private struct FilterMenuView: View {
     }
 }
 
-// MARK: - Tarjeta de cada cultivo
 private struct CropCardView: View {
     let crop: Crop
 
     var body: some View {
         GlassCard {
             VStack(spacing: 8) {
-                // Imagen o ícono por defecto
                 if let imgName = crop.imageName, !imgName.isEmpty, UIImage(named: imgName) != nil {
                     Image(imgName)
                         .resizable()
                         .scaledToFill()
-                        .frame(height: 100)
+                        .frame(height: 60)
                         .clipped()
                         .cornerRadius(10)
-                        .accessibilityHidden(true) // 👈 evitamos leer doble
+                        .accessibilityHidden(true)
                 } else {
                     ZStack {
                         Color.blue.opacity(0.25)
@@ -160,12 +174,11 @@ private struct CropCardView: View {
                             .foregroundColor(.white)
                             .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 1)
                     }
-                    .frame(height: 100)
+                    .frame(height: 110)
                     .cornerRadius(10)
                     .accessibilityLabel(Text(LocalizationHelper.shared.localized("crop_image_placeholder")))
                 }
 
-                // Nombre
                 Text(LocalizationHelper.shared.localized(crop.name ?? "crop_no_name"))
                     .font(.headline)
                     .foregroundColor(.white)
@@ -174,9 +187,8 @@ private struct CropCardView: View {
                     .background(Color.green.opacity(0.4))
                     .cornerRadius(4)
                     .lineLimit(1)
-                    .accessibilityHidden(true) // 👈 lo maneja la tarjeta completa
+                    .accessibilityHidden(true)
 
-                // Categoría
                 if let category = crop.category {
                     Text(LocalizationHelper.shared.localized(category))
                         .font(.caption)
@@ -188,8 +200,8 @@ private struct CropCardView: View {
                         .accessibilityHidden(true)
                 }
             }
+            .frame(minHeight: 110, alignment: .topLeading) // altura estable
             .padding(8)
-            .padding(.vertical, 4)
         }
     }
 }
