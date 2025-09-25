@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "LogoOFICIAL.png",
+      "filename" : "loguitoOficial.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "LogoOFICIAL 2.png",
+      "filename" : "loguitoOficial 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "LogoOFICIAL 1.png",
+      "filename" : "loguitoOficial 2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
