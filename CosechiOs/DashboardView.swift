@@ -7,7 +7,8 @@ import UIKit
 struct DashboardView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
-
+    @EnvironmentObject var theme: AeroTheme
+    
     // FetchRequests generales
     @FetchRequest(entity: TaskEntity.entity(), sortDescriptors: [NSSortDescriptor(key: "dueDate", ascending: true)])
     private var allTasks: FetchedResults<TaskEntity>
@@ -77,9 +78,16 @@ struct DashboardView: View {
                 .navigationTitle(LocalizedStringKey("dashboard_title"))
                 .toolbar {
                     ToolbarItem(placement: .principal) {
-                        Text(LocalizedStringKey("dashboard_title"))
+                        Text(LocalizationHelper.shared.localized("dashboard_title"))
+                            .aeroTextPrimary(theme)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.green.opacity(0.35))
+                            .cornerRadius(6)
+                            .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
                             .font(.headline)
                             .onTapGesture(count: 3) { showDebugMenu = true }
+                            .accessibilityHidden(true) // evita duplicación con navigationTitle
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 12) {
@@ -165,9 +173,11 @@ struct DashboardView: View {
                     .font(.title2).bold()
                     .minimumScaleFactor(0.9)
                     .lineLimit(1)
+                    .aeroTextPrimary(theme)
                 Text(subtitleText)
                     .font(.caption)
                     .foregroundColor(.secondary)
+                    .aeroTextSecondary(theme)
             }
             Spacer()
         }
@@ -184,19 +194,23 @@ struct DashboardView: View {
                 VStack(alignment: .leading) {
                     Text(LocalizationHelper.shared.localized("dashboard_summary"))
                         .font(.headline)
+                        .aeroTextPrimary(theme)
                     Text("\(totalTasksCount) " + LocalizationHelper.shared.localized("dashboard_tasks"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
+                    .aeroTextSecondary(theme)
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
                     Text("\(completedTasksCount)/\(totalTasksCount)")
                         .font(.title3).bold()
+                        .aeroTextPrimary(theme)
                     Text(LocalizationHelper.shared.localized("dashboard_completed"))
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                 }
             }
 
@@ -206,6 +220,7 @@ struct DashboardView: View {
             } else {
                 Text(LocalizationHelper.shared.localized("dashboard_no_tasks"))
                     .foregroundColor(.secondary)
+                    .aeroTextSecondary(theme)
             }
 
             if overdueCount > 0 {
@@ -213,6 +228,7 @@ struct DashboardView: View {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundColor(.yellow)
                     Text(String(format: LocalizationHelper.shared.localized("dashboard_overdue_count"), overdueCount))
                         .font(.caption).foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                 }
             }
         }
@@ -222,6 +238,7 @@ struct DashboardView: View {
     private var metricsCardContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(LocalizationHelper.shared.localized("dashboard_metrics_title"))
+                .aeroTextPrimary(theme)
                 .font(.headline)
             HStack(spacing: 16) {
                 metricColumn(color: .green, value: completedTasksCount, key: "dashboard_metrics_completed")
@@ -233,15 +250,18 @@ struct DashboardView: View {
                 Image(systemName: "chart.bar.fill").foregroundColor(.blue)
                 Text("\(progressLogsCount) " + LocalizationHelper.shared.localized("dashboard_metrics_progresslogs"))
                     .font(.subheadline).foregroundColor(.secondary)
+                    .aeroTextSecondary(theme)
             }
         }
     }
     private func metricColumn(color: Color, value: Int, key: String) -> some View {
         VStack {
             Text("\(value)").font(.title2).bold().foregroundColor(color)
+                .aeroTextPrimary(theme)
             Text(LocalizationHelper.shared.localized(key))
                 .font(.caption).foregroundColor(.secondary)
                 .lineLimit(1).minimumScaleFactor(0.8)
+                .aeroTextSecondary(theme)
         }
         .frame(maxWidth: .infinity)
     }
@@ -259,7 +279,7 @@ struct DashboardView: View {
                     QuickActionButton(icon: "tray.full.fill", titleKey: "dashboard_action_my_crops", color: .teal)
                 }
                 NavigationLink(destination: UserProfileView().environmentObject(appState)) {
-                    QuickActionButton(icon: "person.crop.circle.fill", titleKey: "dashboard_action_profile", color: .gray)
+                    QuickActionButton(icon: "person.crop.circle.fill", titleKey: "dashboard_action_profile", color: .orange)
                 }
                 NavigationLink(destination: StatisticsView().environment(\.managedObjectContext, viewContext).environmentObject(appState)) {
                     QuickActionButton(icon: "chart.bar.fill", titleKey: "dashboard_action_statistics", color: .purple)
@@ -279,6 +299,7 @@ struct DashboardView: View {
                 Text(LocalizationHelper.shared.localized("recommendations_no_results"))
                     .foregroundColor(.secondary)
                     .padding(.horizontal)
+                    .aeroTextSecondary(theme)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 50) {
@@ -312,15 +333,18 @@ struct DashboardView: View {
                                     Text(LocalizationHelper.shared.localized(rec.crop.name ?? "crop_default"))
                                         .font(.subheadline).bold()
                                         .lineLimit(1).minimumScaleFactor(0.9)
+                                        .aeroTextPrimary(theme)
                                     Text(LocalizationHelper.shared.localized(rec.crop.category ?? ""))
                                         .font(.caption2).foregroundColor(.secondary)
-
+                                        .aeroTextSecondary(theme)
+                                
                                     HStack {
                                         Button {
                                             addCropToCollection(rec.crop)
                                         } label: {
                                             Text(LocalizedStringKey("recommendations_add"))
                                                 .font(.caption2)
+                                                .aeroTextPrimary(theme)
                                         }
                                         .buttonStyle(.borderedProminent)
 
@@ -361,6 +385,7 @@ struct DashboardView: View {
                                 }
                                 Text(LocalizedStringKey("recommendations_title"))
                                     .font(.caption2)
+                                    .aeroTextPrimary(theme)
                             }
                             .frame(width: 120, height: 120)
                         }
@@ -380,6 +405,7 @@ struct DashboardView: View {
                 Text(LocalizationHelper.shared.localized("dashboard_no_upcoming"))
                     .foregroundColor(.secondary)
                     .padding(.horizontal)
+                    .aeroTextPrimary(theme)
             } else {
                 ForEach(upcomingTasks.prefix(5), id: \.objectID) { task in
                     NavigationLink(destination: destinationForTask(task)) {
@@ -443,6 +469,7 @@ struct DashboardView: View {
         HStack {
             Text(LocalizationHelper.shared.localized(key))
                 .font(.headline)
+                .aeroTextSecondary(theme)
             Spacer()
         }
     }
@@ -486,10 +513,12 @@ struct DashboardView: View {
                 Text(task.title ?? "")
                     .font(.subheadline)
                     .strikethrough(task.status == "completed")
+                    .aeroTextPrimary(theme)
                 if let d = task.dueDate {
                     Text(d, style: .date)
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                 }
             }
             Spacer()
@@ -499,6 +528,7 @@ struct DashboardView: View {
                     .padding(6)
                     .background(Color(.systemGray5))
                     .cornerRadius(8)
+                    .aeroTextSecondary(theme)
             }
         }
         .padding(10)
@@ -543,11 +573,13 @@ struct DashboardView: View {
                 .font(.subheadline).bold()
                 .lineLimit(1)
                 .minimumScaleFactor(0.85)
+                .aeroTextPrimary(theme)
             Text(LocalizationHelper.shared.localized(crop.category ?? ""))
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .aeroTextSecondary(theme)
         }
         .frame(minWidth: 120, maxWidth: 140)
         .padding(8)
@@ -592,18 +624,22 @@ struct DashboardView: View {
                 HStack {
                     Text(cropName)
                         .font(.subheadline).bold()
+                        .aeroTextPrimary(theme)
                     Spacer()
                     Text(log.date ?? Date(), style: .time)
                         .font(.caption2)
                         .foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                 }
 
                 if let note = log.note, !note.isEmpty {
                     Text(note).font(.caption)
+                    .aeroTextSecondary(theme)
                 } else {
                     Text(LocalizedStringKey("dashboard_progress_no_note"))
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .aeroTextSecondary(theme)
                 }
             }
         }

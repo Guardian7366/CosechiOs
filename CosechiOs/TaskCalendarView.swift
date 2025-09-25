@@ -5,6 +5,7 @@ import CoreData
 struct TaskCalendarView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var theme: AeroTheme
 
     @FetchRequest(
         entity: TaskEntity.entity(),
@@ -18,7 +19,7 @@ struct TaskCalendarView: View {
     var body: some View {
         FrutigerAeroBackground {
             VStack(spacing: 16) {
-                // 🔹 Resumen directamente con su propio estilo
+                // 🔹 Resumen con su propio estilo
                 TaskSummaryView()
                     .environment(\.managedObjectContext, viewContext)
                     .padding(.horizontal)
@@ -26,11 +27,12 @@ struct TaskCalendarView: View {
                 // 🔹 Lista de tareas agrupadas
                 List {
                     ForEach(groupedDates, id: \.self) { date in
-                        Section(header: Text(formattedDate(date))
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .accessibilityLabel(formattedDate(date))) {
-
+                        Section(
+                            header: Text(formattedDate(date))
+                                .font(.headline)
+                                .aeroTextPrimary(theme)
+                                .accessibilityLabel(formattedDate(date))
+                        ) {
                             let items = groupedTasks[date] ?? []
                             ForEach(items, id: \.objectID) { task in
                                 taskRow(task)
@@ -46,8 +48,20 @@ struct TaskCalendarView: View {
                 .scrollContentBackground(.hidden)
             }
         }
-        .navigationTitle("menu_tasks")
+        // 🔹 Navigation Title automático + estilo Frutiger Aero
+        .navigationTitle(LocalizedStringKey("menu_tasks"))
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(LocalizationHelper.shared.localized("menu_tasks"))
+                    .aeroTextPrimary(theme)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.green.opacity(0.35))
+                    .cornerRadius(6)
+                    .shadow(color: .black.opacity(0.7), radius: 3, x: 0, y: 1)
+                    .font(.headline)
+                    .accessibilityHidden(true) // evita duplicación con el navigationTitle nativo
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavigationLink(
                     destination: AddTaskView()
@@ -55,7 +69,7 @@ struct TaskCalendarView: View {
                         .environmentObject(appState)
                 ) {
                     Image(systemName: "plus")
-                        .foregroundColor(.white)
+                        .aeroTextPrimary(theme)
                         .aeroIcon(size: 20)
                         .accessibilityLabel(NSLocalizedString("task_add", comment: ""))
                         .accessibilityHint(NSLocalizedString("task_add_hint", comment: ""))
@@ -112,12 +126,12 @@ struct TaskCalendarView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(task.title ?? NSLocalizedString("task_no_title", comment: ""))
                         .strikethrough(task.status == "completed")
-                        .foregroundColor(.primary)
+                        .aeroTextPrimary(theme)
                         .accessibilityLabel(task.title ?? NSLocalizedString("task_no_title", comment: ""))
                     if let details = task.details, !details.isEmpty {
                         Text(details)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .aeroTextSecondary(theme)
                             .accessibilityLabel(details)
                     }
                 }
