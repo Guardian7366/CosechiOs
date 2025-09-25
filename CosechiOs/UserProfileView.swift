@@ -41,200 +41,13 @@ struct UserProfileView: View {
             FrutigerAeroBackground {
                 ScrollView {
                     VStack(spacing: 18) {
-                        // Encabezado
-                        GlassCard {
-                            HStack(spacing: 14) {
-                                profileAvatar
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text(user?.username ?? NSLocalizedString("profile_anonymous", comment: "Anonymous"))
-                                        .font(.title2)
-                                        .bold()
-                                        .foregroundColor(.primary)
-
-                                    Text(user?.email ?? "-")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-
-                                    HStack(spacing: 8) {
-                                        Text(LocalizedStringKey("CosechiOs"))
-                                            .font(.caption2)
-                                            .padding(6)
-                                            .background(theme.mint.opacity(0.12))
-                                            .cornerRadius(8)
-                                            .foregroundColor(.primary)
-
-                                        if let updated = user?.updatedAt {
-                                            Text("\(updated, style: .date)")
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Username edit
-                        GlassCard {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(LocalizedStringKey("profile_username"))
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-
-                                TextField(LocalizedStringKey("profile_username"), text: $usernameText)
-                                    .autocapitalization(.words)
-                                    .disableAutocorrection(true)
-                                    .padding(12)
-                                    .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.06)))
-                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.06)))
-                                    .accessibilityLabel(Text(LocalizedStringKey("profile_username")))
-                                    .accessibilityHint(Text("Introduce tu nombre de usuario"))
-                            }
-                        }
-
-                        // Logros
-                        GlassCard {
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text(LocalizedStringKey("profile_achievements_section"))
-                                    .font(.headline)
-                                if let uid = user?.userID {
-                                    AchievementsSummaryView(userID: uid)
-                                        .environment(\.managedObjectContext, viewContext)
-
-                                    HStack {
-                                        Spacer()
-                                        NavigationLink(destination: AchievementsView(userID: uid).environment(\.managedObjectContext, viewContext)) {
-                                            Text(LocalizedStringKey("profile_achievements_view_all"))
-                                        }
-                                        .accessibilityHint(Text("Ver todos los logros"))
-                                    }
-                                } else {
-                                    Text("—").foregroundColor(.secondary)
-                                }
-                            }
-                        }
-
-                        // Idioma
-                        GlassCard {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(LocalizedStringKey("profile_language"))
-                                    .font(.headline)
-
-                                Picker(selection: Binding(
-                                    get: { config?.language ?? appState.appLanguage },
-                                    set: { newValue in changeLanguage(to: newValue) }
-                                ), label: Text(LocalizedStringKey("profile_language"))) {
-                                    Text("English").tag("en")
-                                    Text("Español").tag("es")
-                                }
-                                .pickerStyle(.segmented)
-                                .accessibilityLabel(Text(LocalizedStringKey("profile_language")))
-                                .accessibilityHint(Text("Selecciona el idioma de la aplicación"))
-                            }
-                        }
-
-                        // Notificaciones
-                        GlassCard {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(LocalizedStringKey("profile_notifications_settings"))
-                                    .font(.headline)
-
-                                Toggle(isOn: Binding(
-                                    get: { config?.notificationsEnabled ?? true },
-                                    set: { handleNotificationToggle(enabled: $0) }
-                                )) {
-                                    Text(LocalizedStringKey("profile_notifications"))
-                                }
-                                .accessibilityHint(Text("Activa o desactiva todas las notificaciones"))
-
-                                if config?.notificationsEnabled ?? true {
-                                    Toggle(isOn: Binding(
-                                        get: { config?.notifyTasks ?? true },
-                                        set: { updateConfig(\.notifyTasks, value: $0) }
-                                    )) {
-                                        Text(LocalizedStringKey("profile_notify_tasks"))
-                                    }
-                                    .accessibilityHint(Text("Notificar recordatorios de tareas"))
-
-                                    Toggle(isOn: Binding(
-                                        get: { config?.notifyCrops ?? true },
-                                        set: { updateConfig(\.notifyCrops, value: $0) }
-                                    )) {
-                                        Text(LocalizedStringKey("profile_notify_crops"))
-                                    }
-                                    .accessibilityHint(Text("Notificar sobre cultivos"))
-
-                                    Toggle(isOn: Binding(
-                                        get: { config?.notifyTips ?? false },
-                                        set: { updateConfig(\.notifyTips, value: $0) }
-                                    )) {
-                                        Text(LocalizedStringKey("profile_notify_tips"))
-                                    }
-                                    .accessibilityHint(Text("Recibir consejos y tips"))
-
-                                    NavigationLink(destination: NotificationHistoryView().environment(\.managedObjectContext, viewContext)) {
-                                        Text(LocalizedStringKey("profile_notifications_history"))
-                                    }
-                                    .accessibilityHint(Text("Ver historial de notificaciones"))
-                                }
-                            }
-                        }
-
-                        // Apariencia
-                        GlassCard {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(LocalizedStringKey("profile_theme"))
-                                    .font(.headline)
-
-                                Picker(selection: Binding(
-                                    get: { config?.theme ?? "Auto" },
-                                    set: { newVal in
-                                        if let cfg = config {
-                                            cfg.theme = newVal
-                                            try? ConfigHelper.save(cfg, context: viewContext)
-                                            self.config = cfg
-                                        }
-                                        // 👇 Actualiza el theme global en tiempo real
-                                        theme.mode = newVal
-                                    }
-                                ), label: Text(LocalizedStringKey("profile_theme"))) {
-                                    Text(LocalizedStringKey("theme_auto")).tag("Auto")
-                                    Text(LocalizedStringKey("theme_light")).tag("Light")
-                                    Text(LocalizedStringKey("theme_dark")).tag("Dark")
-                                }
-                                .pickerStyle(.segmented)
-                                .accessibilityHint(Text("Selecciona el tema de apariencia"))
-                            }
-                        }
-
-                        // Extras
-                        GlassCard {
-                            VStack(alignment: .leading, spacing: 10) {
-                                Button(role: .destructive) {
-                                    showDeleteConfirm = true
-                                } label: {
-                                    HStack {
-                                        Image(systemName: "trash")
-                                        Text(LocalizedStringKey("profile_delete_photo"))
-                                        Spacer()
-                                    }
-                                }
-                                .accessibilityLabel(Text(LocalizedStringKey("profile_delete_photo")))
-                                .accessibilityHint(Text("Elimina tu foto de perfil"))
-
-                                Button {
-                                    alertMessage = NSLocalizedString("profile_export", comment: "")
-                                    showAlert = true
-                                } label: {
-                                    HStack {
-                                        Image(systemName: "square.and.arrow.up")
-                                        Text(LocalizedStringKey("profile_export"))
-                                        Spacer()
-                                    }
-                                }
-                                .accessibilityLabel(Text(LocalizedStringKey("profile_export")))
-                                .accessibilityHint(Text("Exporta tus datos"))
-                            }
-                        }
+                        headerSection
+                        usernameSection
+                        achievementsSection
+                        languageSection
+                        notificationsSection
+                        appearanceSection
+                        extrasSection
 
                         Spacer(minLength: 32)
                     }
@@ -249,12 +62,13 @@ struct UserProfileView: View {
                             ProgressView()
                         } else {
                             Text(LocalizedStringKey("save"))
+                                .aeroTextPrimary(theme)
                         }
                     }
                     .accessibilityHint(Text("Guarda los cambios del perfil"))
                 }
             }
-            // Image picker + editor + alerts + confirmación
+            // MARK: Image picker + editor + alerts + confirmación
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(image: $pickedUIImage, sourceType: imageSource)
             }
@@ -275,13 +89,17 @@ struct UserProfileView: View {
                 }
             }
             .alert(isPresented: $showAlert) {
-                Alert(title: Text(LocalizedStringKey("alert_title")),
-                      message: Text(alertMessage),
-                      dismissButton: .default(Text(LocalizedStringKey("ok"))))
+                Alert(
+                    title: Text(LocalizedStringKey("alert_title")), // ✅ limpio
+                    message: Text(alertMessage),                   // ✅ limpio
+                    dismissButton: .default(Text(LocalizedStringKey("ok"))) // ✅ limpio
+                )
             }
-            .confirmationDialog(LocalizedStringKey("profile_delete_photo_confirm"),
-                                isPresented: $showDeleteConfirm,
-                                titleVisibility: .visible) {
+            .confirmationDialog(
+                LocalizedStringKey("profile_delete_photo_confirm"),
+                isPresented: $showDeleteConfirm,
+                titleVisibility: .visible
+            ) {
                 Button(LocalizedStringKey("delete"), role: .destructive) {
                     user?.profilePicture = nil
                     try? viewContext.save()
@@ -290,6 +108,210 @@ struct UserProfileView: View {
                 Button(LocalizedStringKey("cancel"), role: .cancel) {}
             }
             .onAppear(perform: loadUserAndConfig)
+        }
+    }
+
+    // MARK: - Secciones desglosadas
+    private var headerSection: some View {
+        GlassCard {
+            HStack(spacing: 14) {
+                profileAvatar
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(user?.username ?? NSLocalizedString("profile_anonymous", comment: "Anonymous"))
+                        .font(.title2).bold()
+                        .aeroTextPrimary(theme)
+
+                    Text(user?.email ?? "-")
+                        .font(.caption)
+                        .aeroTextSecondary(theme)
+
+                    HStack(spacing: 8) {
+                        Text(LocalizedStringKey("CosechiOs"))
+                            .font(.caption2)
+                            .padding(6)
+                            .background(theme.mint.opacity(0.12))
+                            .cornerRadius(8)
+                            .aeroTextPrimary(theme)
+
+                        if let updated = user?.updatedAt {
+                            Text("\(updated, style: .date)")
+                                .font(.caption2)
+                                .aeroTextSecondary(theme)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var usernameSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(LocalizedStringKey("profile_username"))
+                    .font(.caption)
+                    .aeroTextSecondary(theme)
+
+                TextField(LocalizedStringKey("profile_username"), text: $usernameText)
+                    .autocapitalization(.words)
+                    .disableAutocorrection(true)
+                    .padding(12)
+                    .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.06)))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.06)))
+                    .accessibilityLabel(Text(LocalizedStringKey("profile_username")))
+                    .accessibilityHint(Text("Introduce tu nombre de usuario"))
+            }
+        }
+    }
+
+    private var achievementsSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(LocalizedStringKey("profile_achievements_section"))
+                    .font(.headline)
+                    .aeroTextPrimary(theme)
+                if let uid = user?.userID {
+                    AchievementsSummaryView(userID: uid)
+                        .environment(\.managedObjectContext, viewContext)
+
+                    HStack {
+                        Spacer()
+                        NavigationLink(destination: AchievementsView(userID: uid).environment(\.managedObjectContext, viewContext)) {
+                            Text(LocalizedStringKey("profile_achievements_view_all"))
+                                .aeroTextPrimary(theme)
+                        }
+                        .accessibilityHint(Text("Ver todos los logros"))
+                    }
+                } else {
+                    Text("—").aeroTextSecondary(theme)
+                }
+            }
+        }
+    }
+
+    private var languageSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(LocalizedStringKey("profile_language"))
+                    .font(.headline)
+                    .aeroTextPrimary(theme)
+
+                Picker(selection: Binding(
+                    get: { config?.language ?? appState.appLanguage },
+                    set: { newValue in changeLanguage(to: newValue) }
+                ), label: Text(LocalizedStringKey("profile_language"))) {
+                    Text("English").tag("en").aeroTextPrimary(theme)
+                    Text("Español").tag("es").aeroTextPrimary(theme)
+                }
+                .pickerStyle(.segmented)
+                .accessibilityLabel(Text(LocalizedStringKey("profile_language")))
+                .accessibilityHint(Text("Selecciona el idioma de la aplicación"))
+            }
+        }
+    }
+
+    private var notificationsSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(LocalizedStringKey("profile_notifications_settings"))
+                    .font(.headline)
+                    .aeroTextPrimary(theme)
+
+                Toggle(isOn: Binding(
+                    get: { config?.notificationsEnabled ?? true },
+                    set: { handleNotificationToggle(enabled: $0) }
+                )) {
+                    Text(LocalizedStringKey("profile_notifications"))
+                        .aeroTextPrimary(theme)
+                }
+                .accessibilityHint(Text("Activa o desactiva todas las notificaciones"))
+
+                if config?.notificationsEnabled ?? true {
+                    Toggle(isOn: Binding(
+                        get: { config?.notifyTasks ?? true },
+                        set: { updateConfig(\.notifyTasks, value: $0) }
+                    )) {
+                        Text(LocalizedStringKey("profile_notify_tasks"))
+                            .aeroTextPrimary(theme)
+                    }
+
+                    Toggle(isOn: Binding(
+                        get: { config?.notifyCrops ?? true },
+                        set: { updateConfig(\.notifyCrops, value: $0) }
+                    )) {
+                        Text(LocalizedStringKey("profile_notify_crops"))
+                            .aeroTextPrimary(theme)
+                    }
+
+                    Toggle(isOn: Binding(
+                        get: { config?.notifyTips ?? false },
+                        set: { updateConfig(\.notifyTips, value: $0) }
+                    )) {
+                        Text(LocalizedStringKey("profile_notify_tips"))
+                            .aeroTextPrimary(theme)
+                    }
+
+                    NavigationLink(destination: NotificationHistoryView().environment(\.managedObjectContext, viewContext)) {
+                        Text(LocalizedStringKey("profile_notifications_history"))
+                            .aeroTextPrimary(theme)
+                    }
+                }
+            }
+        }
+    }
+
+    private var appearanceSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(LocalizedStringKey("profile_theme"))
+                    .font(.headline)
+                    .aeroTextPrimary(theme)
+
+                Picker(selection: Binding(
+                    get: { config?.theme ?? "Auto" },
+                    set: { newVal in
+                        if let cfg = config {
+                            cfg.theme = newVal
+                            try? ConfigHelper.save(cfg, context: viewContext)
+                            self.config = cfg
+                        }
+                        theme.mode = newVal
+                    }
+                ), label: Text(LocalizedStringKey("profile_theme"))) {
+                    Text(LocalizedStringKey("theme_auto")).tag("Auto").aeroTextPrimary(theme)
+                    Text(LocalizedStringKey("theme_light")).tag("Light").aeroTextPrimary(theme)
+                    Text(LocalizedStringKey("theme_dark")).tag("Dark").aeroTextPrimary(theme)
+                }
+                .pickerStyle(.segmented)
+            }
+        }
+    }
+
+    private var extrasSection: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 10) {
+                Button(role: .destructive) {
+                    showDeleteConfirm = true
+                } label: {
+                    HStack {
+                        Image(systemName: "trash")
+                        Text(LocalizedStringKey("profile_delete_photo"))
+                            .aeroTextInverse(theme)
+                        Spacer()
+                    }
+                }
+
+                Button {
+                    alertMessage = NSLocalizedString("profile_export", comment: "")
+                    showAlert = true
+                } label: {
+                    HStack {
+                        Image(systemName: "square.and.arrow.up")
+                        Text(LocalizedStringKey("profile_export"))
+                            .aeroTextPrimary(theme)
+                        Spacer()
+                    }
+                }
+            }
         }
     }
 
@@ -329,8 +351,6 @@ struct UserProfileView: View {
                         .shadow(radius: 3)
                 }
                 .offset(x: -6, y: -6)
-                .accessibilityLabel(Text("Editar foto de perfil"))
-                .accessibilityHint(Text("Toca para cambiar tu foto de perfil"))
                 .confirmationDialog(LocalizedStringKey("profile_choose_image"),
                                     isPresented: $showImageSourceOptions,
                                     titleVisibility: .visible) {
